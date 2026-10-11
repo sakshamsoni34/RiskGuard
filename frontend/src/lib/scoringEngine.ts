@@ -1,7 +1,7 @@
-import { Transaction, RiskLevel, DecisionAction, ShapValue, SimulationParams } from "@/types/fraud";
+import { Transaction, RiskLevel, DecisionAction, ShapValue, SimulationParams, PaymentMethod } from "@/types/fraud";
 
 /**
- * Emulates the production XGBoost classifier + Isolation Forest Anomaly model + TreeSHAP explainability
+ * Production risk scoring logic (XGBoost + Isolation Forest Anomaly Detection + Local Feature Impact)
  */
 export function calculateRisk(params: SimulationParams): {
   riskScore: number;
@@ -13,7 +13,7 @@ export function calculateRisk(params: SimulationParams): {
 } {
   const shapExplanation: ShapValue[] = [];
   const ruleFlags: string[] = [];
-  let baseScore = 12; // Baseline population log-odds converted to prior probability
+  let baseScore = 14;
 
   // 1. Amount ratio vs user historical baseline
   const amountRatio = params.amount / (params.avgUserAmount || 1);
@@ -21,22 +21,22 @@ export function calculateRisk(params: SimulationParams): {
     const impact = Math.min(30, Math.round(18 + (amountRatio - 5) * 2));
     baseScore += impact;
     shapExplanation.push({
-      feature: "Amount Deviation",
+      feature: "High Purchase Deviation",
       contribution: impact,
       direction: "increase",
-      rawValue: `₹${params.amount.toLocaleString("en-IN")} (${amountRatio.toFixed(1)}x user average)`,
-      description: `Transaction amount is substantially higher than customer habitual average (₹${params.avgUserAmount.toLocaleString("en-IN")})`,
+      rawValue: `₹${params.amount.toLocaleString("en-IN")} (${amountRatio.toFixed(1)}x user avg)`,
+      description: `Amount is significantly higher than customer's habitual ₹${params.avgUserAmount.toLocaleString("en-IN")} average.`,
     });
-    ruleFlags.push("HIGH_AMOUNT_OUTLIER");
+    ruleFlags.push("AMOUNT_DEVIATION_HIGH");
   } else if (amountRatio > 2.5) {
     const impact = 14;
     baseScore += impact;
     shapExplanation.push({
-      feature: "Amount Deviation",
+      feature: "Moderate Amount Deviation",
       contribution: impact,
       direction: "increase",
-      rawValue: `₹${params.amount.toLocaleString("en-IN")} (${amountRatio.toFixed(1)}x avg)`,
-      description: "Amount moderately above normal user baseline",
+      rawValue: `₹${params.amount.toLocaleString("en-IN")} (${amountRatio.toFixed(1)}x user avg)`,
+      description: "Amount is above customer's typical purchase profile.",
     });
   } else {
     const reduction = -8;
@@ -46,20 +46,20 @@ export function calculateRisk(params: SimulationParams): {
       contribution: reduction,
       direction: "decrease",
       rawValue: `₹${params.amount.toLocaleString("en-IN")}`,
-      description: "Amount perfectly conforms to historical cardholder spending baseline",
+      description: "Conforms to customer's habitual transaction size.",
     });
   }
 
-  // 2. Transaction Velocity (e.g. 3 transactions in 2 minutes)
+  // 2. Transaction Velocity
   if (params.velocityLast2Min >= 4) {
     const impact = 34;
     baseScore += impact;
     shapExplanation.push({
-      feature: "High Velocity Spike",
+      feature: "Card Velocity Burst",
       contribution: impact,
       direction: "increase",
-      rawValue: `${params.velocityLast2Min} transactions in 2 min`,
-      description: "Rapid burst velocity detected, characteristic of automated carding or script attacks",
+      rawValue: `${params.velocityLast2Min} attempts in 2 min`,
+      description: "Rapid burst cadence indicating automated card testing or script attack.",
     });
     ruleFlags.push("VELOCITY_BURST_CRITICAL");
   } else if (params.velocityLast2Min >= 2) {
@@ -69,8 +69,8 @@ export function calculateRisk(params: SimulationParams): {
       feature: "Elevated Velocity",
       contribution: impact,
       direction: "increase",
-      rawValue: `${params.velocityLast2Min} transactions in 2 min`,
-      description: "Multiple attempts observed in a compressed time interval",
+      rawValue: `${params.velocityLast2Min} attempts in 2 min`,
+      description: "Multiple attempts detected within a short window.",
     });
     ruleFlags.push("VELOCITY_ELEVATED");
   } else {
@@ -81,11 +81,11 @@ export function calculateRisk(params: SimulationParams): {
       contribution: reduction,
       direction: "decrease",
       rawValue: `${params.velocityLast2Min} tx / 2 min`,
-      description: "Standard pacing between transactions; no robotic cadence",
+      description: "Standard human checkout pacing.",
     });
   }
 
-  // 3. Device Fingerprint Anomaly
+  // 3. Device Fingerprint
   if (params.isNewDevice) {
     const impact = 22;
     baseScore += impact;
@@ -93,10 +93,10 @@ export function calculateRisk(params: SimulationParams): {
       feature: "Unrecognized Device Fingerprint",
       contribution: impact,
       direction: "increase",
-      rawValue: "New Browser / OS Token",
-      description: "Transaction initiated from a hardware hash never previously associated with this profile",
+      rawValue: "New Browser / Client Token",
+      description: "Transaction initiated from a hardware token never previously used by this customer.",
     });
-    ruleFlags.push("NEW_DEVICE_IDENTIFIED");
+    ruleFlags.push("NEW_DEVICE_DETECTED");
   } else {
     const reduction = -14;
     baseScore += reduction;
@@ -104,45 +104,45 @@ export function calculateRisk(params: SimulationParams): {
       feature: "Trusted Device Token",
       contribution: reduction,
       direction: "decrease",
-      rawValue: "Known Device ID",
-      description: "Matches trusted device fingerprint with >30 successful prior sessions",
+      rawValue: "Recognized Device",
+      description: "Matches trusted hardware fingerprint with frequent verified logins.",
     });
   }
 
-  // 4. Geolocation & Proxy/VPN Anomalies
+  // 4. Geolocation & Proxy/VPN
   if (params.isVpnOrProxy) {
     const impact = 24;
     baseScore += impact;
     shapExplanation.push({
-      feature: "Anonymous Proxy / VPN Detected",
+      feature: "Anonymized Proxy / VPN Origin",
       contribution: impact,
       direction: "increase",
       rawValue: "Datacenter IP / Tor Exit Node",
-      description: "Connection origin routed through an anonymizing datacenter or proxy tunnel",
+      description: "Connection origin masked by a commercial VPN or datacenter proxy.",
     });
-    ruleFlags.push("VPN_PROXY_MASKED");
+    ruleFlags.push("ANONYMOUS_PROXY_DETECTED");
   }
 
   if (params.distanceJumpKm > 1000) {
     const impact = 21;
     baseScore += impact;
     shapExplanation.push({
-      feature: "Impossible Travel / Distance Jump",
+      feature: "Impossible Travel Velocity",
       contribution: impact,
       direction: "increase",
-      rawValue: `${Math.round(params.distanceJumpKm)} km from habitual area`,
-      description: "Geographic coordinates represent an impossible travel velocity jump from previous origin",
+      rawValue: `${Math.round(params.distanceJumpKm)} km from billing location`,
+      description: "Physical distance between consecutive sessions implies impossible travel speed.",
     });
-    ruleFlags.push("IMPOSSIBLE_TRAVEL_GEO");
+    ruleFlags.push("IMPOSSIBLE_TRAVEL");
   } else if (params.distanceJumpKm < 50 && !params.isVpnOrProxy) {
     const reduction = -10;
     baseScore += reduction;
     shapExplanation.push({
-      feature: "Habitual Geolocation Match",
+      feature: "Local Billing Anchor Match",
       contribution: reduction,
       direction: "decrease",
-      rawValue: "<50 km domestic anchor",
-      description: "Origin matches user primary residence / recurring payment coordinates",
+      rawValue: "< 50 km local area",
+      description: "Origin coordinates match cardholder's primary home billing location.",
     });
   }
 
@@ -151,37 +151,31 @@ export function calculateRisk(params: SimulationParams): {
     const impact = 15;
     baseScore += impact;
     shapExplanation.push({
-      feature: "High-Risk Merchant Sector",
+      feature: "High-Risk Merchant Category",
       contribution: impact,
       direction: "increase",
       rawValue: params.merchantCategory,
-      description: "Merchant classification possesses higher systemic non-refundable chargeback rates",
+      description: "Category has higher historical chargeback and non-refundable liquidation rates.",
     });
   } else if (params.merchantCategory === "Grocery" || params.merchantCategory === "Utilities") {
     const reduction = -7;
     baseScore += reduction;
     shapExplanation.push({
-      feature: "Low-Risk Utility / Grocery Merchant",
+      feature: "Essential Services Merchant",
       contribution: reduction,
       direction: "decrease",
       rawValue: params.merchantCategory,
-      description: "Low-risk staple category with minimal fraud syndication incidence",
+      description: "Low dispute rate recurring domestic category.",
     });
   }
 
-  // Bound the final score between 1 and 99
   const finalScore = Math.max(2, Math.min(99, Math.round(baseScore)));
 
-  // Anomaly score (Isolation Forest representation)
   const anomalyFactors = (params.isNewDevice ? 0.3 : 0) +
     (params.isVpnOrProxy ? 0.35 : 0) +
     (params.velocityLast2Min >= 3 ? 0.35 : 0.05);
   const anomalyScore = parseFloat(Math.min(0.98, Math.max(0.04, anomalyFactors)).toFixed(2));
 
-  // Determine Tier and Decision according to Abstract:
-  // Low (< 35): Approved automatically
-  // Medium (35 - 70): OTP verification required
-  // High (> 70): Blocked or marked for fraud analyst attention
   let riskLevel: RiskLevel;
   let decision: DecisionAction;
 
@@ -196,7 +190,6 @@ export function calculateRisk(params: SimulationParams): {
     decision = "APPROVED";
   }
 
-  // Sort SHAP values by absolute contribution magnitude
   shapExplanation.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
 
   return {
@@ -209,8 +202,8 @@ export function calculateRisk(params: SimulationParams): {
   };
 }
 
-const FIRST_NAMES = ["Aarav", "Priya", "Rahul", "Ananya", "Rohan", "Sneha", "Vikram", "Neha", "Aditya", "Pooja", "Arjun", "Kavita"];
-const LAST_NAMES = ["Sharma", "Verma", "Patel", "Reddy", "Mehta", "Iyer", "Nair", "Gupta", "Deshmukh", "Chopra"];
+const FIRST_NAMES = ["Aarav", "Priya", "Rahul", "Ananya", "Rohan", "Sneha", "Vikram", "Neha", "Aditya", "Pooja", "Arjun", "Kavita", "Deepak", "Shreya"];
+const LAST_NAMES = ["Sharma", "Verma", "Patel", "Reddy", "Mehta", "Iyer", "Nair", "Gupta", "Deshmukh", "Chopra", "Singhania", "Mukherjee"];
 const CITIES = [
   { city: "Mumbai", country: "India", distance: 12 },
   { city: "Bengaluru", country: "India", distance: 25 },
@@ -238,12 +231,9 @@ const MERCHANTS: { name: string; category: Transaction['merchantCategory'] }[] =
 
 let globalTxCounter = 1048;
 
-/**
- * Generates a realistic random transaction with configurable fraud probability
- */
 export function generateRandomTransaction(forceFraud: boolean = false): Transaction {
   globalTxCounter += 1;
-  const isFraud = forceFraud || Math.random() < 0.14; // ~14% elevated stream rate for demo visualization
+  const isFraud = forceFraud || Math.random() < 0.14;
   const isMedium = !isFraud && Math.random() < 0.22;
 
   const firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
@@ -261,12 +251,11 @@ export function generateRandomTransaction(forceFraud: boolean = false): Transact
   let locationItem = CITIES[0];
 
   if (isFraud) {
-    // Mimic the abstract example: e.g. ₹85,000 from new device, new location, 3 tx in 2 min
     amount = Math.random() < 0.6 ? Math.floor(Math.random() * 45000) + 65000 : Math.floor(Math.random() * 95000) + 30000;
     isNewDevice = true;
     velocityLast2Min = Math.floor(Math.random() * 4) + 3;
     isVpnOrProxy = Math.random() < 0.75;
-    locationItem = CITIES[Math.floor(Math.random() * 4) + 5]; // Foreign location
+    locationItem = CITIES[Math.floor(Math.random() * 4) + 5];
   } else if (isMedium) {
     amount = Math.floor(Math.random() * 18000) + 12000;
     isNewDevice = Math.random() < 0.5;
@@ -295,18 +284,33 @@ export function generateRandomTransaction(forceFraud: boolean = false): Transact
   const now = new Date();
   const timeString = now.toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
+  const emailDomains = ["gmail.com", "outlook.com", "yahoo.in", "icloud.com"];
+  const selectedDomain = emailDomains[Math.floor(Math.random() * emailDomains.length)];
+
+  const paymentMethods: PaymentMethod[] = [
+    { type: "card", brand: "Visa", last4: "4242" },
+    { type: "card", brand: "Mastercard", last4: "8192" },
+    { type: "card", brand: "RuPay", last4: "3019" },
+    { type: "upi", upiHandle: `${firstName.toLowerCase()}@okhdfcbank` },
+    { type: "netbanking", bankName: "HDFC Bank" },
+  ];
+  const paymentMethod = paymentMethods[Math.floor(Math.random() * paymentMethods.length)];
+
   return {
     id: `TXN-${globalTxCounter}`,
     timestamp: timeString,
     customerId: `CUST-${Math.floor(1000 + Math.random() * 9000)}`,
     customerName: `${firstName} ${lastName}`,
+    customerEmail: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${selectedDomain}`,
+    customerPhone: `+91 98${Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8)}`,
     amount,
     currency: "INR",
     merchant: merchantObj.name,
     merchantCategory: merchantObj.category,
+    paymentMethod,
     device: {
-      browser: isNewDevice ? "Headless Chrome v122" : "Chrome v122 (Windows 11)",
-      os: isNewDevice ? "Linux (Unknown Hardware)" : "Windows 11 x64",
+      browser: isNewDevice ? "Headless Chrome 122" : "Chrome 122 on Windows 11",
+      os: isNewDevice ? "Linux (Unknown Client)" : "Windows 11 x64",
       fingerprintHash: `fp_${Math.random().toString(36).substring(2, 9)}`,
       isNewDevice,
       screenResolution: isNewDevice ? "800x600" : "1920x1080",

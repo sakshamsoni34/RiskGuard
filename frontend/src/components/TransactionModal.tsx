@@ -7,16 +7,16 @@ import {
   ShieldAlert,
   ShieldCheck,
   KeyRound,
-  AlertTriangle,
   ArrowUpRight,
   ArrowDownRight,
-  Cpu,
   Smartphone,
   MapPin,
   Clock,
-  Activity,
   CheckCircle2,
   Lock,
+  CreditCard,
+  User,
+  Check,
 } from "lucide-react";
 
 interface TransactionModalProps {
@@ -39,7 +39,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
   const handleAction = (action: Transaction["decision"], label: string) => {
     onUpdateStatus(transaction.id, action);
-    setToastMessage(`Action Applied: ${label}`);
+    setToastMessage(`Decision updated: ${label}`);
     setTimeout(() => {
       setToastMessage(null);
     }, 3000);
@@ -49,53 +49,53 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-slate-700/80 bg-[#0e1424] shadow-2xl z-10 my-8">
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-xl border border-slate-800 bg-[#0c1322] shadow-2xl z-10 my-8">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 bg-slate-900/80">
+        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 bg-slate-900/60">
           <div className="flex items-center gap-3">
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
+              className={`flex h-10 w-10 items-center justify-center rounded-lg border ${
                 isHigh
-                  ? "bg-rose-950/60 border-rose-500/40 text-rose-400 glow-rose"
+                  ? "bg-rose-950/60 border-rose-800/50 text-rose-400"
                   : isMedium
-                  ? "bg-amber-950/60 border-amber-500/40 text-amber-400 glow-amber"
-                  : "bg-emerald-950/60 border-emerald-500/40 text-emerald-400 glow-emerald"
+                  ? "bg-amber-950/60 border-amber-800/50 text-amber-400"
+                  : "bg-emerald-950/60 border-emerald-800/50 text-emerald-400"
               }`}
             >
               {isHigh ? (
-                <ShieldAlert className="h-6 w-6" />
+                <ShieldAlert className="h-5 w-5" />
               ) : isMedium ? (
-                <KeyRound className="h-6 w-6" />
+                <KeyRound className="h-5 w-5" />
               ) : (
-                <ShieldCheck className="h-6 w-6" />
+                <ShieldCheck className="h-5 w-5" />
               )}
             </div>
 
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-white font-mono">{transaction.id}</h3>
-                <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300 font-mono">
+                <h3 className="text-base font-bold text-white font-mono">{transaction.id}</h3>
+                <span className="text-xs text-slate-400 font-mono">
                   {transaction.timestamp}
                 </span>
                 <span
-                  className={`rounded-md px-2.5 py-0.5 text-xs font-bold border ${
+                  className={`rounded px-2 py-0.5 text-xs font-semibold border ${
                     isHigh
-                      ? "bg-rose-950/80 text-rose-300 border-rose-700/50"
+                      ? "bg-rose-950/80 text-rose-300 border-rose-800/40"
                       : isMedium
-                      ? "bg-amber-950/80 text-amber-300 border-amber-700/50"
-                      : "bg-emerald-950/80 text-emerald-300 border-emerald-700/50"
+                      ? "bg-amber-950/80 text-amber-300 border-amber-800/40"
+                      : "bg-emerald-950/80 text-emerald-300 border-emerald-800/40"
                   }`}
                 >
-                  {transaction.decision}
+                  {transaction.decision === "BLOCKED" ? "Blocked" : transaction.decision === "OTP_REQUIRED" ? "3DS Review" : "Allowed"}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Customer: <span className="text-slate-200 font-medium">{transaction.customerName}</span> ({transaction.customerId}) • {transaction.merchant}
+              <p className="text-xs text-slate-400 mt-0.5">
+                Customer: <span className="text-slate-200 font-medium">{transaction.customerName}</span> ({transaction.customerEmail})
               </p>
             </div>
           </div>
@@ -112,38 +112,30 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         <div className="max-h-[75vh] overflow-y-auto p-6 space-y-6">
           {/* Toast Notification */}
           {toastMessage && (
-            <div className="rounded-lg border border-emerald-500/40 bg-emerald-950/80 px-4 py-2.5 text-xs font-semibold text-emerald-200 flex items-center gap-2 shadow-lg animate-fade-in">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <div className="rounded-lg border border-emerald-700/50 bg-emerald-950/80 px-4 py-2.5 text-xs font-medium text-emerald-200 flex items-center gap-2 shadow-lg animate-fade-in">
+              <Check className="h-4 w-4 text-emerald-400" />
               {toastMessage}
             </div>
           )}
 
-          {/* Top Overview: Risk Score & Decision Summary */}
+          {/* Top Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Score Gauge Card */}
-            <div
-              className={`rounded-xl border p-4 flex flex-col justify-between ${
-                isHigh
-                  ? "bg-rose-950/20 border-rose-500/30 glow-rose"
-                  : isMedium
-                  ? "bg-amber-950/20 border-amber-500/30 glow-amber"
-                  : "bg-emerald-950/20 border-emerald-500/30 glow-emerald"
-              }`}
-            >
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-                <span>ML Risk Score</span>
-                <span className="font-mono text-[11px] text-slate-500">XGBoost v2.4</span>
+            {/* 1. Score Gauge Card */}
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between">
+              <div className="text-xs font-medium text-slate-400 flex items-center justify-between">
+                <span>Risk Score</span>
+                <span className="font-mono text-[11px] text-slate-500">XGBoost Model</span>
               </div>
 
               <div className="my-3 flex items-baseline gap-2">
                 <span
-                  className={`text-4xl font-extrabold font-mono ${
+                  className={`text-4xl font-bold font-mono ${
                     isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"
                   }`}
                 >
                   {transaction.riskScore}
                 </span>
-                <span className="text-sm font-semibold text-slate-400">/ 100</span>
+                <span className="text-sm font-medium text-slate-500">/ 100</span>
               </div>
 
               <div>
@@ -156,44 +148,44 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                   />
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                  <span>0 (Safe)</span>
-                  <span>35 (OTP Threshold)</span>
+                  <span>0 (Normal)</span>
+                  <span>35 (3DS)</span>
                   <span>70 (Block)</span>
                   <span>100</span>
                 </div>
               </div>
             </div>
 
-            {/* Decision Rule Tier */}
+            {/* 2. Classification Tier */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Classification Tier
+              <div className="text-xs font-medium text-slate-400">
+                Decision Policy
               </div>
               <div className="my-2">
                 <div
-                  className={`text-lg font-bold ${
+                  className={`text-base font-semibold ${
                     isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"
                   }`}
                 >
-                  {transaction.riskLevel} RISK TIER
+                  {transaction.riskLevel} Risk Tier
                 </div>
-                <p className="text-xs text-slate-300 mt-1">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   {isHigh
-                    ? "Exceeds 70 risk cutoff. Immediate block enacted to prevent irreversible financial loss."
+                    ? "Score exceeds 70 threshold. Automatic block enacted to safeguard against unauthorized transfer."
                     : isMedium
-                    ? "Falls in 35-70 intermediate band. Step-up OTP verification challenge issued to user."
-                    : "Below 35 threshold. Transaction classified as genuine; automatic low-friction approval."}
+                    ? "Falls in 35–70 band. 3DS OTP challenge issued to cardholder."
+                    : "Score below 35 cutoff. Automatically allowed with zero customer friction."}
                 </p>
               </div>
-              <div className="text-[11px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-900/50 rounded px-2 py-1">
-                Anomaly Score: {(transaction.anomalyScore * 100).toFixed(0)}% (Isolation Forest)
+              <div className="text-[11px] font-mono text-cyan-400 bg-cyan-950/30 border border-cyan-800/40 rounded px-2 py-1">
+                Anomaly Rating: {(transaction.anomalyScore * 100).toFixed(0)}% (Isolation Forest)
               </div>
             </div>
 
-            {/* Financial Details */}
+            {/* 3. Payment Details */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Transaction Profile
+              <div className="text-xs font-medium text-slate-400">
+                Payment Profile
               </div>
               <div className="my-2">
                 <div className="text-2xl font-bold font-mono text-white">
@@ -202,55 +194,53 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 <div className="text-xs text-slate-400 mt-1">
                   Merchant: <span className="text-slate-200 font-medium">{transaction.merchant}</span>
                 </div>
-                <div className="text-xs text-slate-400">
-                  Category: <span className="text-indigo-400 font-medium">{transaction.merchantCategory}</span>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  Payment: <span className="text-slate-200 font-medium">
+                    {transaction.paymentMethod.type === "card" && `${transaction.paymentMethod.brand} •••• ${transaction.paymentMethod.last4}`}
+                    {transaction.paymentMethod.type === "upi" && transaction.paymentMethod.upiHandle}
+                    {transaction.paymentMethod.type === "netbanking" && transaction.paymentMethod.bankName}
+                  </span>
                 </div>
               </div>
               <div className="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-                <span>Daily Velocity:</span>
-                <span className="font-mono text-slate-200">
-                  {transaction.velocity.lastHourCount} tx / hr (₹{transaction.velocity.totalSpentToday.toLocaleString("en-IN")})
-                </span>
+                <span>Recent Velocity</span>
+                <span className="font-mono text-slate-200">{transaction.velocity.lastHourCount} tx in last hour</span>
               </div>
             </div>
           </div>
 
-          {/* SHAP Explainability Breakdown (Core requirement from abstract) */}
-          <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/10 p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Cpu className="h-5 w-5 text-indigo-400" />
-                <h4 className="text-sm font-bold text-white tracking-wide">
-                  SHAP (SHapley Additive exPlanations) Feature Attribution
+          {/* Feature Attribution (Explainability) */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h4 className="text-sm font-semibold text-white">
+                  Risk Signals & Attribution
                 </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Breakdown of factors contributing to the machine learning decision
+                </p>
               </div>
-              <span className="rounded bg-indigo-950/80 border border-indigo-800/60 px-2 py-0.5 text-[10px] font-mono text-indigo-300">
-                Model Interpretability & Compliance
+              <span className="rounded bg-slate-800 px-2 py-0.5 text-[11px] font-mono text-slate-300">
+                TreeSHAP Weights
               </span>
             </div>
 
-            <p className="text-xs text-slate-300 mb-4 leading-relaxed">
-              TreeSHAP calculates the exact marginal contribution of each signal pushing the model decision up (red risk drivers) or down (green trust anchors) from baseline.
-            </p>
-
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {transaction.shapExplanation.map((shap, idx) => {
                 const isIncrease = shap.direction === "increase";
-                const absContrib = Math.abs(shap.contribution);
-
                 return (
                   <div
                     key={idx}
-                    className="rounded-lg border border-slate-800/80 bg-slate-900/80 p-3 flex flex-col gap-2"
+                    className="rounded-lg border border-slate-800 bg-slate-950/60 p-3 flex flex-col gap-1.5"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {isIncrease ? (
-                          <div className="flex h-5 w-5 items-center justify-center rounded bg-rose-500/20 text-rose-400">
+                          <div className="flex h-5 w-5 items-center justify-center rounded bg-rose-500/10 text-rose-400">
                             <ArrowUpRight className="h-3.5 w-3.5" />
                           </div>
                         ) : (
-                          <div className="flex h-5 w-5 items-center justify-center rounded bg-emerald-500/20 text-emerald-400">
+                          <div className="flex h-5 w-5 items-center justify-center rounded bg-emerald-500/10 text-emerald-400">
                             <ArrowDownRight className="h-3.5 w-3.5" />
                           </div>
                         )}
@@ -259,21 +249,20 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                       </div>
 
                       <span
-                        className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
+                        className={`font-mono text-xs font-semibold px-2 py-0.5 rounded ${
                           isIncrease
-                            ? "bg-rose-950 text-rose-400 border border-rose-800/40"
-                            : "bg-emerald-950 text-emerald-400 border border-emerald-800/40"
+                            ? "bg-rose-950/80 text-rose-300 border border-rose-800/40"
+                            : "bg-emerald-950/80 text-emerald-300 border border-emerald-800/40"
                         }`}
                       >
                         {isIncrease ? `+${shap.contribution}` : shap.contribution} pts
                       </span>
                     </div>
 
-                    {/* Visual Bar representation */}
-                    <div className="w-full bg-slate-800/60 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                       <div
                         className={`h-full ${isIncrease ? "bg-rose-500" : "bg-emerald-500"}`}
-                        style={{ width: `${Math.min(100, absContrib * 2.8)}%` }}
+                        style={{ width: `${Math.min(100, Math.abs(shap.contribution) * 2.8)}%` }}
                       />
                     </div>
 
@@ -284,112 +273,89 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
           </div>
 
-          {/* Deep Signal Dossier */}
+          {/* Client Hardware & Geolocation Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Device & Hardware Fingerprint */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-300">
-                <Smartphone className="h-4 w-4 text-cyan-400" />
-                <span>Hardware & Fingerprint Signals</span>
+              <div className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                <Smartphone className="h-4 w-4 text-slate-400" />
+                <span>Client & Device Environment</span>
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Browser Client:</span>
-                  <span className="font-mono text-slate-200">{transaction.device.browser}</span>
+                  <span className="text-slate-400">Browser</span>
+                  <span className="text-slate-200 font-mono">{transaction.device.browser}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Operating System:</span>
-                  <span className="font-mono text-slate-200">{transaction.device.os}</span>
+                  <span className="text-slate-400">Operating System</span>
+                  <span className="text-slate-200 font-mono">{transaction.device.os}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Fingerprint Hash:</span>
-                  <span className="font-mono text-cyan-400">{transaction.device.fingerprintHash}</span>
+                  <span className="text-slate-400">Fingerprint Hash</span>
+                  <span className="text-slate-300 font-mono">{transaction.device.fingerprintHash}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Device Familiarity:</span>
-                  <span
-                    className={`font-semibold ${
-                      transaction.device.isNewDevice ? "text-rose-400" : "text-emerald-400"
-                    }`}
-                  >
-                    {transaction.device.isNewDevice ? "New Device (No Prior History)" : "Verified Trusted Device"}
+                  <span className="text-slate-400">Device Status</span>
+                  <span className={transaction.device.isNewDevice ? "text-amber-400 font-medium" : "text-emerald-400 font-medium"}>
+                    {transaction.device.isNewDevice ? "Unrecognized Client" : "Verified Trusted Device"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Geolocation & Network */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-300">
-                <MapPin className="h-4 w-4 text-emerald-400" />
-                <span>Network & Geolocation Signals</span>
+              <div className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-slate-400" />
+                <span>Network & Geolocation</span>
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Coordinates Origin:</span>
-                  <span className="font-semibold text-slate-200">
-                    {transaction.location.city}, {transaction.location.country}
-                  </span>
+                  <span className="text-slate-400">Location</span>
+                  <span className="text-slate-200 font-medium">{transaction.location.city}, {transaction.location.country}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">IP Address:</span>
-                  <span className="font-mono text-slate-300">{transaction.location.ipAddress}</span>
+                  <span className="text-slate-400">IP Address</span>
+                  <span className="text-slate-300 font-mono">{transaction.location.ipAddress}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Proxy / VPN Cloaking:</span>
-                  <span
-                    className={`font-semibold ${
-                      transaction.location.isVpnOrProxy ? "text-rose-400" : "text-emerald-400"
-                    }`}
-                  >
-                    {transaction.location.isVpnOrProxy ? "Detected (High Anomaly)" : "Clean Domestic ISP"}
+                  <span className="text-slate-400">Proxy / VPN</span>
+                  <span className={transaction.location.isVpnOrProxy ? "text-rose-400 font-medium" : "text-emerald-400 font-medium"}>
+                    {transaction.location.isVpnOrProxy ? "Detected (Anonymous Proxy)" : "Clean Domestic ISP"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Distance from Habitual Area:</span>
-                  <span
-                    className={`font-mono font-semibold ${
-                      transaction.location.distanceFromHomeKm > 500 ? "text-rose-400" : "text-slate-200"
-                    }`}
-                  >
-                    {transaction.location.distanceFromHomeKm} km
-                  </span>
+                  <span className="text-slate-400">Distance from Anchor</span>
+                  <span className="text-slate-200 font-mono">{transaction.location.distanceFromHomeKm} km</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Action Bar for Risk Analysts */}
+        {/* Footer Actions */}
         <div className="flex flex-wrap items-center justify-between border-t border-slate-800 bg-slate-950 px-6 py-4 gap-3">
           <div className="text-xs text-slate-400 flex items-center gap-2">
             <Lock className="h-3.5 w-3.5 text-slate-500" />
-            <span>Analyst Authority Actions</span>
+            <span>Manual Analyst Override</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => handleAction("APPROVED", "Manual Override Approved")}
-              className="flex items-center gap-1.5 rounded-lg border border-emerald-600/40 bg-emerald-950/60 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 hover:border-emerald-500 transition-colors"
+              onClick={() => handleAction("APPROVED", "Allowed")}
+              className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
             >
-              <ShieldCheck className="h-4 w-4" />
-              Override Approve
+              Allow Transaction
             </button>
-
             <button
-              onClick={() => handleAction("OTP_REQUIRED", "OTP Challenge Dispatched")}
-              className="flex items-center gap-1.5 rounded-lg border border-amber-600/40 bg-amber-950/60 px-3 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-900/60 hover:border-amber-500 transition-colors"
+              onClick={() => handleAction("OTP_REQUIRED", "3DS OTP Requested")}
+              className="rounded-lg border border-amber-800/40 bg-amber-950/60 px-3 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-900/60 transition-colors"
             >
-              <KeyRound className="h-4 w-4" />
-              Trigger OTP Challenge
+              Request 3DS OTP
             </button>
-
             <button
-              onClick={() => handleAction("BLOCKED", "Fraud Confirmed & Device Blacklisted")}
-              className="flex items-center gap-1.5 rounded-lg border border-rose-600/40 bg-rose-950/60 px-3 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-900/60 hover:border-rose-500 transition-colors"
+              onClick={() => handleAction("BLOCKED", "Fraud Block Confirmed")}
+              className="rounded-lg border border-rose-800/40 bg-rose-950/60 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-900/60 transition-colors"
             >
-              <ShieldAlert className="h-4 w-4" />
-              Confirm Fraud Block
+              Confirm Block
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@ export type DecisionAction = 'APPROVED' | 'OTP_REQUIRED' | 'BLOCKED';
 export interface ShapValue {
   feature: string;
   contribution: number; // e.g. +24 or -12
-  direction: 'increase' | 'decrease'; // does it increase or decrease risk
+  direction: 'increase' | 'decrease';
   rawValue: string | number;
   description: string;
 }
@@ -31,15 +31,26 @@ export interface TransactionVelocity {
   totalSpentToday: number;
 }
 
+export interface PaymentMethod {
+  type: 'card' | 'upi' | 'netbanking';
+  brand?: 'Visa' | 'Mastercard' | 'RuPay';
+  last4?: string;
+  upiHandle?: string;
+  bankName?: string;
+}
+
 export interface Transaction {
   id: string;
   timestamp: string;
   customerId: string;
   customerName: string;
+  customerEmail: string;
+  customerPhone: string;
   amount: number;
   currency: string;
   merchant: string;
   merchantCategory: 'Electronics' | 'Jewelry' | 'Grocery' | 'Travel' | 'Gaming' | 'Crypto' | 'Utilities';
+  paymentMethod: PaymentMethod;
   device: DeviceInfo;
   location: GeoLocation;
   velocity: TransactionVelocity;
@@ -48,7 +59,7 @@ export interface Transaction {
   decision: DecisionAction;
   status: 'PROCESSED' | 'REVIEWED' | 'MANUALLY_OVERRIDDEN';
   shapExplanation: ShapValue[];
-  anomalyScore: number; // 0.0 - 1.0 (Isolation Forest)
+  anomalyScore: number;
   ruleFlags: string[];
 }
 

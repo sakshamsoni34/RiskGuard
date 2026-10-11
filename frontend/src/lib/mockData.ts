@@ -2,18 +2,25 @@ import { Transaction, ModelMetrics } from "@/types/fraud";
 import { calculateRisk } from "./scoringEngine";
 
 export const initialTransactions: Transaction[] = [
-  // 1. Critical Fraud Case (exact abstract scenario: ₹85,000, new device, foreign location, 3 tx in 2 min)
+  // 1. Critical High Risk Fraud
   {
     id: "TXN-1048",
     timestamp: "15:09:42",
     customerId: "CUST-8492",
     customerName: "Vikram Mehta",
+    customerEmail: "vikram.mehta@gmail.com",
+    customerPhone: "+91 98201 44821",
     amount: 85000,
     currency: "INR",
     merchant: "Apple Store Online",
     merchantCategory: "Electronics",
+    paymentMethod: {
+      type: "card",
+      brand: "Visa",
+      last4: "4242",
+    },
     device: {
-      browser: "Headless Chrome v121",
+      browser: "Headless Chrome 121",
       os: "Linux (Virtual Machine)",
       fingerprintHash: "fp_9f8d3a1",
       isNewDevice: true,
@@ -37,57 +44,64 @@ export const initialTransactions: Transaction[] = [
     status: "PROCESSED",
     shapExplanation: [
       {
-        feature: "High Velocity Spike",
+        feature: "Card Velocity Burst",
         contribution: 34,
         direction: "increase",
-        rawValue: "3 transactions in 2 min",
-        description: "Burst attempt frequency characteristic of automated script or card cracking attack",
+        rawValue: "3 attempts in 2 min",
+        description: "Multiple authorization requests within 120 seconds indicate card cracking or botnet script.",
       },
       {
-        feature: "Anonymous Proxy / VPN Detected",
+        feature: "Anonymized Proxy / VPN Origin",
         contribution: 24,
         direction: "increase",
-        rawValue: "Datacenter VPN IP (Tor / ASN 29838)",
-        description: "Traffic routed via known anonymizing residential proxy farm",
+        rawValue: "Datacenter ASN 29838",
+        description: "Connection routed via known proxy tunnel subnet.",
       },
       {
         feature: "Unrecognized Device Fingerprint",
         contribution: 22,
         direction: "increase",
-        rawValue: "New Browser / Linux VM Token",
-        description: "Zero session history on this client hardware fingerprint",
+        rawValue: "New Browser / Linux VM",
+        description: "Zero transaction history on this hardware signature.",
       },
       {
-        feature: "Impossible Travel / Distance Jump",
+        feature: "Impossible Travel Velocity",
         contribution: 21,
         direction: "increase",
         rawValue: "7,200 km jump from Mumbai",
-        description: "Impossible physical travel time between Mumbai home IP and Lagos IP in < 1 hour",
+        description: "Impossible physical travel time from cardholder home location in < 1 hr.",
       },
       {
-        feature: "Amount Deviation",
+        feature: "High Purchase Deviation",
         contribution: 18,
         direction: "increase",
-        rawValue: "₹85,000 (14.2x customer average)",
-        description: "Significantly exceeds cardholder standard ₹6,000 average purchase amount",
+        rawValue: "₹85,000 (14.2x customer avg)",
+        description: "Significantly exceeds cardholder standard ₹6,000 habitual transaction amount.",
       },
     ],
     anomalyScore: 0.94,
-    ruleFlags: ["HIGH_AMOUNT_OUTLIER", "VELOCITY_BURST_CRITICAL", "NEW_DEVICE_IDENTIFIED", "VPN_PROXY_MASKED", "IMPOSSIBLE_TRAVEL_GEO"],
+    ruleFlags: ["AMOUNT_DEVIATION_HIGH", "VELOCITY_BURST_CRITICAL", "NEW_DEVICE_DETECTED", "ANONYMOUS_PROXY_DETECTED", "IMPOSSIBLE_TRAVEL"],
   },
 
-  // 2. Medium Risk Case (Requires OTP Step-up Auth)
+  // 2. Medium Risk Case (Requires 3DS OTP Step-up Auth)
   {
     id: "TXN-1047",
     timestamp: "15:08:15",
     customerId: "CUST-3910",
     customerName: "Ananya Iyer",
+    customerEmail: "ananya.iyer@outlook.com",
+    customerPhone: "+91 99302 11094",
     amount: 28500,
     currency: "INR",
     merchant: "Tanishq Jewellers",
     merchantCategory: "Jewelry",
+    paymentMethod: {
+      type: "card",
+      brand: "Mastercard",
+      last4: "8192",
+    },
     device: {
-      browser: "Safari Mobile v17.2",
+      browser: "Mobile Safari 17.2",
       os: "iOS 17 (iPhone 14)",
       fingerprintHash: "fp_44e190b",
       isNewDevice: true,
@@ -115,25 +129,25 @@ export const initialTransactions: Transaction[] = [
         contribution: 22,
         direction: "increase",
         rawValue: "New Device (iOS 17)",
-        description: "First time transacting from this smartphone device",
+        description: "First transaction from this mobile client token.",
       },
       {
-        feature: "Amount Deviation",
+        feature: "Moderate Amount Deviation",
         contribution: 14,
         direction: "increase",
         rawValue: "₹28,500 (3.1x avg)",
-        description: "Higher than typical grocery/retail tickets",
+        description: "Higher than typical cardholder discretionary ticket size.",
       },
       {
-        feature: "Habitual Geolocation Match",
+        feature: "Local Billing Anchor Match",
         contribution: -10,
         direction: "decrease",
         rawValue: "Bengaluru, 28 km",
-        description: "Within cardholder primary metropolitan residential perimeter",
+        description: "Within cardholder regular metropolitan perimeter.",
       },
     ],
     anomalyScore: 0.42,
-    ruleFlags: ["NEW_DEVICE_IDENTIFIED"],
+    ruleFlags: ["NEW_DEVICE_DETECTED"],
   },
 
   // 3. Low Risk Case (Auto-Approved)
@@ -142,13 +156,19 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:07:30",
     customerId: "CUST-1192",
     customerName: "Rahul Reddy",
+    customerEmail: "rahul.reddy@yahoo.in",
+    customerPhone: "+91 97110 55418",
     amount: 1499,
     currency: "INR",
     merchant: "Blinkit Grocery",
     merchantCategory: "Grocery",
+    paymentMethod: {
+      type: "upi",
+      upiHandle: "rahulreddy@okaxis",
+    },
     device: {
-      browser: "Chrome v122",
-      os: "Windows 11",
+      browser: "Chrome 122",
+      os: "Windows 11 x64",
       fingerprintHash: "fp_aa88102",
       isNewDevice: false,
       screenResolution: "1920x1080",
@@ -174,22 +194,22 @@ export const initialTransactions: Transaction[] = [
         feature: "Trusted Device Token",
         contribution: -14,
         direction: "decrease",
-        rawValue: "Known Device ID",
-        description: "Authenticated 48 historical purchases over past 8 months",
+        rawValue: "Verified Device ID",
+        description: "Matches trusted hardware profile with 48 prior verified sessions.",
       },
       {
-        feature: "Habitual Geolocation Match",
+        feature: "Local Billing Anchor Match",
         contribution: -10,
         direction: "decrease",
-        rawValue: "6 km from home",
-        description: "Matches regular broadband ISP and geo lat/long",
+        rawValue: "6 km from billing address",
+        description: "Origin coordinates conform to cardholder home broadband IP.",
       },
       {
         feature: "Consistent Spend Profile",
         contribution: -8,
         direction: "decrease",
         rawValue: "₹1,499 (0.8x avg)",
-        description: "Standard grocery retail pattern",
+        description: "Normal recurring grocery merchant pattern.",
       },
     ],
     anomalyScore: 0.05,
@@ -202,13 +222,20 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:05:12",
     customerId: "CUST-7711",
     customerName: "Rohan Chopra",
+    customerEmail: "rohan.chopra@gmail.com",
+    customerPhone: "+91 98104 90211",
     amount: 98000,
     currency: "INR",
     merchant: "Binance P2P Exchange",
     merchantCategory: "Crypto",
+    paymentMethod: {
+      type: "card",
+      brand: "Visa",
+      last4: "9041",
+    },
     device: {
-      browser: "Firefox v118",
-      os: "Linux",
+      browser: "Firefox 118",
+      os: "Linux x86_64",
       fingerprintHash: "fp_88bc41e",
       isNewDevice: true,
       screenResolution: "1366x768",
@@ -231,29 +258,29 @@ export const initialTransactions: Transaction[] = [
     status: "PROCESSED",
     shapExplanation: [
       {
-        feature: "High Velocity Spike",
+        feature: "Card Velocity Burst",
         contribution: 34,
         direction: "increase",
-        rawValue: "4 transactions in 2 min",
-        description: "Extreme transaction burst frequency",
+        rawValue: "4 attempts in 2 min",
+        description: "Severe velocity spike; repeated liquidation attempts in minutes.",
       },
       {
-        feature: "Anonymous Proxy / VPN Detected",
+        feature: "Anonymized Proxy / VPN Origin",
         contribution: 24,
         direction: "increase",
-        rawValue: "Russian Proxy",
-        description: "Known bulletproof VPN subnet",
+        rawValue: "Tor / Datacenter Node",
+        description: "Connection routed via bulletproof hosting infrastructure.",
       },
       {
-        feature: "High-Risk Merchant Sector",
+        feature: "High-Risk Merchant Category",
         contribution: 15,
         direction: "increase",
         rawValue: "Crypto Exchange",
-        description: "Irreversible digital asset purchase",
+        description: "Non-reversible digital asset liquidation merchant.",
       },
     ],
     anomalyScore: 0.98,
-    ruleFlags: ["HIGH_AMOUNT_OUTLIER", "VELOCITY_BURST_CRITICAL", "NEW_DEVICE_IDENTIFIED", "VPN_PROXY_MASKED"],
+    ruleFlags: ["AMOUNT_DEVIATION_HIGH", "VELOCITY_BURST_CRITICAL", "NEW_DEVICE_DETECTED", "ANONYMOUS_PROXY_DETECTED"],
   },
 
   // 5. Utility Bill (Low Risk)
@@ -262,12 +289,18 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:03:01",
     customerId: "CUST-4412",
     customerName: "Sneha Nair",
+    customerEmail: "sneha.nair@hdfcbank.com",
+    customerPhone: "+91 98450 33819",
     amount: 3240,
     currency: "INR",
     merchant: "Tata Power Electricity",
     merchantCategory: "Utilities",
+    paymentMethod: {
+      type: "netbanking",
+      bankName: "HDFC Bank",
+    },
     device: {
-      browser: "Chrome Mobile v122",
+      browser: "Chrome Mobile 122",
       os: "Android 14",
       fingerprintHash: "fp_55102ff",
       isNewDevice: false,
@@ -294,33 +327,40 @@ export const initialTransactions: Transaction[] = [
         feature: "Trusted Device Token",
         contribution: -14,
         direction: "decrease",
-        rawValue: "Known Android Token",
-        description: "High reputation hardware key",
+        rawValue: "Known Android Device",
+        description: "Verified token with daily active usage.",
       },
       {
-        feature: "Low-Risk Utility / Grocery Merchant",
+        feature: "Essential Services Merchant",
         contribution: -7,
         direction: "decrease",
         rawValue: "Electricity Utility",
-        description: "Recurring municipal bill payment",
+        description: "Recurring municipal utility bill payment.",
       },
     ],
     anomalyScore: 0.04,
     ruleFlags: [],
   },
 
-  // 6. Travel Flight Booking (Medium Risk OTP)
+  // 6. Travel Flight Booking (Medium Risk 3DS OTP)
   {
     id: "TXN-1043",
     timestamp: "15:00:20",
     customerId: "CUST-9018",
     customerName: "Aditya Patel",
+    customerEmail: "aditya.patel@gmail.com",
+    customerPhone: "+91 99001 88320",
     amount: 42000,
     currency: "INR",
     merchant: "MakeMyTrip Flights",
     merchantCategory: "Travel",
+    paymentMethod: {
+      type: "card",
+      brand: "Visa",
+      last4: "1094",
+    },
     device: {
-      browser: "Chrome v122",
+      browser: "Chrome 122",
       os: "macOS Sonoma",
       fingerprintHash: "fp_192aa00",
       isNewDevice: false,
@@ -344,18 +384,18 @@ export const initialTransactions: Transaction[] = [
     status: "PROCESSED",
     shapExplanation: [
       {
-        feature: "Amount Deviation",
+        feature: "Moderate Amount Deviation",
         contribution: 14,
         direction: "increase",
         rawValue: "₹42,000 (3.5x avg)",
-        description: "Moderate spike above normal weekend ticket size",
+        description: "Higher transaction size than usual weekday tickets.",
       },
       {
         feature: "Trusted Device Token",
         contribution: -14,
         direction: "decrease",
-        rawValue: "Known Mac Device",
-        description: "Prior authenticated sessions verify cardholder ownership",
+        rawValue: "Verified MacBook Token",
+        description: "Prior authenticated sessions confirm device ownership.",
       },
     ],
     anomalyScore: 0.35,
@@ -369,48 +409,44 @@ export const initialMetrics: ModelMetrics = {
   fraudAttemptCount: 312,
   otpChallengeCount: 1845,
   autoApprovedCount: 12663,
-  precision: 0.942, // 94.2% precision (low false alarms)
-  recall: 0.968, // 96.8% recall (catches nearly all fraud)
+  precision: 0.942,
+  recall: 0.968,
   f1Score: 0.955,
-  prAuc: 0.961, // Critical metric for class imbalance
+  prAuc: 0.961,
   rocAuc: 0.991,
-  falsePositiveRate: 0.012, // Only 1.2% false declines
-  avgLatencyMs: 38, // <40ms XGBoost inference + SHAP computation
+  falsePositiveRate: 0.012,
+  avgLatencyMs: 38,
 };
 
-// Precision-Recall curve coordinates demonstrating threshold trade-offs under class imbalance
 export const prCurveData = [
   { threshold: 0.95, recall: 0.72, precision: 0.99, costTradeoff: 450000 },
   { threshold: 0.90, recall: 0.84, precision: 0.98, costTradeoff: 280000 },
   { threshold: 0.85, recall: 0.91, precision: 0.97, costTradeoff: 160000 },
-  { threshold: 0.70, recall: 0.968, precision: 0.942, costTradeoff: 82000, isOptimal: true }, // Current calibrated threshold
+  { threshold: 0.70, recall: 0.968, precision: 0.942, costTradeoff: 82000, isOptimal: true },
   { threshold: 0.50, recall: 0.985, precision: 0.86, costTradeoff: 195000 },
   { threshold: 0.35, recall: 0.994, precision: 0.72, costTradeoff: 390000 },
   { threshold: 0.20, recall: 0.998, precision: 0.51, costTradeoff: 680000 },
 ];
 
-// Confusion Matrix under heavy class imbalance (e.g. 10,000 transactions with 2% fraud prevalence)
 export const confusionMatrixData = {
-  truePositive: 194, // Real Fraud caught
-  falsePositive: 12, // Legitimate blocked (false decline friction)
-  trueNegative: 9788, // Legitimate smoothly approved
-  falseNegative: 6, // Fraud missed (slippage loss)
-  estimatedFraudPreventedINR: 16800000, // ₹1.68 Crore
-  frictionCostINR: 42000, // Very low friction cost
+  truePositive: 194,
+  falsePositive: 12,
+  trueNegative: 9788,
+  falseNegative: 6,
+  estimatedFraudPreventedINR: 16800000,
+  frictionCostINR: 42000,
 };
 
-// Global SHAP Feature Importance across the entire population
 export const shapGlobalImportance = [
-  { feature: "Transaction Velocity (2m burst)", meanAbsShap: 28.4, type: "behavioral" },
-  { feature: "Amount Ratio vs Customer Baseline", meanAbsShap: 24.1, type: "financial" },
-  { feature: "Device Fingerprint Novelty", meanAbsShap: 21.6, type: "device" },
-  { feature: "VPN / Tor / Datacenter IP", meanAbsShap: 19.8, type: "network" },
-  { feature: "Geo-Distance Jump (Impossible Travel)", meanAbsShap: 16.3, type: "geographic" },
-  { feature: "Merchant Sector Risk Index", meanAbsShap: 12.2, type: "merchant" },
-  { feature: "Hour of Day / Diurnal Pattern", meanAbsShap: 7.9, type: "temporal" },
+  { feature: "Payment Velocity (2-min burst)", meanAbsShap: 28.4, type: "behavioral" },
+  { feature: "Purchase vs Baseline Ratio", meanAbsShap: 24.1, type: "financial" },
+  { feature: "Client Device Novelty", meanAbsShap: 21.6, type: "device" },
+  { feature: "Proxy / VPN Masking", meanAbsShap: 19.8, type: "network" },
+  { feature: "Distance from Billing Anchor", meanAbsShap: 16.3, type: "geographic" },
+  { feature: "Merchant Sector Risk", meanAbsShap: 12.2, type: "merchant" },
+  { feature: "Diurnal Time Pattern", meanAbsShap: 7.9, type: "temporal" },
 ];
 
-// Hourly volume & risk trends for the main dashboard chart
 export const hourlyTrendData = [
   { time: "09:00", volume: 640, lowRisk: 580, medRisk: 48, highRisk: 12 },
   { time: "10:00", volume: 820, lowRisk: 740, medRisk: 62, highRisk: 18 },
