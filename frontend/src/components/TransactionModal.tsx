@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Transaction } from "@/types/fraud";
+import { ShapWaterfallChart } from "@/components/ShapWaterfallChart";
+import { GeoThreatMap } from "@/components/GeoThreatMap";
 import {
   X,
   ShieldAlert,
@@ -17,6 +19,10 @@ import {
   CreditCard,
   User,
   Check,
+  FileText,
+  Save,
+  Activity,
+  History,
 } from "lucide-react";
 
 interface TransactionModalProps {
@@ -31,14 +37,29 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   onUpdateStatus,
 }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [analystNote, setAnalystNote] = useState<string>("");
+  const [savedNotes, setSavedNotes] = useState<string[]>([
+    "Initial evaluation triggered by automated ingestion pipeline.",
+  ]);
 
   if (!transaction) return null;
 
   const isHigh = transaction.riskLevel === "HIGH";
   const isMedium = transaction.riskLevel === "MEDIUM";
 
+  const handleSaveNote = () => {
+    if (!analystNote.trim()) return;
+    const now = new Date().toLocaleTimeString("en-IN", { hour12: false });
+    setSavedNotes((prev) => [...prev, `[${now}] ${analystNote.trim()}`]);
+    setAnalystNote("");
+    setToastMessage("Investigation note appended to audit trail");
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
   const handleAction = (action: Transaction["decision"], label: string) => {
     onUpdateStatus(transaction.id, action);
+    const now = new Date().toLocaleTimeString("en-IN", { hour12: false });
+    setSavedNotes((prev) => [...prev, `[${now}] Analyst updated status: ${label}`]);
     setToastMessage(`Decision updated: ${label}`);
     setTimeout(() => {
       setToastMessage(null);
@@ -209,75 +230,25 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
           </div>
 
-          {/* Feature Attribution (Explainability) */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div>
-                <h4 className="text-sm font-semibold text-white">
-                  Risk Signals & Attribution
-                </h4>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Breakdown of factors contributing to the machine learning decision
-                </p>
-              </div>
-              <span className="rounded bg-slate-800 px-2 py-0.5 text-[11px] font-mono text-slate-300">
-                TreeSHAP Weights
-              </span>
-            </div>
+          {/* Interactive TreeSHAP Explainability Waterfall */}
+          <ShapWaterfallChart
+            shapValues={transaction.shapExplanation}
+            baseScore={14}
+            finalScore={transaction.riskScore}
+          />
 
-            <div className="space-y-2.5">
-              {transaction.shapExplanation.map((shap, idx) => {
-                const isIncrease = shap.direction === "increase";
-                return (
-                  <div
-                    key={idx}
-                    className="rounded-lg border border-slate-800 bg-slate-950/60 p-3 flex flex-col gap-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {isIncrease ? (
-                          <div className="flex h-5 w-5 items-center justify-center rounded bg-rose-500/10 text-rose-400">
-                            <ArrowUpRight className="h-3.5 w-3.5" />
-                          </div>
-                        ) : (
-                          <div className="flex h-5 w-5 items-center justify-center rounded bg-emerald-500/10 text-emerald-400">
-                            <ArrowDownRight className="h-3.5 w-3.5" />
-                          </div>
-                        )}
-                        <span className="text-xs font-semibold text-slate-200">{shap.feature}</span>
-                        <span className="text-[11px] font-mono text-slate-400">({shap.rawValue})</span>
-                      </div>
+          {/* Geospatial Threat & Impossible Travel Vector */}
+          <GeoThreatMap
+            location={transaction.location}
+            homeCity="Mumbai"
+            homeCountry="India"
+          />
 
-                      <span
-                        className={`font-mono text-xs font-semibold px-2 py-0.5 rounded ${
-                          isIncrease
-                            ? "bg-rose-950/80 text-rose-300 border border-rose-800/40"
-                            : "bg-emerald-950/80 text-emerald-300 border border-emerald-800/40"
-                        }`}
-                      >
-                        {isIncrease ? `+${shap.contribution}` : shap.contribution} pts
-                      </span>
-                    </div>
-
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${isIncrease ? "bg-rose-500" : "bg-emerald-500"}`}
-                        style={{ width: `${Math.min(100, Math.abs(shap.contribution) * 2.8)}%` }}
-                      />
-                    </div>
-
-                    <p className="text-[11px] text-slate-400">{shap.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Client Hardware & Geolocation Details */}
+          {/* Client Hardware & Network Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
               <div className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Smartphone className="h-4 w-4 text-slate-400" />
+                <Smartphone className="h-4 w-4 text-indigo-400" />
                 <span>Client & Device Environment</span>
               </div>
               <div className="space-y-2 text-xs">
@@ -304,7 +275,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
               <div className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-slate-400" />
+                <MapPin className="h-4 w-4 text-cyan-400" />
                 <span>Network & Geolocation</span>
               </div>
               <div className="space-y-2 text-xs">
@@ -326,6 +297,46 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                   <span className="text-slate-400">Distance from Anchor</span>
                   <span className="text-slate-200 font-mono">{transaction.location.distanceFromHomeKm} km</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Analyst Investigation Notes & Audit Trail */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                <FileText className="h-4 w-4 text-amber-400" />
+                <span>Analyst Investigation Notes & Audit Trail</span>
+              </div>
+              <span className="text-[11px] font-mono text-slate-500">Immutable Ledger</span>
+            </div>
+
+            <div className="space-y-2">
+              <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                {savedNotes.map((note, idx) => (
+                  <div key={idx} className="rounded bg-slate-950/60 border border-slate-800/80 px-3 py-1.5 text-xs text-slate-300 font-mono flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
+                    <span>{note}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <input
+                  type="text"
+                  placeholder="Add investigation finding (e.g. customer verified travel via 2FA)..."
+                  value={analystNote}
+                  onChange={(e) => setAnalystNote(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveNote()}
+                  className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                />
+                <button
+                  onClick={handleSaveNote}
+                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
+                >
+                  <Save className="h-3.5 w-3.5" />
+                  <span>Save Note</span>
+                </button>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ShieldAlert,
   ShieldCheck,
@@ -19,7 +19,11 @@ import {
   Lock,
   Flame,
   CheckCircle2,
+  Volume2,
+  VolumeX,
+  Radio,
 } from "lucide-react";
+import { soundEngine } from "@/lib/soundFx";
 
 export type AttackVectorType = "abstract_velocity" | "geo_spoof" | "account_takeover" | "credential_stuffing";
 
@@ -31,8 +35,8 @@ interface NavbarProps {
   streamSpeed: "normal" | "fast";
   setStreamSpeed: (speed: "normal" | "fast") => void;
   onSimulateAttackVector: (vector: AttackVectorType) => void;
-  searchQuery?: string;
-  setSearchQuery?: (q: string) => void;
+  apiMode?: "mock" | "live";
+  setApiMode?: (mode: "mock" | "live") => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -43,10 +47,25 @@ export const Navbar: React.FC<NavbarProps> = ({
   streamSpeed,
   setStreamSpeed,
   onSimulateAttackVector,
-  searchQuery = "",
-  setSearchQuery,
+  apiMode = "mock",
+  setApiMode,
 }) => {
   const [showSimulateMenu, setShowSimulateMenu] = useState<boolean>(false);
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(soundEngine.getMuted());
+
+  useEffect(() => {
+    setIsAudioMuted(soundEngine.getMuted());
+    const unsub = soundEngine.subscribe((muted) => setIsAudioMuted(muted));
+    return unsub;
+  }, []);
+
+  const handleToggleAudio = () => {
+    const next = soundEngine.toggleMute();
+    setIsAudioMuted(next);
+    if (!next) {
+      soundEngine.playSuccessChime();
+    }
+  };
 
   const handleSelectSim = (type: AttackVectorType) => {
     setShowSimulateMenu(false);
@@ -120,14 +139,43 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right Action Tools */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          {/* Audio Synthesizer Telemetry Toggle */}
+          <button
+            onClick={handleToggleAudio}
+            className={`flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-all ${
+              !isAudioMuted
+                ? "border-indigo-500/50 bg-indigo-950/40 text-indigo-300 shadow-sm shadow-indigo-900/30"
+                : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
+            }`}
+            title={!isAudioMuted ? "Audio Telemetry Active (Click to mute)" : "Audio Telemetry Muted (Click to enable)"}
+          >
+            {!isAudioMuted ? (
+              <>
+                <Volume2 className="h-3.5 w-3.5 text-indigo-400 animate-pulse" />
+                <span className="hidden xl:inline text-[11px]">Audio On</span>
+              </>
+            ) : (
+              <>
+                <VolumeX className="h-3.5 w-3.5 text-slate-500" />
+                <span className="hidden xl:inline text-[11px]">Muted</span>
+              </>
+            )}
+          </button>
+
+          {/* Engine Connectivity Badge */}
+          <div className="hidden lg:flex items-center gap-1.5 rounded-lg border border-slate-800/80 bg-slate-900/50 px-2.5 py-1 text-[11px] font-mono text-slate-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+            <span>FastAPI: <span className="text-slate-200">XGBoost+SHAP</span></span>
+          </div>
+
           {/* Stream Status Toggle */}
           <div className="flex items-center rounded-lg border border-slate-800 bg-slate-900/60 p-0.5 text-xs">
             <button
               onClick={() => setIsStreaming(!isStreaming)}
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium text-xs transition-colors ${
                 isStreaming
-                  ? "bg-emerald-950/70 text-emerald-300 border border-emerald-800/50"
+                  ? "bg-emerald-950/70 text-emerald-300 border border-emerald-800/50 shadow-sm shadow-emerald-900/20"
                   : "bg-slate-800 text-slate-400"
               }`}
               title="Pause or resume live incoming transactions"

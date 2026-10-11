@@ -187,19 +187,28 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
           <span className="font-medium text-slate-200">{transaction.customerName}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-slate-400">Email</span>
-          <span className="text-slate-300 font-mono text-[11px]">{transaction.customerEmail}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-slate-400">Location</span>
+          <span className="text-slate-400">Location & Hop</span>
           <span className="text-slate-200">
             {transaction.location.city}, {transaction.location.country}
-            {transaction.location.isVpnOrProxy && " (VPN)"}
+            {transaction.location.distanceFromHomeKm > 500 && (
+              <span className="text-rose-400 font-mono text-[11px] ml-1">({transaction.location.distanceFromHomeKm}km)</span>
+            )}
+            {transaction.location.isVpnOrProxy && (
+              <span className="ml-1 rounded bg-rose-950/80 px-1 text-[9px] font-semibold text-rose-300 border border-rose-800/50">
+                VPN
+              </span>
+            )}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-slate-400">Device</span>
-          <span className="text-slate-200 text-[11px]">{transaction.device.browser}</span>
+          <span className="text-slate-200 text-[11px] truncate max-w-[170px]">{transaction.device.browser}</span>
+        </div>
+        <div className="flex justify-between border-t border-slate-800/80 pt-1.5 text-[11px]">
+          <span className="text-slate-400">Anomaly Index</span>
+          <span className="font-mono text-cyan-400 font-semibold">
+            {(transaction.anomalyScore * 100).toFixed(0)}% (Isolation Forest)
+          </span>
         </div>
       </div>
 

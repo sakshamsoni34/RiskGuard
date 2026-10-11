@@ -4,7 +4,17 @@
  */
 class SoundEngine {
   private ctx: AudioContext | null = null;
-  private isMuted: boolean = true; // default muted to respect user preference
+  private isMuted: boolean = false; // default enabled for impactful demo, easily toggled
+  private listeners: ((muted: boolean) => void)[] = [];
+
+  constructor() {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("riskguard_audio_muted");
+      if (saved !== null) {
+        this.isMuted = saved === "true";
+      }
+    }
+  }
 
   private getContext(): AudioContext | null {
     if (typeof window === "undefined") return null;
@@ -20,8 +30,25 @@ class SoundEngine {
     return this.ctx;
   }
 
+  public subscribe(fn: (muted: boolean) => void) {
+    this.listeners.push(fn);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== fn);
+    };
+  }
+
   public setMuted(muted: boolean) {
     this.isMuted = muted;
+    if (typeof window !== "undefined") {
+      localStorage.setItem("riskguard_audio_muted", String(muted));
+    }
+    this.listeners.forEach((fn) => fn(muted));
+  }
+
+  public toggleMute(): boolean {
+    const next = !this.isMuted;
+    this.setMuted(next);
+    return next;
   }
 
   public getMuted(): boolean {
@@ -40,18 +67,45 @@ class SoundEngine {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(680, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.28);
+      osc.frequency.setValueAtTime(740, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.32);
 
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.14, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.32);
+      osc.stop(ctx.currentTime + 0.36);
     } catch {
       // AudioContext policy suppression fallback
+    }
+  }
+
+  /**
+   * Warning tone for 3DS OTP step-up verification needed (Medium risk)
+   */
+  public playStepUpAlert() {
+    if (this.isMuted) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(520, ctx.currentTime);
+      osc.frequency.setValueAtTime(660, ctx.currentTime + 0.12);
+
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.26);
+    } catch {
+      // Fallback
     }
   }
 
@@ -69,13 +123,13 @@ class SoundEngine {
       osc.type = "sine";
       osc.frequency.setValueAtTime(880, ctx.currentTime);
 
-      gain.gain.setValueAtTime(0.04, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.025, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.09);
+      osc.stop(ctx.currentTime + 0.07);
     } catch {
       // AudioContext policy suppression fallback
     }

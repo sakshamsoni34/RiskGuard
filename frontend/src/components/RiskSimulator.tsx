@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Transaction } from "@/types/fraud";
 import { calculateRisk } from "@/lib/scoringEngine";
+import { ShapWaterfallChart } from "@/components/ShapWaterfallChart";
 import {
   Sliders,
   ShieldAlert,
@@ -425,30 +426,12 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             </div>
           </div>
 
-          {/* Factor Breakdown */}
-          <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-xs font-semibold text-slate-300">
-              <span>Key Decision Factors</span>
-              <span className="text-[11px] font-mono text-slate-500">TreeSHAP</span>
-            </div>
-
-            <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
-              {result.shapExplanation.map((item, idx) => {
-                const isInc = item.direction === "increase";
-                return (
-                  <div key={idx} className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-2.5 text-xs space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-200">{item.feature}</span>
-                      <span className={`font-mono text-xs font-semibold ${isInc ? "text-rose-400" : "text-emerald-400"}`}>
-                        {isInc ? `+${item.contribution}` : item.contribution} pts
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400">{item.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/* Interactive Live TreeSHAP Waterfall */}
+          <ShapWaterfallChart
+            shapValues={result.shapExplanation}
+            baseScore={14}
+            finalScore={result.riskScore}
+          />
         </div>
       </div>
     </div>

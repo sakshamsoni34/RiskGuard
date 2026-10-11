@@ -12,6 +12,8 @@ import {
   MapPin,
   ChevronRight,
   ArrowUpRight,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 
 interface TransactionTableProps {
@@ -58,27 +60,75 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
     }
   };
 
+  const handleExportCSV = () => {
+    const headers = [
+      "Transaction ID",
+      "Timestamp",
+      "Customer Name",
+      "Email",
+      "Amount (INR)",
+      "Merchant",
+      "Category",
+      "Risk Score",
+      "Risk Tier",
+      "Decision",
+      "City",
+      "Country",
+      "Proxy / VPN",
+    ];
+
+    const rows = filtered.map((t) => [
+      t.id,
+      t.timestamp,
+      `"${t.customerName}"`,
+      t.customerEmail,
+      t.amount,
+      `"${t.merchant}"`,
+      t.merchantCategory,
+      t.riskScore,
+      t.riskLevel,
+      t.decision,
+      t.location.city,
+      t.location.country,
+      t.location.isVpnOrProxy ? "YES" : "NO",
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `RiskGuard_Transactions_${new Date().toISOString().substring(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#0d1424] shadow-sm">
       {/* Table Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 p-4 gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-white">Live Transactions</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-white">Live Transactions</h2>
+            <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-cyan-400 border border-slate-700/60">
+              {filtered.length} visible
+            </span>
+          </div>
           <p className="text-xs text-slate-400 mt-0.5">
             Real-time evaluated payment requests and automated risk decisions
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           {/* Search Box */}
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by ID, customer, merchant..."
+              placeholder="Search ID, customer, merchant..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 rounded-lg border border-slate-700 bg-slate-900/80 pl-8 pr-3 text-xs text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="h-8 w-44 sm:w-56 rounded-lg border border-slate-700 bg-slate-900/80 pl-8 pr-3 text-xs text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
@@ -90,7 +140,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                 currentFilter === "ALL" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400 hover:text-white"
               }`}
             >
-              All ({transactions.length})
+              All
             </button>
             <button
               onClick={() => handleFilterClick("HIGH")}
@@ -117,6 +167,16 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               Allowed
             </button>
           </div>
+
+          {/* Export CSV Button */}
+          <button
+            onClick={handleExportCSV}
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/90 px-2.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
+            title="Export filtered transactions as CSV"
+          >
+            <Download className="h-3.5 w-3.5 text-slate-400" />
+            <span className="hidden sm:inline">Export</span>
+          </button>
         </div>
       </div>
 
@@ -142,7 +202,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                 </td>
               </tr>
             ) : (
-              filtered.map((txn) => {
+              filtered.map((txn, idx) => {
                 const isHigh = txn.riskLevel === "HIGH";
                 const isMedium = txn.riskLevel === "MEDIUM";
                 const isSelected = selectedTransactionId === txn.id;
@@ -152,6 +212,8 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                     key={txn.id}
                     onClick={() => onSelectTransaction(txn)}
                     className={`transition-colors cursor-pointer group ${
+                      idx === 0 ? "animate-row-enter" : ""
+                    } ${
                       isSelected
                         ? "bg-slate-800/60 border-l-2 border-indigo-500"
                         : "hover:bg-slate-800/40 border-l-2 border-transparent"

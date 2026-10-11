@@ -14,6 +14,7 @@ import { RiskSimulator } from "@/components/RiskSimulator";
 import { ModelAnalytics } from "@/components/ModelAnalytics";
 import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
 import { AlertCircle, ShieldAlert, CheckCircle2, X } from "lucide-react";
+import { soundEngine } from "@/lib/soundFx";
 
 export default function RiskGuardDashboard() {
   const [activeTab, setActiveTab] = useState<"monitor" | "simulator" | "analytics" | "architecture">("monitor");
@@ -40,6 +41,15 @@ export default function RiskGuardDashboard() {
   }, [isStreaming, streamSpeed]);
 
   const addNewTransaction = (newTxn: Transaction) => {
+    // Audio telemetry feedback
+    if (newTxn.decision === "BLOCKED") {
+      soundEngine.playAttackAlert();
+    } else if (newTxn.decision === "OTP_REQUIRED") {
+      soundEngine.playStepUpAlert();
+    } else {
+      soundEngine.playIngestBlip();
+    }
+
     setTransactions((prev) => [newTxn, ...prev.slice(0, 49)]);
 
     setMetrics((prev) => {
@@ -157,11 +167,12 @@ export default function RiskGuardDashboard() {
       subtitle: `Amount: ₹${txn.amount.toLocaleString("en-IN")} • Risk Score: ${txn.riskScore}/100 (${txn.decision})`,
     });
     setTimeout(() => {
-      setAlertNotice(null), 4000;
-    });
+      setAlertNotice(null);
+    }, 4000);
   };
 
   const handleUpdateStatus = (txnId: string, newAction: Transaction["decision"]) => {
+    soundEngine.playSuccessChime();
     setTransactions((prev) =>
       prev.map((t) => (t.id === txnId ? { ...t, decision: newAction, status: "MANUALLY_OVERRIDDEN" } : t))
     );
