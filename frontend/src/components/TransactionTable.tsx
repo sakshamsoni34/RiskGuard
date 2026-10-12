@@ -11,9 +11,8 @@ import {
   CreditCard,
   MapPin,
   ChevronRight,
-  ArrowUpRight,
   Download,
-  FileSpreadsheet,
+  AlertTriangle,
 } from "lucide-react";
 
 interface TransactionTableProps {
@@ -35,6 +34,11 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
 
   const currentFilter = onFilterChange ? activeFilter : internalFilter;
+
+  // Counts for each category
+  const highCount = transactions.filter((t) => t.riskLevel === "HIGH").length;
+  const mediumCount = transactions.filter((t) => t.riskLevel === "MEDIUM").length;
+  const lowCount = transactions.filter((t) => t.riskLevel === "LOW").length;
 
   const filtered = transactions.filter((txn) => {
     let matchesFilter = true;
@@ -70,11 +74,10 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
       "Merchant",
       "Category",
       "Risk Score",
-      "Risk Tier",
       "Decision",
       "City",
       "Country",
-      "Proxy / VPN",
+      "VPN Detected",
     ];
 
     const rows = filtered.map((t) => [
@@ -86,7 +89,6 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
       `"${t.merchant}"`,
       t.merchantCategory,
       t.riskScore,
-      t.riskLevel,
       t.decision,
       t.location.city,
       t.location.country,
@@ -104,75 +106,86 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#0d1424] shadow-sm">
-      {/* Table Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 p-4 gap-3">
+    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-[#0c1220]/90 shadow-xl backdrop-blur-sm">
+      {/* Table Header & Toolbar */}
+      <div className="flex flex-col gap-3.5 border-b border-slate-800/80 p-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-white">Live Transactions</h2>
-            <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-mono text-cyan-400 border border-slate-700/60">
-              {filtered.length} visible
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-sm font-bold text-white tracking-wide">Live Transaction Stream</h2>
+            <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-[11px] font-mono text-cyan-400 border border-slate-700/60">
+              {filtered.length} showing
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real-time evaluated payment requests and automated risk decisions
+            Real-time authorizations analyzed in under 40 milliseconds
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Box */}
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search ID, customer, merchant..."
+              placeholder="Search customer, merchant, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-44 sm:w-56 rounded-lg border border-slate-700 bg-slate-900/80 pl-8 pr-3 text-xs text-slate-200 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="h-9 w-52 sm:w-60 rounded-xl border border-slate-700/80 bg-slate-900/90 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
             />
           </div>
 
-          {/* Quick Filter Segment */}
-          <div className="flex rounded-lg border border-slate-800 bg-slate-900 p-0.5 text-xs">
+          {/* Clean Filter Pills with Counts */}
+          <div className="flex rounded-xl border border-slate-800 bg-slate-900/90 p-1 text-xs">
             <button
               onClick={() => handleFilterClick("ALL")}
-              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                currentFilter === "ALL" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400 hover:text-white"
+              className={`rounded-lg px-3 py-1 font-medium transition-all ${
+                currentFilter === "ALL"
+                  ? "bg-slate-800 text-white shadow-sm font-semibold"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
-              All
+              All ({transactions.length})
             </button>
             <button
               onClick={() => handleFilterClick("HIGH")}
-              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                currentFilter === "HIGH" ? "bg-rose-950 text-rose-300 font-semibold" : "text-slate-400 hover:text-rose-400"
+              className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
+                currentFilter === "HIGH"
+                  ? "bg-rose-950/80 text-rose-300 font-semibold border border-rose-800/50 shadow-sm"
+                  : "text-slate-400 hover:text-rose-400"
               }`}
             >
-              Blocked
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              Blocked ({highCount})
             </button>
             <button
               onClick={() => handleFilterClick("MEDIUM")}
-              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                currentFilter === "MEDIUM" ? "bg-amber-950 text-amber-300 font-semibold" : "text-slate-400 hover:text-amber-400"
+              className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
+                currentFilter === "MEDIUM"
+                  ? "bg-amber-950/80 text-amber-300 font-semibold border border-amber-800/50 shadow-sm"
+                  : "text-slate-400 hover:text-amber-400"
               }`}
             >
-              3DS Review
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              2FA Review ({mediumCount})
             </button>
             <button
               onClick={() => handleFilterClick("LOW")}
-              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                currentFilter === "LOW" ? "bg-emerald-950 text-emerald-300 font-semibold" : "text-slate-400 hover:text-emerald-400"
+              className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
+                currentFilter === "LOW"
+                  ? "bg-emerald-950/80 text-emerald-300 font-semibold border border-emerald-800/50 shadow-sm"
+                  : "text-slate-400 hover:text-emerald-400"
               }`}
             >
-              Allowed
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Approved ({lowCount})
             </button>
           </div>
 
-          {/* Export CSV Button */}
+          {/* Export CSV */}
           <button
             onClick={handleExportCSV}
-            className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/90 px-2.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
-            title="Export filtered transactions as CSV"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-700/80 bg-slate-800/80 px-3 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+            title="Export filtered records to CSV"
           >
             <Download className="h-3.5 w-3.5 text-slate-400" />
             <span className="hidden sm:inline">Export</span>
@@ -180,25 +193,29 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
         </div>
       </div>
 
-      {/* Table Data */}
+      {/* Table Data View */}
       <div className="overflow-x-auto max-h-[580px] overflow-y-auto">
         <table className="w-full text-left text-xs">
-          <thead className="sticky top-0 z-10 border-b border-slate-800 bg-[#090e1a] font-medium text-slate-400 text-[11px]">
+          <thead className="sticky top-0 z-10 border-b border-slate-800/80 bg-[#090e1a] font-semibold text-slate-400 text-[11px] uppercase tracking-wider">
             <tr>
-              <th className="py-2.5 px-4">Transaction</th>
-              <th className="py-2.5 px-4">Customer</th>
-              <th className="py-2.5 px-4">Payment Method</th>
-              <th className="py-2.5 px-4">Amount & Merchant</th>
-              <th className="py-2.5 px-4 text-center">Risk Score</th>
-              <th className="py-2.5 px-4">Decision</th>
-              <th className="py-2.5 px-4 text-right">Details</th>
+              <th className="py-3 px-4">Decision</th>
+              <th className="py-3 px-4">Customer & ID</th>
+              <th className="py-3 px-4">Amount & Merchant</th>
+              <th className="py-3 px-4">Method & Location</th>
+              <th className="py-3 px-4 text-center">AI Risk</th>
+              <th className="py-3 px-4 text-right">Time</th>
+              <th className="py-3 pr-4 pl-1"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="divide-y divide-slate-800/50">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-slate-500">
-                  No transactions match the selected filter criteria.
+                <td colSpan={7} className="py-14 text-center text-slate-400">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <Filter className="h-8 w-8 text-slate-600" />
+                    <p className="font-medium text-slate-300">No transactions match your search filter</p>
+                    <p className="text-xs text-slate-500">Try changing your search keywords or switching filters</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -211,29 +228,59 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                   <tr
                     key={txn.id}
                     onClick={() => onSelectTransaction(txn)}
-                    className={`transition-colors cursor-pointer group ${
+                    className={`transition-all cursor-pointer group ${
                       idx === 0 ? "animate-row-enter" : ""
                     } ${
                       isSelected
-                        ? "bg-slate-800/60 border-l-2 border-indigo-500"
-                        : "hover:bg-slate-800/40 border-l-2 border-transparent"
+                        ? "bg-slate-800/70 border-l-4 border-indigo-500"
+                        : "hover:bg-slate-800/30 border-l-4 border-transparent"
                     }`}
                   >
-                    {/* ID & Time */}
-                    <td className="py-3 px-4">
-                      <div className="font-mono font-medium text-white">{txn.id}</div>
-                      <div className="text-[11px] text-slate-400">{txn.timestamp}</div>
+                    {/* Decision Badge */}
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      {txn.decision === "BLOCKED" && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-950/70 border border-rose-800/50 px-2.5 py-1 text-[11px] font-semibold text-rose-300">
+                          <ShieldAlert className="h-3.5 w-3.5 text-rose-400" />
+                          Blocked
+                        </span>
+                      )}
+                      {txn.decision === "OTP_REQUIRED" && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-950/70 border border-amber-800/50 px-2.5 py-1 text-[11px] font-semibold text-amber-300">
+                          <KeyRound className="h-3.5 w-3.5 text-amber-400" />
+                          2FA Review
+                        </span>
+                      )}
+                      {txn.decision === "APPROVED" && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950/70 border border-emerald-800/50 px-2.5 py-1 text-[11px] font-semibold text-emerald-300">
+                          <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                          Approved
+                        </span>
+                      )}
                     </td>
 
-                    {/* Customer */}
+                    {/* Customer & ID */}
                     <td className="py-3 px-4">
-                      <div className="font-medium text-slate-200">{txn.customerName}</div>
-                      <div className="text-[11px] text-slate-400 truncate max-w-[150px]">{txn.customerEmail}</div>
+                      <div className="font-semibold text-slate-100 group-hover:text-white transition-colors">
+                        {txn.customerName}
+                      </div>
+                      <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                        {txn.id}
+                      </div>
                     </td>
 
-                    {/* Payment Method */}
+                    {/* Amount & Merchant */}
                     <td className="py-3 px-4">
-                      <div className="flex items-center gap-1.5 text-slate-300">
+                      <div className="font-mono font-bold text-white">
+                        ₹{txn.amount.toLocaleString("en-IN")}
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate max-w-[150px]">
+                        {txn.merchant}
+                      </div>
+                    </td>
+
+                    {/* Payment Method & Location */}
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-1.5 text-slate-300 text-xs">
                         <CreditCard className="h-3.5 w-3.5 text-slate-400" />
                         {txn.paymentMethod.type === "card" && (
                           <span>{txn.paymentMethod.brand} •••• {txn.paymentMethod.last4}</span>
@@ -249,28 +296,18 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                         <MapPin className="h-3 w-3 text-slate-500" />
                         <span>{txn.location.city}, {txn.location.country}</span>
                         {txn.location.isVpnOrProxy && (
-                          <span className="rounded bg-rose-950/80 px-1 text-[9px] font-semibold text-rose-300 border border-rose-800/50">
+                          <span className="rounded bg-rose-950/90 px-1 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-800/50">
                             VPN
                           </span>
                         )}
                       </div>
                     </td>
 
-                    {/* Amount & Merchant */}
-                    <td className="py-3 px-4">
-                      <div className="font-mono font-semibold text-white">
-                        ₹{txn.amount.toLocaleString("en-IN")}
-                      </div>
-                      <div className="text-[11px] text-slate-400 truncate max-w-[140px]">
-                        {txn.merchant}
-                      </div>
-                    </td>
-
-                    {/* Risk Score */}
+                    {/* AI Risk Score */}
                     <td className="py-3 px-4 text-center">
                       <div className="inline-flex flex-col items-center">
                         <span
-                          className={`font-mono font-semibold text-xs px-2 py-0.5 rounded ${
+                          className={`font-mono font-bold text-xs px-2 py-0.5 rounded-md ${
                             isHigh
                               ? "bg-rose-950/80 text-rose-300 border border-rose-800/40"
                               : isMedium
@@ -291,31 +328,14 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                       </div>
                     </td>
 
-                    {/* Decision */}
-                    <td className="py-3 px-4">
-                      {txn.decision === "BLOCKED" && (
-                        <span className="inline-flex items-center gap-1.5 rounded-md bg-rose-950/60 border border-rose-800/40 px-2 py-0.5 text-[11px] font-medium text-rose-300">
-                          <ShieldAlert className="h-3 w-3 text-rose-400" />
-                          Blocked
-                        </span>
-                      )}
-                      {txn.decision === "OTP_REQUIRED" && (
-                        <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-950/60 border border-amber-800/40 px-2 py-0.5 text-[11px] font-medium text-amber-300">
-                          <KeyRound className="h-3 w-3 text-amber-400" />
-                          3DS Review
-                        </span>
-                      )}
-                      {txn.decision === "APPROVED" && (
-                        <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
-                          <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                          Allowed
-                        </span>
-                      )}
+                    {/* Timestamp */}
+                    <td className="py-3 px-4 text-right font-mono text-[11px] text-slate-400">
+                      {txn.timestamp}
                     </td>
 
-                    {/* Row Arrow */}
-                    <td className="py-3 px-4 text-right">
-                      <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all inline-block" />
+                    {/* Row Select Chevron */}
+                    <td className="py-3 pr-4 pl-1 text-right">
+                      <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all inline-block" />
                     </td>
                   </tr>
                 );

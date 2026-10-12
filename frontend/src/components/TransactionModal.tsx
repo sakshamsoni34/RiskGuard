@@ -9,12 +9,9 @@ import {
   ShieldAlert,
   ShieldCheck,
   KeyRound,
-  ArrowUpRight,
-  ArrowDownRight,
   Smartphone,
   MapPin,
   Clock,
-  CheckCircle2,
   Lock,
   CreditCard,
   User,
@@ -22,7 +19,9 @@ import {
   FileText,
   Save,
   Activity,
-  History,
+  Layers,
+  Globe2,
+  TrendingUp,
 } from "lucide-react";
 
 interface TransactionModalProps {
@@ -36,10 +35,11 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   onClose,
   onUpdateStatus,
 }) => {
+  const [modalTab, setModalTab] = useState<"summary" | "explainability" | "geo" | "audit">("summary");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [analystNote, setAnalystNote] = useState<string>("");
   const [savedNotes, setSavedNotes] = useState<string[]>([
-    "Initial evaluation triggered by automated ingestion pipeline.",
+    "Real-time evaluation completed by FastAPI XGBoost engine in 34ms.",
   ]);
 
   if (!transaction) return null;
@@ -52,15 +52,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     const now = new Date().toLocaleTimeString("en-IN", { hour12: false });
     setSavedNotes((prev) => [...prev, `[${now}] ${analystNote.trim()}`]);
     setAnalystNote("");
-    setToastMessage("Investigation note appended to audit trail");
+    setToastMessage("Note added to investigation history");
     setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleAction = (action: Transaction["decision"], label: string) => {
     onUpdateStatus(transaction.id, action);
     const now = new Date().toLocaleTimeString("en-IN", { hour12: false });
-    setSavedNotes((prev) => [...prev, `[${now}] Analyst updated status: ${label}`]);
-    setToastMessage(`Decision updated: ${label}`);
+    setSavedNotes((prev) => [...prev, `[${now}] Status updated by analyst: ${label}`]);
+    setToastMessage(`Decision saved: ${label}`);
     setTimeout(() => {
       setToastMessage(null);
     }, 3000);
@@ -70,49 +70,46 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-xl border border-slate-800 bg-[#0c1322] shadow-2xl z-10 my-8">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 bg-slate-900/60">
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-slate-800 bg-[#0c1220] shadow-2xl z-10 my-8 flex flex-col max-h-[90vh]">
+        {/* Modal Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800/80 px-6 py-4 bg-slate-900/80 gap-3">
           <div className="flex items-center gap-3">
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-lg border ${
+              className={`flex h-11 w-11 items-center justify-center rounded-xl border ${
                 isHigh
-                  ? "bg-rose-950/60 border-rose-800/50 text-rose-400"
+                  ? "bg-rose-950/70 border-rose-800/60 text-rose-400"
                   : isMedium
-                  ? "bg-amber-950/60 border-amber-800/50 text-amber-400"
-                  : "bg-emerald-950/60 border-emerald-800/50 text-emerald-400"
+                  ? "bg-amber-950/70 border-amber-800/60 text-amber-400"
+                  : "bg-emerald-950/70 border-emerald-800/60 text-emerald-400"
               }`}
             >
               {isHigh ? (
-                <ShieldAlert className="h-5 w-5" />
+                <ShieldAlert className="h-6 w-6" />
               ) : isMedium ? (
-                <KeyRound className="h-5 w-5" />
+                <KeyRound className="h-6 w-6" />
               ) : (
-                <ShieldCheck className="h-5 w-5" />
+                <ShieldCheck className="h-6 w-6" />
               )}
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h3 className="text-base font-bold text-white font-mono">{transaction.id}</h3>
-                <span className="text-xs text-slate-400 font-mono">
-                  {transaction.timestamp}
-                </span>
                 <span
-                  className={`rounded px-2 py-0.5 text-xs font-semibold border ${
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
                     isHigh
-                      ? "bg-rose-950/80 text-rose-300 border-rose-800/40"
+                      ? "bg-rose-950/80 text-rose-300 border-rose-800/50"
                       : isMedium
-                      ? "bg-amber-950/80 text-amber-300 border-amber-800/40"
-                      : "bg-emerald-950/80 text-emerald-300 border-emerald-800/40"
+                      ? "bg-amber-950/80 text-amber-300 border-amber-800/50"
+                      : "bg-emerald-950/80 text-emerald-300 border-emerald-800/50"
                   }`}
                 >
-                  {transaction.decision === "BLOCKED" ? "Blocked" : transaction.decision === "OTP_REQUIRED" ? "3DS Review" : "Allowed"}
+                  {transaction.decision === "BLOCKED" ? "Blocked (High Risk)" : transaction.decision === "OTP_REQUIRED" ? "2FA Review Required" : "Approved (Low Risk)"}
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -121,252 +118,348 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
           </div>
 
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <div className="text-xs font-bold text-white font-mono">
+                ₹{transaction.amount.toLocaleString("en-IN")}
+              </div>
+              <div className="text-[11px] text-slate-400">{transaction.timestamp}</div>
+            </div>
+            <button
+              onClick={onClose}
+              className="rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Navigation Tabs */}
+        <div className="flex border-b border-slate-800 bg-[#090e1a] px-6 gap-2 text-xs font-medium overflow-x-auto">
           <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            onClick={() => setModalTab("summary")}
+            className={`flex items-center gap-1.5 py-3 border-b-2 px-3 transition-colors ${
+              modalTab === "summary"
+                ? "border-indigo-500 text-white font-semibold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
           >
-            <X className="h-5 w-5" />
+            <Activity className="h-4 w-4 text-cyan-400" />
+            <span>Summary & Verdict</span>
+          </button>
+          <button
+            onClick={() => setModalTab("explainability")}
+            className={`flex items-center gap-1.5 py-3 border-b-2 px-3 transition-colors ${
+              modalTab === "explainability"
+                ? "border-indigo-500 text-white font-semibold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <TrendingUp className="h-4 w-4 text-indigo-400" />
+            <span>AI Feature Attribution (SHAP)</span>
+          </button>
+          <button
+            onClick={() => setModalTab("geo")}
+            className={`flex items-center gap-1.5 py-3 border-b-2 px-3 transition-colors ${
+              modalTab === "geo"
+                ? "border-indigo-500 text-white font-semibold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Globe2 className="h-4 w-4 text-emerald-400" />
+            <span>Travel Hop & Device</span>
+          </button>
+          <button
+            onClick={() => setModalTab("audit")}
+            className={`flex items-center gap-1.5 py-3 border-b-2 px-3 transition-colors ${
+              modalTab === "audit"
+                ? "border-indigo-500 text-white font-semibold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <FileText className="h-4 w-4 text-amber-400" />
+            <span>Audit Trail & Notes</span>
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="max-h-[75vh] overflow-y-auto p-6 space-y-6">
-          {/* Toast Notification */}
+        {/* Modal Content Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Notification Toast */}
           {toastMessage && (
-            <div className="rounded-lg border border-emerald-700/50 bg-emerald-950/80 px-4 py-2.5 text-xs font-medium text-emerald-200 flex items-center gap-2 shadow-lg animate-fade-in">
+            <div className="rounded-xl border border-emerald-700/60 bg-emerald-950/80 px-4 py-2.5 text-xs font-semibold text-emerald-200 flex items-center gap-2 shadow-lg animate-fade-in">
               <Check className="h-4 w-4 text-emerald-400" />
-              {toastMessage}
+              <span>{toastMessage}</span>
             </div>
           )}
 
-          {/* Top Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* 1. Score Gauge Card */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between">
-              <div className="text-xs font-medium text-slate-400 flex items-center justify-between">
-                <span>Risk Score</span>
-                <span className="font-mono text-[11px] text-slate-500">XGBoost Model</span>
-              </div>
-
-              <div className="my-3 flex items-baseline gap-2">
-                <span
-                  className={`text-4xl font-bold font-mono ${
-                    isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"
-                  }`}
-                >
-                  {transaction.riskScore}
-                </span>
-                <span className="text-sm font-medium text-slate-500">/ 100</span>
-              </div>
-
-              <div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-2">
-                  <div
-                    className={`h-full ${
-                      isHigh ? "bg-rose-500" : isMedium ? "bg-amber-500" : "bg-emerald-500"
-                    }`}
-                    style={{ width: `${transaction.riskScore}%` }}
-                  />
+          {/* TAB 1: SUMMARY & VERDICT */}
+          {modalTab === "summary" && (
+            <div className="space-y-6">
+              {/* Top 3 Metric Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Score */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4.5 flex flex-col justify-between">
+                  <div className="text-xs font-medium text-slate-400">AI Risk Assessment</div>
+                  <div className="my-3 flex items-baseline gap-2">
+                    <span
+                      className={`text-4xl font-bold font-mono ${
+                        isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"
+                      }`}
+                    >
+                      {transaction.riskScore}
+                    </span>
+                    <span className="text-sm font-medium text-slate-500">/ 100</span>
+                  </div>
+                  <div>
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-1.5">
+                      <div
+                        className={`h-full ${isHigh ? "bg-rose-500" : isMedium ? "bg-amber-500" : "bg-emerald-500"}`}
+                        style={{ width: `${transaction.riskScore}%` }}
+                      />
+                    </div>
+                    <div className="text-[11px] text-slate-400">
+                      {isHigh ? "High Risk: Score &gt; 70" : isMedium ? "Medium: Score 35-70" : "Low: Score &lt; 35"}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                  <span>0 (Normal)</span>
-                  <span>35 (3DS)</span>
-                  <span>70 (Block)</span>
-                  <span>100</span>
+
+                {/* Policy Action */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4.5 flex flex-col justify-between">
+                  <div className="text-xs font-medium text-slate-400">Automated Defense Policy</div>
+                  <div className="my-2">
+                    <div
+                      className={`text-base font-bold ${
+                        isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"
+                      }`}
+                    >
+                      {transaction.decision === "BLOCKED" ? "Automatic Block" : transaction.decision === "OTP_REQUIRED" ? "3DS Step-Up Challenge" : "Frictionless Pass"}
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      {isHigh
+                        ? "Intercepted immediately. Card was not charged to protect the account balance."
+                        : isMedium
+                        ? "Triggered SMS OTP challenge to confirm the legitimate cardholder is present."
+                        : "Approved seamlessly with 0 customer friction in 32 milliseconds."}
+                    </p>
+                  </div>
+                  <div className="text-[11px] font-mono text-cyan-400 bg-cyan-950/30 border border-cyan-800/40 rounded-lg px-2.5 py-1">
+                    Behavior Anomaly: {(transaction.anomalyScore * 100).toFixed(0)}%
+                  </div>
+                </div>
+
+                {/* Charge Info */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4.5 flex flex-col justify-between">
+                  <div className="text-xs font-medium text-slate-400">Payment Breakdown</div>
+                  <div className="my-2">
+                    <div className="text-2xl font-bold font-mono text-white">
+                      ₹{transaction.amount.toLocaleString("en-IN")}
+                    </div>
+                    <div className="text-xs text-slate-300 mt-1">
+                      Merchant: <span className="font-semibold text-white">{transaction.merchant}</span>
+                    </div>
+                    <div className="text-xs text-slate-400 mt-0.5">
+                      Category: {transaction.merchantCategory}
+                    </div>
+                  </div>
+                  <div className="text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 flex justify-between">
+                    <span>Recent Velocity:</span>
+                    <span className="font-mono text-slate-200">{transaction.velocity.lastHourCount} tx in last hour</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Reasons Why Flagged */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <h4 className="text-sm font-semibold text-white">Primary Risk Factors for This Decision</h4>
+                  <span className="text-xs text-slate-500">Decomposed by TreeSHAP</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {transaction.shapExplanation.map((item, idx) => {
+                    const isIncrease = item.direction === "increase";
+                    return (
+                      <div
+                        key={idx}
+                        className="rounded-xl border border-slate-800/90 bg-slate-950/50 p-3 flex items-start justify-between gap-3"
+                      >
+                        <div>
+                          <div className="font-semibold text-xs text-slate-200">{item.feature}</div>
+                          <div className="text-xs text-slate-400 mt-0.5 leading-relaxed">{item.description}</div>
+                          <div className="text-[10px] text-slate-500 font-mono mt-1">Input: {item.rawValue}</div>
+                        </div>
+                        <span
+                          className={`font-mono text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                            isIncrease
+                              ? "text-rose-300 bg-rose-950/80 border border-rose-800/50"
+                              : "text-emerald-300 bg-emerald-950/80 border border-emerald-800/50"
+                          }`}
+                        >
+                          {isIncrease ? `+${item.contribution}` : item.contribution} pts
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
+          )}
 
-            {/* 2. Classification Tier */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between">
-              <div className="text-xs font-medium text-slate-400">
-                Decision Policy
-              </div>
-              <div className="my-2">
-                <div
-                  className={`text-base font-semibold ${
-                    isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"
-                  }`}
-                >
-                  {transaction.riskLevel} Risk Tier
-                </div>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  {isHigh
-                    ? "Score exceeds 70 threshold. Automatic block enacted to safeguard against unauthorized transfer."
-                    : isMedium
-                    ? "Falls in 35–70 band. 3DS OTP challenge issued to cardholder."
-                    : "Score below 35 cutoff. Automatically allowed with zero customer friction."}
+          {/* TAB 2: AI FEATURE ATTRIBUTION (SHAP) */}
+          {modalTab === "explainability" && (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-300 leading-relaxed">
+                <p>
+                  <strong className="text-white">TreeSHAP Explainability:</strong> Every machine learning score starts at a baseline population average (14 points). Each transaction attribute either adds risk or subtracts risk. Below is the exact additive mathematical waterfall that produced the final score of <strong className="text-white">{transaction.riskScore}/100</strong>.
                 </p>
               </div>
-              <div className="text-[11px] font-mono text-cyan-400 bg-cyan-950/30 border border-cyan-800/40 rounded px-2 py-1">
-                Anomaly Rating: {(transaction.anomalyScore * 100).toFixed(0)}% (Isolation Forest)
-              </div>
+
+              <ShapWaterfallChart
+                shapValues={transaction.shapExplanation}
+                baseScore={14}
+                finalScore={transaction.riskScore}
+              />
             </div>
+          )}
 
-            {/* 3. Payment Details */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col justify-between">
-              <div className="text-xs font-medium text-slate-400">
-                Payment Profile
-              </div>
-              <div className="my-2">
-                <div className="text-2xl font-bold font-mono text-white">
-                  ₹{transaction.amount.toLocaleString("en-IN")}
-                </div>
-                <div className="text-xs text-slate-400 mt-1">
-                  Merchant: <span className="text-slate-200 font-medium">{transaction.merchant}</span>
-                </div>
-                <div className="text-xs text-slate-400 mt-0.5">
-                  Payment: <span className="text-slate-200 font-medium">
-                    {transaction.paymentMethod.type === "card" && `${transaction.paymentMethod.brand} •••• ${transaction.paymentMethod.last4}`}
-                    {transaction.paymentMethod.type === "upi" && transaction.paymentMethod.upiHandle}
-                    {transaction.paymentMethod.type === "netbanking" && transaction.paymentMethod.bankName}
-                  </span>
-                </div>
-              </div>
-              <div className="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-                <span>Recent Velocity</span>
-                <span className="font-mono text-slate-200">{transaction.velocity.lastHourCount} tx in last hour</span>
-              </div>
-            </div>
-          </div>
+          {/* TAB 3: GEOSPATIAL & DEVICE */}
+          {modalTab === "geo" && (
+            <div className="space-y-6">
+              <GeoThreatMap
+                location={transaction.location}
+                homeCity="Mumbai"
+                homeCountry="India"
+              />
 
-          {/* Interactive TreeSHAP Explainability Waterfall */}
-          <ShapWaterfallChart
-            shapValues={transaction.shapExplanation}
-            baseScore={14}
-            finalScore={transaction.riskScore}
-          />
-
-          {/* Geospatial Threat & Impossible Travel Vector */}
-          <GeoThreatMap
-            location={transaction.location}
-            homeCity="Mumbai"
-            homeCountry="India"
-          />
-
-          {/* Client Hardware & Network Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-              <div className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Smartphone className="h-4 w-4 text-indigo-400" />
-                <span>Client & Device Environment</span>
-              </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Browser</span>
-                  <span className="text-slate-200 font-mono">{transaction.device.browser}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Operating System</span>
-                  <span className="text-slate-200 font-mono">{transaction.device.os}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Fingerprint Hash</span>
-                  <span className="text-slate-300 font-mono">{transaction.device.fingerprintHash}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Device Status</span>
-                  <span className={transaction.device.isNewDevice ? "text-amber-400 font-medium" : "text-emerald-400 font-medium"}>
-                    {transaction.device.isNewDevice ? "Unrecognized Client" : "Verified Trusted Device"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-              <div className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-cyan-400" />
-                <span>Network & Geolocation</span>
-              </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Location</span>
-                  <span className="text-slate-200 font-medium">{transaction.location.city}, {transaction.location.country}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">IP Address</span>
-                  <span className="text-slate-300 font-mono">{transaction.location.ipAddress}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5">
-                  <span className="text-slate-400">Proxy / VPN</span>
-                  <span className={transaction.location.isVpnOrProxy ? "text-rose-400 font-medium" : "text-emerald-400 font-medium"}>
-                    {transaction.location.isVpnOrProxy ? "Detected (Anonymous Proxy)" : "Clean Domestic ISP"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Distance from Anchor</span>
-                  <span className="text-slate-200 font-mono">{transaction.location.distanceFromHomeKm} km</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Analyst Investigation Notes & Audit Trail */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-200">
-                <FileText className="h-4 w-4 text-amber-400" />
-                <span>Analyst Investigation Notes & Audit Trail</span>
-              </div>
-              <span className="text-[11px] font-mono text-slate-500">Immutable Ledger</span>
-            </div>
-
-            <div className="space-y-2">
-              <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
-                {savedNotes.map((note, idx) => (
-                  <div key={idx} className="rounded bg-slate-950/60 border border-slate-800/80 px-3 py-1.5 text-xs text-slate-300 font-mono flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
-                    <span>{note}</span>
+              {/* Hardware & Network Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4.5 space-y-3">
+                  <div className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                    <Smartphone className="h-4 w-4 text-indigo-400" />
+                    <span>Client Device Telemetry</span>
                   </div>
-                ))}
-              </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-400">Browser</span>
+                      <span className="text-slate-200 font-mono">{transaction.device.browser}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-400">Operating System</span>
+                      <span className="text-slate-200 font-mono">{transaction.device.os}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-400">Fingerprint Hash</span>
+                      <span className="text-slate-300 font-mono">{transaction.device.fingerprintHash}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Device Status</span>
+                      <span className={transaction.device.isNewDevice ? "text-amber-400 font-semibold" : "text-emerald-400 font-semibold"}>
+                        {transaction.device.isNewDevice ? "Unrecognized Client" : "Verified Trusted Device"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="flex gap-2 pt-1">
-                <input
-                  type="text"
-                  placeholder="Add investigation finding (e.g. customer verified travel via 2FA)..."
-                  value={analystNote}
-                  onChange={(e) => setAnalystNote(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSaveNote()}
-                  className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
-                />
-                <button
-                  onClick={handleSaveNote}
-                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  <span>Save Note</span>
-                </button>
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4.5 space-y-3">
+                  <div className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-cyan-400" />
+                    <span>Network & Origin Data</span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-400">Observed City / Country</span>
+                      <span className="text-slate-200 font-medium">{transaction.location.city}, {transaction.location.country}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-400">IP Address</span>
+                      <span className="text-slate-300 font-mono">{transaction.location.ipAddress}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800/60 pb-2">
+                      <span className="text-slate-400">Proxy / VPN Detection</span>
+                      <span className={transaction.location.isVpnOrProxy ? "text-rose-400 font-semibold" : "text-emerald-400 font-semibold"}>
+                        {transaction.location.isVpnOrProxy ? "Detected (Anonymous Proxy)" : "Clean Domestic ISP"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Distance from Billing Home</span>
+                      <span className="text-slate-200 font-mono">{transaction.location.distanceFromHomeKm.toLocaleString()} km</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* TAB 4: AUDIT TRAIL & NOTES */}
+          {modalTab === "audit" && (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                    <FileText className="h-4 w-4 text-amber-400" />
+                    <span>Investigation Log & Audit History</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-500">Immutable Audit Ledger</span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {savedNotes.map((note, idx) => (
+                      <div key={idx} className="rounded-xl bg-slate-950/70 border border-slate-800/80 px-3.5 py-2 text-xs text-slate-300 font-mono flex items-center gap-2.5">
+                        <span className="h-2 w-2 rounded-full bg-indigo-400 flex-shrink-0" />
+                        <span>{note}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <input
+                      type="text"
+                      placeholder="Add investigation observation (e.g. Cardholder confirmed overseas trip)..."
+                      value={analystNote}
+                      onChange={(e) => setAnalystNote(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSaveNote()}
+                      className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                    />
+                    <button
+                      onClick={handleSaveNote}
+                      className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
+                    >
+                      <Save className="h-3.5 w-3.5" />
+                      <span>Save</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Footer Actions */}
+        {/* Modal Footer Controls */}
         <div className="flex flex-wrap items-center justify-between border-t border-slate-800 bg-slate-950 px-6 py-4 gap-3">
           <div className="text-xs text-slate-400 flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5 text-slate-500" />
-            <span>Manual Analyst Override</span>
+            <Lock className="h-4 w-4 text-slate-500" />
+            <span>Analyst Override Action:</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => handleAction("APPROVED", "Allowed")}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
+              className="rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
             >
-              Allow Transaction
+              Approve Transaction
             </button>
             <button
               onClick={() => handleAction("OTP_REQUIRED", "3DS OTP Requested")}
-              className="rounded-lg border border-amber-800/40 bg-amber-950/60 px-3 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-900/60 transition-colors"
+              className="rounded-xl border border-amber-800/50 bg-amber-950/70 px-3.5 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-900/80 transition-colors"
             >
               Request 3DS OTP
             </button>
             <button
               onClick={() => handleAction("BLOCKED", "Fraud Block Confirmed")}
-              className="rounded-lg border border-rose-800/40 bg-rose-950/60 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-900/60 transition-colors"
+              className="rounded-xl border border-rose-800/50 bg-rose-950/70 px-3.5 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-900/80 transition-colors"
             >
-              Confirm Block
+              Confirm Fraud Block
             </button>
           </div>
         </div>

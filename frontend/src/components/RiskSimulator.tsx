@@ -9,8 +9,6 @@ import {
   ShieldAlert,
   ShieldCheck,
   KeyRound,
-  ArrowUpRight,
-  ArrowDownRight,
   Send,
   RotateCcw,
   Smartphone,
@@ -18,6 +16,9 @@ import {
   Check,
   Flame,
   Zap,
+  Info,
+  Layers,
+  ArrowRight,
 } from "lucide-react";
 
 interface RiskSimulatorProps {
@@ -34,6 +35,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
   const [merchantCategory, setMerchantCategory] = useState<string>("Electronics");
   const [merchantName, setMerchantName] = useState<string>("Apple Store Online");
   const [injectedNotice, setInjectedNotice] = useState<boolean>(false);
+  const [activeScenario, setActiveScenario] = useState<string>("velocity");
 
   // Compute live score using the exact ML engine logic
   const result = useMemo(() => {
@@ -54,6 +56,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
 
   // Preset Handlers
   const applyAbstractFraudPreset = () => {
+    setActiveScenario("velocity");
     setAmount(85000);
     setAvgUserAmount(6000);
     setIsNewDevice(true);
@@ -65,6 +68,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
   };
 
   const applyAtoCryptoPreset = () => {
+    setActiveScenario("crypto");
     setAmount(145000);
     setAvgUserAmount(12000);
     setIsNewDevice(true);
@@ -76,6 +80,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
   };
 
   const applyMediumOtpPreset = () => {
+    setActiveScenario("discretionary");
     setAmount(32000);
     setAvgUserAmount(9000);
     setIsNewDevice(true);
@@ -87,6 +92,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
   };
 
   const applyLegitimatePreset = () => {
+    setActiveScenario("legitimate");
     setAmount(1850);
     setAvgUserAmount(4500);
     setIsNewDevice(false);
@@ -105,7 +111,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
       id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
       timestamp: timeString,
       customerId: `CUST-${Math.floor(1000 + Math.random() * 9000)}`,
-      customerName: "Saksham Soni (Test Payment)",
+      customerName: "Saksham Soni (Simulator)",
       customerEmail: "saksham.soni@example.com",
       customerPhone: "+91 98201 00921",
       amount,
@@ -152,59 +158,115 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
 
   return (
     <div className="space-y-6">
-      {/* Header and Preset Scenarios */}
-      <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Overview & Quick Scenario Cards */}
+      <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-5 space-y-4">
         <div>
-          <h2 className="text-base font-semibold text-white">Rule Testing Sandbox</h2>
-          <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
-            Simulate incoming transaction attributes and observe how model rules, velocity checks, and risk thresholds evaluate in real-time.
+          <h2 className="text-base font-bold text-white tracking-wide">
+            Interactive Rule Testing Sandbox
+          </h2>
+          <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Test how the AI model evaluates different transaction scenarios in real time. Click a preset scenario below or adjust the sliders to watch how risk rules calculate scores.
           </p>
         </div>
 
-        {/* Presets */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-500 font-medium">Scenarios:</span>
-          <button
+        {/* 4 Clickable Scenarios */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+          {/* Scenario 1 */}
+          <div
             onClick={applyAbstractFraudPreset}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
+            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
+              activeScenario === "velocity"
+                ? "border-rose-500/70 bg-rose-950/30 ring-1 ring-rose-500/30"
+                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+            }`}
           >
-            Velocity burst (₹85k)
-          </button>
-          <button
+            <div className="flex items-center gap-2">
+              <Flame className="h-4 w-4 text-rose-400" />
+              <span className="text-xs font-semibold text-slate-200">Velocity Attack</span>
+            </div>
+            <div className="mt-2 text-sm font-bold font-mono text-white">₹85,000</div>
+            <p className="text-[11px] text-slate-400 mt-1">3 attempts in 2 min + Lagos IP</p>
+            <span className="inline-block mt-2 text-[10px] font-semibold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">
+              Expected: Auto-Blocked
+            </span>
+          </div>
+
+          {/* Scenario 2 */}
+          <div
             onClick={applyAtoCryptoPreset}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
+            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
+              activeScenario === "crypto"
+                ? "border-rose-500/70 bg-rose-950/30 ring-1 ring-rose-500/30"
+                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+            }`}
           >
-            Crypto ATO (₹1.45L)
-          </button>
-          <button
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-purple-400" />
+              <span className="text-xs font-semibold text-slate-200">Crypto Account Drain</span>
+            </div>
+            <div className="mt-2 text-sm font-bold font-mono text-white">₹1,45,000</div>
+            <p className="text-[11px] text-slate-400 mt-1">Brand new device + VPN Proxy</p>
+            <span className="inline-block mt-2 text-[10px] font-semibold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">
+              Expected: Auto-Blocked
+            </span>
+          </div>
+
+          {/* Scenario 3 */}
+          <div
             onClick={applyMediumOtpPreset}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
+            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
+              activeScenario === "discretionary"
+                ? "border-amber-500/70 bg-amber-950/30 ring-1 ring-amber-500/30"
+                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+            }`}
           >
-            Discretionary spend (₹32k)
-          </button>
-          <button
+            <div className="flex items-center gap-2">
+              <KeyRound className="h-4 w-4 text-amber-400" />
+              <span className="text-xs font-semibold text-slate-200">Unusual High Spend</span>
+            </div>
+            <div className="mt-2 text-sm font-bold font-mono text-white">₹32,000</div>
+            <p className="text-[11px] text-slate-400 mt-1">Jewelry store on new browser</p>
+            <span className="inline-block mt-2 text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40">
+              Expected: 2FA OTP Challenge
+            </span>
+          </div>
+
+          {/* Scenario 4 */}
+          <div
             onClick={applyLegitimatePreset}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
+            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
+              activeScenario === "legitimate"
+                ? "border-emerald-500/70 bg-emerald-950/30 ring-1 ring-emerald-500/30"
+                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+            }`}
           >
-            Everyday grocery (₹1.85k)
-          </button>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-400" />
+              <span className="text-xs font-semibold text-slate-200">Normal Grocery</span>
+            </div>
+            <div className="mt-2 text-sm font-bold font-mono text-white">₹1,850</div>
+            <p className="text-[11px] text-slate-400 mt-1">Known laptop + domestic home ISP</p>
+            <span className="inline-block mt-2 text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">
+              Expected: Instant Approval
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Main Grid: Parameters on Left, Output on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Parameters Column (7 cols) */}
-        <div className="lg:col-span-7 space-y-4 rounded-xl border border-slate-800 bg-[#0d1424] p-5">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <span className="text-xs font-semibold text-slate-300">Transaction Parameters</span>
-            <span className="text-xs font-mono text-slate-500">FastAPI Model Evaluation</span>
+        <div className="lg:col-span-7 space-y-4 rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-5">
+          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+            <span className="text-xs font-bold text-white uppercase tracking-wider">Configure Transaction</span>
+            <span className="text-xs font-mono text-slate-400">FastAPI Model Scoring</span>
           </div>
 
           {/* Amount Slider */}
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <label className="font-medium text-slate-300">Transaction Amount (₹)</label>
-              <div className="font-mono text-base font-semibold text-white bg-slate-900 px-2.5 py-1 rounded border border-slate-800">
+              <label className="font-semibold text-slate-200">Transaction Amount</label>
+              <div className="font-mono text-base font-bold text-white bg-slate-900 px-3 py-1 rounded-xl border border-slate-700/80">
                 ₹{amount.toLocaleString("en-IN")}
               </div>
             </div>
@@ -215,41 +277,20 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
               step={500}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
-              className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-800 rounded"
+              className="w-full accent-indigo-500 cursor-pointer h-2 bg-slate-800 rounded-lg"
             />
-            <div className="flex justify-between text-[11px] text-slate-500 font-mono">
-              <span>₹500</span>
+            <div className="flex justify-between text-[11px] text-slate-400 font-mono">
+              <span>₹500 (micro)</span>
               <span>₹50,000</span>
-              <span>₹85,000</span>
-              <span>₹1,50,000</span>
+              <span>₹1,50,000 (high ticket)</span>
             </div>
           </div>
 
-          {/* User Baseline */}
-          <div className="space-y-2 border-t border-slate-800/80 pt-3">
+          {/* Velocity Attempts */}
+          <div className="space-y-2 border-t border-slate-800/80 pt-3.5">
             <div className="flex justify-between items-center text-xs">
-              <label className="font-medium text-slate-300">Cardholder Average Transaction (₹)</label>
-              <span className="font-mono text-xs text-slate-300">
-                ₹{avgUserAmount.toLocaleString("en-IN")}{" "}
-                <span className="text-slate-500">({(amount / avgUserAmount).toFixed(1)}x ratio)</span>
-              </span>
-            </div>
-            <input
-              type="range"
-              min={1000}
-              max={30000}
-              step={1000}
-              value={avgUserAmount}
-              onChange={(e) => setAvgUserAmount(Number(e.target.value))}
-              className="w-full accent-slate-600 cursor-pointer h-1.5 bg-slate-800 rounded"
-            />
-          </div>
-
-          {/* Velocity */}
-          <div className="space-y-2 border-t border-slate-800/80 pt-3">
-            <div className="flex justify-between items-center text-xs">
-              <label className="font-medium text-slate-300">Card Attempts in Last 2 Minutes</label>
-              <span className="font-mono text-xs font-semibold text-white bg-slate-800 px-2 py-0.5 rounded">
+              <label className="font-semibold text-slate-200">Card Attempts in Last 2 Minutes</label>
+              <span className="font-mono text-xs font-bold text-white bg-slate-800 px-2.5 py-1 rounded-lg">
                 {velocityLast2Min} attempts
               </span>
             </div>
@@ -260,25 +301,25 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
               step={1}
               value={velocityLast2Min}
               onChange={(e) => setVelocityLast2Min(Number(e.target.value))}
-              className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-800 rounded"
+              className="w-full accent-indigo-500 cursor-pointer h-2 bg-slate-800 rounded-lg"
             />
             <p className="text-[11px] text-slate-400">
               {velocityLast2Min >= 3
                 ? "Multiple authorizations within 120 seconds heavily penalizes the velocity feature score."
-                : "Normal authorization cadence."}
+                : "Normal single transaction."}
             </p>
           </div>
 
-          {/* Device & Proxy Toggles */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800/80 pt-3">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 space-y-2">
-              <span className="text-xs font-medium text-slate-300 block">Device Fingerprint</span>
+          {/* Device & Network Toggles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800/80 pt-3.5">
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3 space-y-2">
+              <span className="text-xs font-semibold text-slate-300 block">Device Fingerprint</span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewDevice(false)}
-                  className={`flex-1 rounded py-1.5 text-xs font-medium transition-colors ${
-                    !isNewDevice ? "bg-slate-800 text-white border border-slate-700" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
+                    !isNewDevice ? "bg-slate-800 text-white border border-slate-700 shadow-sm" : "text-slate-400 hover:text-white"
                   }`}
                 >
                   Known Device
@@ -286,8 +327,8 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <button
                   type="button"
                   onClick={() => setIsNewDevice(true)}
-                  className={`flex-1 rounded py-1.5 text-xs font-medium transition-colors ${
-                    isNewDevice ? "bg-rose-950 text-rose-300 border border-rose-800/50" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
+                    isNewDevice ? "bg-rose-950 text-rose-300 border border-rose-800/50 shadow-sm" : "text-slate-400 hover:text-white"
                   }`}
                 >
                   Unrecognized
@@ -295,14 +336,14 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
               </div>
             </div>
 
-            <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 space-y-2">
-              <span className="text-xs font-medium text-slate-300 block">Network Origin</span>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3 space-y-2">
+              <span className="text-xs font-semibold text-slate-300 block">Network Connection</span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setIsVpnOrProxy(false)}
-                  className={`flex-1 rounded py-1.5 text-xs font-medium transition-colors ${
-                    !isVpnOrProxy ? "bg-slate-800 text-white border border-slate-700" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
+                    !isVpnOrProxy ? "bg-slate-800 text-white border border-slate-700 shadow-sm" : "text-slate-400 hover:text-white"
                   }`}
                 >
                   Residential ISP
@@ -310,8 +351,8 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <button
                   type="button"
                   onClick={() => setIsVpnOrProxy(true)}
-                  className={`flex-1 rounded py-1.5 text-xs font-medium transition-colors ${
-                    isVpnOrProxy ? "bg-rose-950 text-rose-300 border border-rose-800/50" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
+                    isVpnOrProxy ? "bg-rose-950 text-rose-300 border border-rose-800/50 shadow-sm" : "text-slate-400 hover:text-white"
                   }`}
                 >
                   VPN / Proxy
@@ -320,24 +361,24 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             </div>
           </div>
 
-          {/* Travel & Merchant Category */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800/80 pt-3">
+          {/* Distance & Merchant */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800/80 pt-3.5">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300">Distance from Billing Address</label>
+              <label className="text-xs font-semibold text-slate-300">Distance from Customer Home</label>
               <select
                 value={distanceJumpKm}
                 onChange={(e) => setDistanceJumpKm(Number(e.target.value))}
-                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
               >
-                <option value={15}>Local (&lt; 20 km)</option>
+                <option value={15}>Local (&lt; 20 km) - Normal</option>
                 <option value={150}>Domestic Travel (150 km)</option>
-                <option value={4800}>Cross-Border (Moscow, 4,800 km)</option>
+                <option value={4800}>Cross-Border Jump (Moscow, 4,800 km)</option>
                 <option value={7200}>Impossible Travel (Lagos, 7,200 km)</option>
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300">Merchant Category</label>
+              <label className="text-xs font-semibold text-slate-300">Merchant Category</label>
               <select
                 value={merchantCategory}
                 onChange={(e) => {
@@ -347,26 +388,25 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                   if (e.target.value === "Jewelry") setMerchantName("Tanishq Jewellers");
                   if (e.target.value === "Grocery") setMerchantName("Blinkit Supermarket");
                 }}
-                className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
               >
-                <option value="Electronics">Electronics (High Resale)</option>
+                <option value="Electronics">Electronics (High Resale Risk)</option>
                 <option value="Crypto">Crypto (Non-Reversible)</option>
                 <option value="Jewelry">Jewelry & Gold</option>
                 <option value="Travel">Travel & Airlines</option>
                 <option value="Grocery">Grocery & Retail</option>
-                <option value="Utilities">Utilities & Bills</option>
               </select>
             </div>
           </div>
         </div>
 
-        {/* Right Output Column (5 cols) */}
+        {/* Output Column (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Result Card */}
-          <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <span className="text-xs font-semibold text-slate-300">Model Evaluation Output</span>
-              <span className="text-[11px] font-mono text-slate-400">P95 Latency: 34ms</span>
+          <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-5 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+              <span className="text-xs font-bold text-white uppercase tracking-wider">AI Evaluation Verdict</span>
+              <span className="text-xs font-mono text-emerald-400">Response: 32ms</span>
             </div>
 
             <div className="flex items-center justify-between">
@@ -375,58 +415,58 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <div className="text-4xl font-bold font-mono text-white mt-1">
                   {result.riskScore} <span className="text-sm font-normal text-slate-500">/ 100</span>
                 </div>
-                <div className="text-xs font-medium text-slate-300 mt-1">
-                  Tier: <span className={isHigh ? "text-rose-400 font-semibold" : isMedium ? "text-amber-400 font-semibold" : "text-emerald-400 font-semibold"}>{result.riskLevel} Risk</span>
+                <div className="text-xs font-semibold text-slate-300 mt-1">
+                  Classification: <span className={isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"}>{result.riskLevel} Risk</span>
                 </div>
               </div>
 
               <div>
                 {result.decision === "BLOCKED" && (
-                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-rose-800/50 bg-rose-950/80 px-3 py-1.5 text-xs font-semibold text-rose-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-800/60 bg-rose-950/80 px-3.5 py-1.5 text-xs font-bold text-rose-300">
                     <ShieldAlert className="h-4 w-4 text-rose-400" />
-                    Blocked
+                    Auto-Blocked
                   </span>
                 )}
                 {result.decision === "OTP_REQUIRED" && (
-                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-800/50 bg-amber-950/80 px-3 py-1.5 text-xs font-semibold text-amber-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-800/60 bg-amber-950/80 px-3.5 py-1.5 text-xs font-bold text-amber-300">
                     <KeyRound className="h-4 w-4 text-amber-400" />
-                    Require 3DS
+                    Require 3DS OTP
                   </span>
                 )}
                 {result.decision === "APPROVED" && (
-                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-800/50 bg-emerald-950/80 px-3 py-1.5 text-xs font-semibold text-emerald-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-800/60 bg-emerald-950/80 px-3.5 py-1.5 text-xs font-bold text-emerald-300">
                     <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                    Allowed
+                    Auto-Approved
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
               <div
-                className={`h-full ${isHigh ? "bg-rose-500" : isMedium ? "bg-amber-500" : "bg-emerald-500"}`}
+                className={`h-full transition-all duration-300 ${isHigh ? "bg-rose-500" : isMedium ? "bg-amber-500" : "bg-emerald-500"}`}
                 style={{ width: `${result.riskScore}%` }}
               />
             </div>
 
-            <div className="pt-2 border-t border-slate-800">
+            <div className="pt-2 border-t border-slate-800/80">
               <button
                 onClick={handleInject}
-                className="w-full flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-xs font-bold text-white hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-950/40"
               >
                 <Send className="h-4 w-4" />
-                Inject into Live Stream
+                Inject this Test into Live Stream
               </button>
               {injectedNotice && (
-                <div className="mt-2 text-center text-xs font-medium text-emerald-400 flex items-center justify-center gap-1">
-                  <Check className="h-3.5 w-3.5" />
-                  Transaction added to live queue
+                <div className="mt-2 text-center text-xs font-semibold text-emerald-400 flex items-center justify-center gap-1.5 animate-fade-in">
+                  <Check className="h-4 w-4" />
+                  Sent! Check the Live Monitor tab.
                 </div>
               )}
             </div>
           </div>
 
-          {/* Interactive Live TreeSHAP Waterfall */}
+          {/* TreeSHAP Waterfall Explanation */}
           <ShapWaterfallChart
             shapValues={result.shapExplanation}
             baseScore={14}

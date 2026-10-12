@@ -13,7 +13,7 @@ import { TransactionModal } from "@/components/TransactionModal";
 import { RiskSimulator } from "@/components/RiskSimulator";
 import { ModelAnalytics } from "@/components/ModelAnalytics";
 import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
-import { AlertCircle, ShieldAlert, CheckCircle2, X } from "lucide-react";
+import { ShieldAlert, ShieldCheck, KeyRound, CheckCircle2, X, Info, Zap, ArrowRight, Sparkles } from "lucide-react";
 import { soundEngine } from "@/lib/soundFx";
 
 export default function RiskGuardDashboard() {
@@ -26,6 +26,7 @@ export default function RiskGuardDashboard() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [alertNotice, setAlertNotice] = useState<{ title: string; subtitle: string } | null>(null);
   const [activeFilter, setActiveFilter] = useState<"ALL" | "HIGH" | "MEDIUM" | "LOW">("ALL");
+  const [showGuideBanner, setShowGuideBanner] = useState<boolean>(true);
 
   // Ingestion stream simulation
   useEffect(() => {
@@ -89,7 +90,7 @@ export default function RiskGuardDashboard() {
       attackTxn.decision = "BLOCKED";
 
       setAlertNotice({
-        title: "Test Payment Injected: ₹85,000 at Apple Store Online",
+        title: "Test Injected: ₹85,000 at Apple Store Online",
         subtitle: "Scored 96/100 (High Risk). Automatically blocked by velocity burst rule and proxy detection.",
       });
     } else if (vector === "geo_spoof") {
@@ -109,7 +110,7 @@ export default function RiskGuardDashboard() {
       attackTxn.decision = "BLOCKED";
 
       setAlertNotice({
-        title: "Test Payment Injected: Impossible Travel (4,800 km jump)",
+        title: "Test Injected: Impossible Travel (4,800 km jump)",
         subtitle: "Scored 91/100 (High Risk). Moscow IP detected within minutes of domestic Mumbai activity.",
       });
     } else if (vector === "account_takeover") {
@@ -128,7 +129,7 @@ export default function RiskGuardDashboard() {
       attackTxn.decision = "BLOCKED";
 
       setAlertNotice({
-        title: "Test Payment Injected: Account Takeover Attempt (₹1,45,000)",
+        title: "Test Injected: Account Takeover Attempt (₹1,45,000)",
         subtitle: "Scored 98/100 (High Risk). Large non-refundable crypto ticket on brand new client token.",
       });
     } else {
@@ -145,7 +146,7 @@ export default function RiskGuardDashboard() {
       attackTxn.decision = "BLOCKED";
 
       setAlertNotice({
-        title: "Test Payment Injected: Rapid Carding Micro-Probe",
+        title: "Test Injected: Rapid Carding Micro-Probe",
         subtitle: "Scored 84/100 (High Risk). Multiple rapid transactions flagged as automated card testing.",
       });
     }
@@ -155,7 +156,7 @@ export default function RiskGuardDashboard() {
 
     setTimeout(() => {
       setAlertNotice(null);
-    }, 5000);
+    }, 6000);
   };
 
   const handleInjectFromSimulator = (txn: Transaction) => {
@@ -168,7 +169,7 @@ export default function RiskGuardDashboard() {
     });
     setTimeout(() => {
       setAlertNotice(null);
-    }, 4000);
+    }, 5000);
   };
 
   const handleUpdateStatus = (txnId: string, newAction: Transaction["decision"]) => {
@@ -182,7 +183,7 @@ export default function RiskGuardDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#080c16] text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
       {/* Header */}
       <Navbar
         activeTab={activeTab}
@@ -198,17 +199,19 @@ export default function RiskGuardDashboard() {
       <main className="mx-auto flex-1 w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         {/* Notice Banner */}
         {alertNotice && (
-          <div className="rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-xs flex items-center justify-between shadow-lg animate-fade-in">
-            <div className="flex items-center gap-2.5">
-              <ShieldAlert className="h-4 w-4 text-rose-400 flex-shrink-0" />
+          <div className="rounded-2xl border border-indigo-500/50 bg-indigo-950/90 px-4.5 py-3 text-xs flex items-center justify-between shadow-2xl animate-fade-in backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+                <Sparkles className="h-4 w-4" />
+              </div>
               <div>
-                <span className="font-semibold text-white">{alertNotice.title}</span>
-                <span className="text-slate-400 ml-2 hidden sm:inline">{alertNotice.subtitle}</span>
+                <span className="font-bold text-white">{alertNotice.title}</span>
+                <span className="text-slate-300 ml-2 hidden sm:inline">{alertNotice.subtitle}</span>
               </div>
             </div>
             <button
               onClick={() => setAlertNotice(null)}
-              className="text-slate-400 hover:text-white transition-colors"
+              className="text-slate-400 hover:text-white transition-colors p-1"
             >
               <X className="h-4 w-4" />
             </button>
@@ -218,6 +221,54 @@ export default function RiskGuardDashboard() {
         {/* Tab 1: Live Transactions */}
         {activeTab === "monitor" && (
           <div className="space-y-6">
+            {/* Quick 3-Step Guide: How RiskGuard Evaluates Fraud */}
+            {showGuideBanner && (
+              <div className="relative rounded-2xl border border-slate-800 bg-gradient-to-r from-[#0d1527] via-[#0b1220] to-[#0a101d] p-4.5 sm:p-5 shadow-lg">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <h3 className="text-sm font-bold text-white tracking-wide">
+                        Real-Time Fraud Defense Engine
+                      </h3>
+                      <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-[10px] text-slate-300 font-mono border border-slate-700/60">
+                        P95: 34ms
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
+                      Every payment is scored in 34ms using machine learning models (XGBoost + Isolation Forest) across velocity bursts, proxy hops, and hardware identity.
+                    </p>
+                  </div>
+
+                  {/* 3 Step Visual Flow */}
+                  <div className="flex items-center gap-2 text-xs flex-wrap self-start md:self-auto">
+                    <div className="flex items-center gap-1.5 rounded-xl bg-slate-900/90 border border-slate-800 px-3 py-1.5 text-slate-300">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-[10px]">1</span>
+                      <span className="font-medium">Live Payment</span>
+                    </div>
+                    <span className="text-slate-600 text-xs">→</span>
+                    <div className="flex items-center gap-1.5 rounded-xl bg-slate-900/90 border border-slate-800 px-3 py-1.5 text-slate-300">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400 font-bold text-[10px]">2</span>
+                      <span className="font-medium">AI Scoring (0-100)</span>
+                    </div>
+                    <span className="text-slate-600 text-xs">→</span>
+                    <div className="flex items-center gap-1.5 rounded-xl bg-slate-900/90 border border-slate-800 px-3 py-1.5 text-slate-300">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">3</span>
+                      <span className="font-medium">Pass / 2FA / Block</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowGuideBanner(false)}
+                  className="absolute top-3 right-3 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                  title="Dismiss this guide"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* Real-time Status Bar */}
             <ThreatTicker
               transactions={transactions}
@@ -277,10 +328,10 @@ export default function RiskGuardDashboard() {
       )}
 
       {/* Clean Fintech Footer */}
-      <footer className="border-t border-slate-800 bg-[#070b13] py-4 text-xs text-slate-500">
+      <footer className="border-t border-slate-800/80 bg-[#070b13] py-4 text-xs text-slate-500">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-300">RiskGuard</span>
+            <span className="font-bold text-slate-300">RiskGuard</span>
             <span>•</span>
             <span>Real-Time Fraud Prevention & Risk Scoring System</span>
           </div>
