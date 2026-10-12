@@ -16,7 +16,7 @@ export interface ApiConfig {
 export const defaultApiConfig: ApiConfig = {
   mlServiceUrl: process.env.NEXT_PUBLIC_ML_SERVICE_URL || "http://localhost:8000",
   gatewayUrl: process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:5000",
-  useLiveBackend: false, // default to mock simulation until backend services are started
+  useLiveBackend: true, // connected to live FastAPI ML engine on :8000
 };
 
 /**
