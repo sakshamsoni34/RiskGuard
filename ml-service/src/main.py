@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.schemas import (
     TransactionEvaluationRequest,
     RiskEvaluationResponse,
+    BatchEvaluationRequest,
+    BatchEvaluationResponse,
     ModelMetricsResponse,
     HealthCheckResponse,
 )
@@ -92,6 +94,17 @@ def evaluate_transaction(request: TransactionEvaluationRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference failure: {str(e)}")
+
+@app.post("/v1/risk/evaluate/batch", response_model=BatchEvaluationResponse, tags=["Inference"])
+def evaluate_batch_transactions(request: BatchEvaluationRequest):
+    try:
+        if len(request.transactions) > 100:
+            raise HTTPException(status_code=400, detail="Batch size exceeds maximum limit of 100 transactions")
+        return risk_engine.evaluate_batch(request.transactions)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Batch inference failure: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

@@ -43,6 +43,19 @@ class RiskEvaluationResponse(BaseModel):
     shap_explanation: List[ShapValue] = Field(default_factory=list, description="TreeSHAP local feature attribution factors")
     anomaly_score: float = Field(..., description="Unsupervised Isolation Forest anomaly score (-1 to 1 or normalized 0 to 1)")
     rule_flags: List[str] = Field(default_factory=list, description="Rule-based heuristic trigger alerts")
+    # Optional extensions for Phase 4 (backward compatible)
+    model_version: Optional[str] = Field("2.0.0", description="Model architecture version")
+    calibrated_probability: Optional[float] = Field(None, description="Calibrated posterior fraud probability [0, 1]")
+    risk_band: Optional[str] = Field(None, description="Detailed 4-band risk category")
+    top_reasons: Optional[List[str]] = Field(default_factory=list, description="Top decision driver bullet points")
+
+class BatchEvaluationRequest(BaseModel):
+    transactions: List[TransactionEvaluationRequest] = Field(..., max_length=100)
+
+class BatchEvaluationResponse(BaseModel):
+    results: List[RiskEvaluationResponse]
+    total_processed: int
+    batch_latency_ms: float
 
 class ModelMetricsResponse(BaseModel):
     totalProcessed: int

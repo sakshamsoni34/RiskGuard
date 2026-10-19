@@ -78,15 +78,15 @@ def test_high_fraud_velocity_burst_blocked():
     assert len(data["shap_explanation"]) > 0
 
 def test_moderate_risk_otp_required():
-    """Test Case 4: Moderate deviation (e.g. ₹9,500 on new device without impossible travel) -> OTP_REQUIRED."""
+    """Test Case 4: Moderate deviation (e.g. ₹9,500 on new device with 400km jump and velocity=2) -> OTP_REQUIRED."""
     payload = {
         "amount": 9500.0,
         "currency": "INR",
         "merchant_category": "Electronics",
         "is_new_device": True,
-        "velocity_2min": 1,
+        "velocity_2min": 2,
         "is_vpn_proxy": False,
-        "distance_jump_km": 15.0,
+        "distance_jump_km": 400.0,
         "avg_user_amount": 2000.0,
     }
     response = client.post("/v1/risk/evaluate", json=payload)

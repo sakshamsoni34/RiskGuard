@@ -8,10 +8,18 @@ import pandas as pd
 import joblib
 import shap
 
-from src.config import MODELS_DIR, OTP_THRESHOLD, BLOCK_THRESHOLD, ALL_FEATURE_COLUMNS
+from src.config import (
+    MODELS_DIR,
+    OTP_THRESHOLD,
+    BLOCK_THRESHOLD,
+    CRITICAL_THRESHOLD,
+    MODEL_VERSION,
+    ALL_FEATURE_COLUMNS,
+)
 from src.schemas import (
     TransactionEvaluationRequest,
     RiskEvaluationResponse,
+    BatchEvaluationResponse,
     ShapValue,
     RiskLevel,
     DecisionAction,
@@ -207,13 +215,39 @@ class RiskEngine:
                 description=desc
             ))
 
+        # 4-band classification
+        if final_risk_score >= CRITICAL_THRESHOLD:
+            risk_band = "CRITICAL"
+        elif final_risk_score >= BLOCK_THRESHOLD:
+            risk_band = "HIGH"
+        elif final_risk_score >= OTP_THRESHOLD:
+            risk_band = "MEDIUM"
+        else:
+            risk_band = "LOW"
+
+        top_reasons = [item.description for item in shap_items[:3]]
+
         return RiskEvaluationResponse(
             risk_score=final_risk_score,
             risk_level=risk_level,
             decision=decision,
             shap_explanation=shap_items,
             anomaly_score=anomaly_score,
-            rule_flags=rule_flags
+            rule_flags=rule_flags,
+            model_version=MODEL_VERSION,
+            calibrated_probability=round(float(p_true), 4),
+            risk_band=risk_band,
+            top_reasons=top_reasons,
+        )
+
+    def evaluate_batch(self, requests: List[TransactionEvaluationRequest]) -> BatchEvaluationResponse:
+        t0 = time.perf_counter()
+        results = [self.evaluate(req) for req in requests]
+        batch_duration_ms = round((time.perf_counter() - t0) * 1000, 2)
+        return BatchEvaluationResponse(
+            results=results,
+            total_processed=len(results),
+            batch_latency_ms=batch_duration_ms,
         )
 
     def get_metrics(self) -> Dict[str, Any]:

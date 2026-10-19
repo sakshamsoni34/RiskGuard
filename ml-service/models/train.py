@@ -44,13 +44,9 @@ def run_training_pipeline():
     data_dir.mkdir(parents=True, exist_ok=True)
 
     csv_path = data_dir / "transactions.csv"
-    if not csv_path.exists():
-        print(f"Dataset not found at {csv_path}. Generating 25,000 transactions...")
-        df_raw = generate_transaction_dataset(num_samples=25000, fraud_ratio=0.018, seed=42)
-        df_raw.to_csv(csv_path, index=False)
-    else:
-        print(f"Loading existing transactions from {csv_path}...")
-        df_raw = pd.read_csv(csv_path)
+    print(f"Generating 25,000 calibrated transactions with 6 fraud typologies and label noise...")
+    df_raw = generate_transaction_dataset(num_samples=25000, fraud_ratio=0.02, seed=42)
+    df_raw.to_csv(csv_path, index=False)
 
     print(f"Dataset loaded: {len(df_raw)} records")
     total_fraud = int(df_raw["is_fraud"].sum())
@@ -206,6 +202,8 @@ def run_training_pipeline():
         "featureColumns": ALL_FEATURE_COLUMNS,
         "otpThreshold": OTP_THRESHOLD,
         "blockThreshold": BLOCK_THRESHOLD,
+        "criticalThreshold": 88.0,
+        "modelVersion": "2.0.0",
     }
 
     metrics_file = artifacts_dir / "model_metrics.json"

@@ -1,17 +1,17 @@
 {
   "totalProcessed": 25000,
-  "fraudBlockedAmount": 25599535.83,
-  "fraudAttemptCount": 449,
-  "otpChallengeCount": 0,
-  "autoApprovedCount": 24553,
-  "blockedCount": 447,
-  "precision": 1.0,
-  "recall": 0.9778,
-  "f1Score": 0.9888,
-  "prAuc": 0.9974,
-  "rocAuc": 0.9999,
-  "falsePositiveRate": 0.0,
-  "avgLatencyMs": 23.03,
+  "fraudBlockedAmount": 28999752.01,
+  "fraudAttemptCount": 859,
+  "otpChallengeCount": 39,
+  "autoApprovedCount": 24481,
+  "blockedCount": 480,
+  "precision": 0.9083,
+  "recall": 0.5756,
+  "f1Score": 0.7046,
+  "prAuc": 0.5931,
+  "rocAuc": 0.7801,
+  "falsePositiveRate": 0.0021,
+  "avgLatencyMs": 2.87,
   "featureColumns": [
     "amount",
     "avg_user_amount",
@@ -32,5 +32,7 @@
     "cat_Utilities"
   ],
   "otpThreshold": 35.0,
-  "blockThreshold": 70.0
+  "blockThreshold": 70.0,
+  "criticalThreshold": 88.0,
+  "modelVersion": "2.0.0"
 }

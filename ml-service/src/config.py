@@ -9,6 +9,9 @@ DATA_DIR = BASE_DIR / "data"
 # Risk threshold cutoffs (calibrated for business risk & cost optimization)
 OTP_THRESHOLD = 35.0
 BLOCK_THRESHOLD = 70.0
+CRITICAL_THRESHOLD = 88.0
+MAX_BATCH_SIZE = 100
+MODEL_VERSION = "2.0.0"
 
 # Server configurations
 HOST = "0.0.0.0"
