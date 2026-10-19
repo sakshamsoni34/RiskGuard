@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useActionState } from "react";
+import { loginAction } from "./actions";
 import {
   ShieldAlert,
   KeyRound,
@@ -14,23 +14,14 @@ import {
 } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const [state, formAction, isPending] = useActionState(loginAction, null);
   const [badgeId, setBadgeId] = useState("CC-8421");
-  const [password, setPassword] = useState("••••••••••••");
+  const [password, setPassword] = useState("investigator123");
   const [role, setRole] = useState("INVESTIGATOR");
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.push("/dashboard");
-    }, 600);
-  };
-
-  const setDemoOfficer = (badge: string, officerRole: string) => {
+  const setDemoOfficer = (badge: string, pass: string, officerRole: string) => {
     setBadgeId(badge);
+    setPassword(pass);
     setRole(officerRole);
   };
 
@@ -62,7 +53,13 @@ export default function LoginPage() {
 
         {/* Login Form Card */}
         <div className="fintech-card p-6 rounded-2xl border border-slate-800 space-y-5">
-          <form onSubmit={handleLogin} className="space-y-4">
+          {state?.error && (
+            <div className="p-3 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-mono">
+              {state.error}
+            </div>
+          )}
+
+          <form action={formAction} className="space-y-4">
             <div>
               <label className="block text-xs font-mono text-slate-300 mb-1.5 flex items-center justify-between">
                 <span>OFFICER BADGE ID</span>
@@ -72,6 +69,7 @@ export default function LoginPage() {
                 <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="text"
+                  name="badge_number"
                   required
                   value={badgeId}
                   onChange={(e) => setBadgeId(e.target.value)}
@@ -90,6 +88,7 @@ export default function LoginPage() {
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="password"
+                  name="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -101,6 +100,7 @@ export default function LoginPage() {
             <div>
               <label className="block text-xs font-mono text-slate-300 mb-1.5">UNIT CLEARANCE LEVEL</label>
               <select
+                name="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full bg-[#070b14] border border-slate-700/80 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -114,10 +114,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="w-full py-2.5 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-900/40 disabled:opacity-50"
             >
-              {loading ? (
+              {isPending ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>AUTHENTICATING SECURE SESSION...</span>
@@ -140,7 +140,7 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
               <button
                 type="button"
-                onClick={() => setDemoOfficer("CC-8421", "INVESTIGATOR")}
+                onClick={() => setDemoOfficer("CC-8421", "investigator123", "INVESTIGATOR")}
                 className="p-2 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-left transition-colors"
               >
                 <div className="text-indigo-300 font-semibold">Insp. Sharma</div>
@@ -148,7 +148,7 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setDemoOfficer("CC-9104", "INVESTIGATOR")}
+                onClick={() => setDemoOfficer("CC-9104", "investigator123", "INVESTIGATOR")}
                 className="p-2 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-left transition-colors"
               >
                 <div className="text-cyan-300 font-semibold">Sub-Insp. Patel</div>
@@ -156,7 +156,7 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setDemoOfficer("SUP-010", "SUPERVISOR")}
+                onClick={() => setDemoOfficer("SUP-010", "supervisor123", "SUPERVISOR")}
                 className="p-2 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-left transition-colors"
               >
                 <div className="text-amber-300 font-semibold">ACP Rajesh Nair</div>
@@ -164,7 +164,7 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setDemoOfficer("ADM-001", "ADMIN")}
+                onClick={() => setDemoOfficer("ADM-001", "admin123", "ADMIN")}
                 className="p-2 rounded bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-left transition-colors"
               >
                 <div className="text-emerald-300 font-semibold">Admin Desai</div>

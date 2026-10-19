@@ -8,15 +8,13 @@ import { calculateRisk } from "./scoringEngine";
  */
 
 export interface ApiConfig {
-  mlServiceUrl: string;
-  gatewayUrl: string;
+  baseUrl: string;
   useLiveBackend: boolean;
 }
 
 export const defaultApiConfig: ApiConfig = {
-  mlServiceUrl: process.env.NEXT_PUBLIC_ML_SERVICE_URL || "http://localhost:8000",
-  gatewayUrl: process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:5000",
-  useLiveBackend: true, // connected to live FastAPI ML engine on :8000
+  baseUrl: "/api/v1",
+  useLiveBackend: true,
 };
 
 /**
@@ -27,12 +25,11 @@ export async function evaluateRisk(
   config: ApiConfig = defaultApiConfig
 ): Promise<ReturnType<typeof calculateRisk>> {
   if (!config.useLiveBackend) {
-    // High-performance client-side inference simulation
     return calculateRisk(params);
   }
 
   try {
-    const res = await fetch(`${config.mlServiceUrl}/v1/risk/evaluate`, {
+    const res = await fetch(`${config.baseUrl}/transactions/evaluate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +47,7 @@ export async function evaluateRisk(
     });
 
     if (!res.ok) {
-      throw new Error(`ML engine returned HTTP ${res.status}`);
+      throw new Error(`Scoring engine returned HTTP ${res.status}`);
     }
 
     const data = await res.json();
@@ -63,13 +60,13 @@ export async function evaluateRisk(
       ruleFlags: data.rule_flags || [],
     };
   } catch (err) {
-    console.warn("Live FastAPI service unavailable; falling back to local ML engine simulation:", err);
+    console.warn("Live backend unavailable; falling back to local simulation:", err);
     return calculateRisk(params);
   }
 }
 
 /**
- * Send manual analyst decision override to audit ledger (PostgreSQL)
+ * Send manual analyst decision override to audit ledger
  */
 export async function recordAnalystOverride(
   transactionId: string,
@@ -82,18 +79,17 @@ export async function recordAnalystOverride(
   }
 
   try {
-    const res = await fetch(`${config.gatewayUrl}/api/v1/transactions/${transactionId}/override`, {
+    const res = await fetch(`${config.baseUrl}/transactions/${transactionId}/override`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         decision: newDecision,
-        analyst_notes: analystNotes,
-        timestamp: new Date().toISOString(),
+        reason: analystNotes || "Manual officer override",
       }),
     });
     return res.ok;
   } catch (err) {
-    console.warn("API Gateway unreachable for override record:", err);
+    console.warn("Backend unreachable for override record:", err);
     return false;
   }
 }
