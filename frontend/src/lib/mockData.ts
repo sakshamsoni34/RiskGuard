@@ -1,3 +1,7 @@
+/**
+ * SYNTHETIC DEMO DATA ONLY — no real persons, accounts, or financial data.
+ * All names are fictional, all emails use @example.org (RFC 2606 reserved).
+ */
 import { Transaction, ModelMetrics } from "@/types/fraud";
 import { calculateRisk } from "./scoringEngine";
 
@@ -8,7 +12,7 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:09:42",
     customerId: "CUST-8492",
     customerName: "Vikram Mehta",
-    customerEmail: "vikram.mehta@gmail.com",
+    customerEmail: "vikram.mehta@example.org",
     customerPhone: "+91 98201 44821",
     amount: 85000,
     currency: "INR",
@@ -89,7 +93,7 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:08:15",
     customerId: "CUST-3910",
     customerName: "Ananya Iyer",
-    customerEmail: "ananya.iyer@outlook.com",
+    customerEmail: "ananya.iyer@example.org",
     customerPhone: "+91 99302 11094",
     amount: 28500,
     currency: "INR",
@@ -156,7 +160,7 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:07:30",
     customerId: "CUST-1192",
     customerName: "Rahul Reddy",
-    customerEmail: "rahul.reddy@yahoo.in",
+    customerEmail: "rahul.reddy@example.org",
     customerPhone: "+91 97110 55418",
     amount: 1499,
     currency: "INR",
@@ -222,7 +226,7 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:05:12",
     customerId: "CUST-7711",
     customerName: "Rohan Chopra",
-    customerEmail: "rohan.chopra@gmail.com",
+    customerEmail: "rohan.chopra@example.org",
     customerPhone: "+91 98104 90211",
     amount: 98000,
     currency: "INR",
@@ -289,7 +293,7 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:03:01",
     customerId: "CUST-4412",
     customerName: "Sneha Nair",
-    customerEmail: "sneha.nair@hdfcbank.com",
+    customerEmail: "sneha.nair@example.org",
     customerPhone: "+91 98450 33819",
     amount: 3240,
     currency: "INR",
@@ -348,7 +352,7 @@ export const initialTransactions: Transaction[] = [
     timestamp: "15:00:20",
     customerId: "CUST-9018",
     customerName: "Aditya Patel",
-    customerEmail: "aditya.patel@gmail.com",
+    customerEmail: "aditya.patel@example.org",
     customerPhone: "+91 99001 88320",
     amount: 42000,
     currency: "INR",

@@ -19,8 +19,8 @@ interface TransactionTableProps {
   transactions: Transaction[];
   selectedTransactionId?: string;
   onSelectTransaction: (txn: Transaction) => void;
-  activeFilter?: "ALL" | "HIGH" | "MEDIUM" | "LOW";
-  onFilterChange?: (filter: "ALL" | "HIGH" | "MEDIUM" | "LOW") => void;
+  activeFilter?: "ALL" | RiskLevel;
+  onFilterChange?: (filter: "ALL" | RiskLevel) => void;
 }
 
 export const TransactionTable: React.FC<TransactionTableProps> = ({
@@ -42,7 +42,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
 
   const filtered = transactions.filter((txn) => {
     let matchesFilter = true;
-    if (currentFilter === "HIGH" || currentFilter === "MEDIUM" || currentFilter === "LOW") {
+    if (currentFilter !== "ALL") {
       matchesFilter = txn.riskLevel === currentFilter;
     }
 

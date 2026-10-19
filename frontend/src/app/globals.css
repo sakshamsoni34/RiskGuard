@@ -8,6 +8,9 @@
   --card: #0d1424;
   --card-foreground: #f8fafc;
   --border: #1a2438;
+  --sidebar-bg: #070b14;
+  --sidebar-border: #141d30;
+  --status-critical: #dc2626;
 }
 
 @layer base {
@@ -68,6 +71,10 @@
 }
 
 /* High-risk alert glow */
+.glow-critical {
+  box-shadow: 0 0 25px -4px rgba(220, 38, 38, 0.45);
+}
+
 .glow-rose {
   box-shadow: 0 0 25px -4px rgba(244, 63, 94, 0.35);
 }

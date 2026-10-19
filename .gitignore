@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Next.js
+.next/
+*/.next/
+out/
+
+# Python / Virtualenv
+venv/
+*/venv/
+__pycache__/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+*/.pytest_cache/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# SQLite demo databases
+*.db
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Build & Test outputs
+dist/
+build/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db

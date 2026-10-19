@@ -21,6 +21,7 @@ const config: Config = {
           low: "#10b981",
           medium: "#f59e0b",
           high: "#f43f5e",
+          critical: "#dc2626",
         },
         cyber: {
           obsidian: "#050811",
@@ -33,6 +34,8 @@ const config: Config = {
           emerald: "#10b981",
           rose: "#f43f5e",
           amber: "#f59e0b",
+          sidebar: "#090e1a",
+          panel: "#0b1222",
         },
       },
       animation: {

@@ -1,10 +1,18 @@
 /**
  * Client-side Web Audio API synthesizer for cybersecurity telemetry sounds.
  * Zero external mp3/wav dependencies.
+ * Sound is OFF by default — officer can enable via Settings.
  */
+
+/** Typed interface for the webkit-prefixed AudioContext (Safari legacy). */
+interface WindowWithWebkitAudio extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 class SoundEngine {
   private ctx: AudioContext | null = null;
-  private isMuted: boolean = false; // default enabled for impactful demo, easily toggled
+  /** Default muted = true (sound is opt-in, not opt-out). */
+  private isMuted: boolean = true;
   private listeners: ((muted: boolean) => void)[] = [];
 
   constructor() {
@@ -13,13 +21,19 @@ class SoundEngine {
       if (saved !== null) {
         this.isMuted = saved === "true";
       }
+      // If never set before, persist the default (muted)
+      else {
+        localStorage.setItem("riskguard_audio_muted", "true");
+      }
     }
   }
 
   private getContext(): AudioContext | null {
     if (typeof window === "undefined") return null;
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as WindowWithWebkitAudio).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
@@ -52,6 +66,10 @@ class SoundEngine {
   }
 
   public getMuted(): boolean {
+    return this.isMuted;
+  }
+
+  public isSoundMuted(): boolean {
     return this.isMuted;
   }
 

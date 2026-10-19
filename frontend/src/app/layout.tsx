@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AppShell } from "@/components/layout/AppShell";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RiskGuard | Real-Time Fraud Detection & Risk Scoring",
+  title: "RiskGuard Investigator | Cybercrime Investigation Support Platform",
   description:
-    "Production-grade financial fraud detection engine powered by XGBoost, Anomaly Detection, and SHAP Explainability.",
+    "AI-assisted financial fraud investigation support platform for authorized Cyber Cell officers. Decision support with SHAP explainability.",
 };
 
 export default function RootLayout({
@@ -17,8 +18,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} min-h-screen bg-[#090d16] text-slate-100 antialiased`}>
-        {children}
+      <body className={`${inter.className} min-h-screen bg-[#080d19] text-slate-100 antialiased`}>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

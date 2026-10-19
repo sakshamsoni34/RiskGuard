@@ -1,3 +1,9 @@
+/**
+ * SYNTHETIC DEMO DATA ONLY — no real persons, accounts, or financial data.
+ * All emails use @example.org (RFC 2606 reserved for documentation).
+ * This scoring engine simulates offline scoring for the Simulator page only.
+ * Live risk evaluation routes through the FastAPI ML service via the backend.
+ */
 import { Transaction, RiskLevel, DecisionAction, ShapValue, SimulationParams, PaymentMethod } from "@/types/fraud";
 
 /**
@@ -284,8 +290,8 @@ export function generateRandomTransaction(forceFraud: boolean = false): Transact
   const now = new Date();
   const timeString = now.toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
-  const emailDomains = ["gmail.com", "outlook.com", "yahoo.in", "icloud.com"];
-  const selectedDomain = emailDomains[Math.floor(Math.random() * emailDomains.length)];
+  const emailDomains = ["example.org"];
+  const selectedDomain = emailDomains[0];
 
   const paymentMethods: PaymentMethod[] = [
     { type: "card", brand: "Visa", last4: "4242" },

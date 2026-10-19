@@ -1,5 +1,70 @@
-export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type DecisionAction = 'APPROVED' | 'OTP_REQUIRED' | 'BLOCKED';
+export type CaseStatus = 'NEW' | 'UNDER_INVESTIGATION' | 'PENDING_APPROVAL' | 'ESCALATED' | 'CLOSED';
+export type CasePriority = 'P1_CRITICAL' | 'P2_HIGH' | 'P3_MEDIUM' | 'P4_LOW';
+
+export interface OfficerUser {
+  id: string;
+  badgeNumber: string;
+  name: string;
+  rank: string;
+  cell: string;
+  role: 'INVESTIGATOR' | 'SUPERVISOR' | 'ADMIN' | 'READONLY';
+  unit: string;
+}
+
+export interface CaseNote {
+  id: string;
+  officerBadge: string;
+  officerName: string;
+  timestamp: string;
+  text: string;
+}
+
+export interface InvestigationCase {
+  id: string;
+  caseNumber: string;
+  title: string;
+  status: CaseStatus;
+  priority: CasePriority;
+  assignedTo: string;
+  targetMuleAccount?: string;
+  suspectEntity?: string;
+  totalAmountAtRisk: number;
+  transactionIds: string[];
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+  notes: CaseNote[];
+  summary: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  officerId: string;
+  officerName: string;
+  action: string;
+  entityType: 'TRANSACTION' | 'CASE' | 'MODEL' | 'REPORT' | 'USER_SESSION';
+  entityId: string;
+  ipAddress: string;
+  sha256Hash: string;
+  details: string;
+}
+
+export interface InvestigationReport {
+  id: string;
+  reportNumber: string;
+  caseId: string;
+  generatedBy: string;
+  generatedAt: string;
+  title: string;
+  totalTransactions: number;
+  totalDisputedAmount: number;
+  primaryTypology: string;
+  sha256VerificationHash: string;
+  status: 'DRAFT' | 'SEALED' | 'DISPATCHED_TO_LEGAL';
+}
 
 export interface ShapValue {
   feature: string;
