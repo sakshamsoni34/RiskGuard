@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  ml-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.ml
+    container_name: riskguard-ml
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:9000
+    restart: unless-stopped
+    networks:
+      - riskguard-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: riskguard-backend
+    ports:
+      - "9000:9000"
+    environment:
+      - APP_ENV=production
+      - ML_SERVICE_URL=http://ml-service:8000
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:9000
+      - DATABASE_URL=sqlite:///./riskguard_investigator.db
+    volumes:
+      - backend-data:/app
+      - reports-data:/app/reports_generated
+    depends_on:
+      ml-service:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - riskguard-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: riskguard-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:9000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - riskguard-net
+
+networks:
+  riskguard-net:
+    driver: bridge
+
+volumes:
+  backend-data:
+  reports-data:

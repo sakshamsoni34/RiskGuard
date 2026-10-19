@@ -1,0 +1,25 @@
+FROM python:3.13-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ ./backend/
+COPY reports_generated/ ./reports_generated/
+
+ENV PYTHONPATH=/app
+ENV APP_ENV=production
+ENV ML_SERVICE_URL=http://ml-service:8000
+
+EXPOSE 9000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:9000/health || exit 1
+
+CMD ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "9000"]
