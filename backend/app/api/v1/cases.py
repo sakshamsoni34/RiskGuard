@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from typing import List, Optional
+from datetime import datetime, timezone
 import json
 
 from backend.app.core.database import get_db
@@ -12,7 +14,10 @@ from backend.app.schemas.case import (
     CaseOut,
     CaseNoteCreate,
     CaseNoteOut,
+    LinkTransactionsRequest,
+    AnalystFeedbackRequest,
 )
+from backend.app.services.case_state_machine import validate_case_transition
 from backend.app.services.audit import record_audit_event
 
 router = APIRouter(prefix="/cases", tags=["Cases"])
@@ -55,13 +60,25 @@ def map_case_to_schema(c: CaseRecord) -> CaseOut:
 def list_cases(
     status: Optional[str] = Query(None),
     priority: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
     query = db.query(CaseRecord)
     if status and status != "ALL":
-        query = query.filter(CaseRecord.status == status)
+        query = query.filter(CaseRecord.status == status.upper())
     if priority and priority != "ALL":
-        query = query.filter(CaseRecord.priority == priority)
+        query = query.filter(CaseRecord.priority == priority.upper())
+    if search:
+        search_pattern = f"%{search.strip()}%"
+        query = query.filter(
+            or_(
+                CaseRecord.case_number.ilike(search_pattern),
+                CaseRecord.title.ilike(search_pattern),
+                CaseRecord.suspect_entity.ilike(search_pattern),
+                CaseRecord.target_mule_account.ilike(search_pattern),
+                CaseRecord.assigned_to.ilike(search_pattern),
+            )
+        )
     cases = query.order_by(CaseRecord.updated_at.desc()).all()
     return [map_case_to_schema(c) for c in cases]
 
@@ -135,10 +152,11 @@ def update_case(id: str, req: CaseUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Case file not found")
 
     old_status = c.status
+    if req.status:
+        validate_case_transition(c.status, req.status)
+        c.status = req.status
     if req.title:
         c.title = req.title
-    if req.status:
-        c.status = req.status
     if req.priority:
         c.priority = req.priority
     if req.assigned_to:
@@ -146,6 +164,7 @@ def update_case(id: str, req: CaseUpdate, db: Session = Depends(get_db)):
     if req.summary:
         c.summary = req.summary
 
+    c.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(c)
 
@@ -175,6 +194,7 @@ def add_case_note(id: str, req: CaseNoteCreate, db: Session = Depends(get_db)):
         text=req.text,
     )
     db.add(note)
+    c.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(note)
 
@@ -195,3 +215,70 @@ def add_case_note(id: str, req: CaseNoteCreate, db: Session = Depends(get_db)):
         timestamp=note.timestamp.isoformat(),
         text=note.text,
     )
+
+
+@router.post("/{id}/transactions", response_model=CaseOut)
+def link_transactions_to_case(id: str, req: LinkTransactionsRequest, db: Session = Depends(get_db)):
+    c = db.query(CaseRecord).filter((CaseRecord.id == id) | (CaseRecord.case_number == id)).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Case file not found")
+
+    existing_links = {l.transaction_id for l in c.links}
+    new_ids = [tid for tid in req.transaction_ids if tid not in existing_links]
+
+    for tid in new_ids:
+        db.add(CaseTransactionLink(case_id=c.id, transaction_id=tid))
+
+    # Recalculate total amount at risk
+    all_txn_ids = list(existing_links.union(new_ids))
+    txns = db.query(TransactionRecord).filter(TransactionRecord.id.in_(all_txn_ids)).all()
+    c.total_amount_at_risk = sum(t.amount for t in txns)
+    c.updated_at = datetime.now(timezone.utc)
+
+    # Add system case note
+    note = CaseNoteRecord(
+        case_id=c.id,
+        officer_badge="#CC-8421",
+        officer_name="Insp. Vikram Sharma",
+        text=f"Linked {len(new_ids)} additional transactions to evidence chain: {', '.join(new_ids[:5])}",
+    )
+    db.add(note)
+    db.commit()
+    db.refresh(c)
+
+    record_audit_event(
+        db=db,
+        officer_id="#CC-8421",
+        officer_name="Insp. Vikram Sharma",
+        action="CASE_TRANSACTIONS_LINKED",
+        entity_type="CASE",
+        entity_id=c.case_number,
+        details=f"Linked {len(new_ids)} transactions. Updated total at risk: ₹{c.total_amount_at_risk:,.2f}",
+    )
+
+    return map_case_to_schema(c)
+
+
+@router.post("/{id}/feedback")
+def submit_analyst_feedback(id: str, req: AnalystFeedbackRequest, db: Session = Depends(get_db)):
+    c = db.query(CaseRecord).filter((CaseRecord.id == id) | (CaseRecord.case_number == id)).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Case file not found")
+
+    record_audit_event(
+        db=db,
+        officer_id="#CC-8421",
+        officer_name="Insp. Vikram Sharma",
+        action="ANALYST_MODEL_FEEDBACK",
+        entity_type="MODEL",
+        entity_id=req.transaction_id,
+        details=f"Ground truth label: {req.ground_truth_label} | Typology: {req.typology_tag} | Notes: {req.notes}",
+    )
+
+    return {
+        "status": "FEEDBACK_LOGGED",
+        "case_id": c.case_number,
+        "transaction_id": req.transaction_id,
+        "ground_truth_label": req.ground_truth_label,
+        "message": "Analyst feedback recorded in audit ledger for model continuous calibration.",
+    }

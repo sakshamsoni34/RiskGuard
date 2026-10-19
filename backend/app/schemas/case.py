@@ -48,3 +48,15 @@ class CaseOut(BaseModel):
     tags: List[str] = []
     notes: List[CaseNoteOut] = []
     summary: str
+
+
+class LinkTransactionsRequest(BaseModel):
+    transaction_ids: List[str]
+
+
+class AnalystFeedbackRequest(BaseModel):
+    transaction_id: str
+    ground_truth_label: str  # TRUE_POSITIVE, FALSE_POSITIVE, TRUE_NEGATIVE, FALSE_NEGATIVE
+    notes: Optional[str] = ""
+    typology_tag: Optional[str] = "ACCOUNT_TAKEOVER"
+

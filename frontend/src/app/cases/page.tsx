@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { InvestigationCase, CaseStatus } from "@/types/fraud";
 import { mockCases } from "@/lib/apiClient";
+import { CaseKanban } from "@/components/cases/CaseKanban";
 import {
   FolderGit2,
   Plus,
@@ -17,63 +18,165 @@ import {
   AlertTriangle,
   FileText,
   DollarSign,
+  LayoutGrid,
+  List,
+  Loader2,
+  X,
 } from "lucide-react";
 
 export default function CasesPage() {
   const [cases, setCases] = useState<InvestigationCase[]>(mockCases);
+  const [viewMode, setViewMode] = useState<"kanban" | "table">("kanban");
   const [statusFilter, setStatusFilter] = useState<"ALL" | CaseStatus>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewCaseModalOpen, setIsNewCaseModalOpen] = useState(false);
   const [newCaseTitle, setNewCaseTitle] = useState("");
   const [newCaseMule, setNewCaseMule] = useState("");
   const [newCasePriority, setNewCasePriority] = useState<InvestigationCase["priority"]>("P2_HIGH");
+  const [newCaseTxnId, setNewCaseTxnId] = useState("TXN-1002");
+  const [alertNotice, setAlertNotice] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch from backend DB
+  const loadCases = useCallback(async () => {
+    try {
+      const q = new URLSearchParams();
+      if (statusFilter !== "ALL") q.set("status", statusFilter);
+      if (searchQuery.trim()) q.set("search", searchQuery.trim());
+
+      const res = await fetch(`/api/v1/cases?${q.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setCases(data);
+        }
+      }
+    } catch {
+      // Keep mock cases
+    }
+  }, [statusFilter, searchQuery]);
+
+  useEffect(() => {
+    loadCases();
+  }, [loadCases]);
+
+  const handleStatusChange = async (caseId: string, newStatus: CaseStatus) => {
+    // Optimistic UI update
+    setCases((prev) =>
+      prev.map((c) => (c.id === caseId ? { ...c, status: newStatus, updatedAt: new Date().toISOString() } : c))
+    );
+
+    try {
+      const res = await fetch(`/api/v1/cases/${caseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        setAlertNotice(`Status transition rejected: ${err.detail || "Invalid transition"}`);
+        loadCases(); // revert
+        return;
+      }
+
+      setAlertNotice(`Case status changed to ${newStatus}. Transition verified & audit signed.`);
+      setTimeout(() => setAlertNotice(null), 4000);
+    } catch {
+      setAlertNotice(`Case status updated locally.`);
+      setTimeout(() => setAlertNotice(null), 4000);
+    }
+  };
+
+  const handleCreateCase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCaseTitle.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/v1/cases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newCaseTitle.trim(),
+          priority: newCasePriority,
+          target_mule_account: newCaseMule.trim() || undefined,
+          suspect_entity: newCaseMule.trim() || undefined,
+          transaction_ids: newCaseTxnId.trim() ? [newCaseTxnId.trim()] : [],
+          summary: "Manually registered case dossier for cybercrime digital investigation.",
+          tags: ["CyberCell-Triage", "Digital-Evidence"],
+        }),
+      });
+
+      if (res.ok) {
+        const created = await res.json();
+        setCases((prev) => [created, ...prev]);
+        setAlertNotice(`Case ${created.caseNumber} registered successfully with immutable audit block.`);
+      } else {
+        // Fallback local
+        const localCase: InvestigationCase = {
+          id: `case-${Date.now()}`,
+          caseNumber: `CR-2026-0${845 + cases.length}`,
+          title: newCaseTitle,
+          status: "NEW",
+          priority: newCasePriority,
+          assignedTo: "Insp. Vikram Sharma",
+          targetMuleAccount: newCaseMule || "unassigned@example.org",
+          totalAmountAtRisk: 120000,
+          transactionIds: [newCaseTxnId || "TXN-1002"],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          tags: ["Manual-Initiation"],
+          summary: "Manually registered case dossier for digital forensics investigation.",
+          notes: [
+            {
+              id: `note-${Date.now()}`,
+              officerBadge: "#CC-8421",
+              officerName: "Insp. V. Sharma",
+              timestamp: new Date().toISOString(),
+              text: "Case dossier initialized by Lead Investigator.",
+            },
+          ],
+        };
+        setCases((prev) => [localCase, ...prev]);
+        setAlertNotice(`Case registered.`);
+      }
+      setNewCaseTitle("");
+      setNewCaseMule("");
+      setIsNewCaseModalOpen(false);
+      setTimeout(() => setAlertNotice(null), 4000);
+    } catch {
+      setIsNewCaseModalOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const filteredCases = cases.filter((c) => {
     const matchesStatus = statusFilter === "ALL" || c.status === statusFilter;
     const matchesSearch =
       c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.caseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.targetMuleAccount && c.targetMuleAccount.toLowerCase().includes(searchQuery.toLowerCase()));
+      (c.targetMuleAccount && c.targetMuleAccount.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (c.suspectEntity && c.suspectEntity.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesStatus && matchesSearch;
   });
 
-  const handleCreateCase = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCaseTitle.trim()) return;
-
-    const newCase: InvestigationCase = {
-      id: `case-${Date.now()}`,
-      caseNumber: `CR-2026-0${845 + cases.length}`,
-      title: newCaseTitle,
-      status: "NEW",
-      priority: newCasePriority,
-      assignedTo: "Insp. Vikram Sharma",
-      targetMuleAccount: newCaseMule || "unassigned@example.org",
-      totalAmountAtRisk: 120000,
-      transactionIds: ["TXN-1002"],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      tags: ["Manual-Initiation", "CyberCell-Triage"],
-      summary: "Manually registered case dossier for further digital forensics investigation.",
-      notes: [
-        {
-          id: `note-${Date.now()}`,
-          officerBadge: "#CC-8421",
-          officerName: "Insp. V. Sharma",
-          timestamp: new Date().toISOString(),
-          text: "Case dossier initialized by Lead Investigator.",
-        },
-      ],
-    };
-
-    setCases([newCase, ...cases]);
-    setNewCaseTitle("");
-    setNewCaseMule("");
-    setIsNewCaseModalOpen(false);
-  };
-
   return (
     <div className="space-y-6">
+      {/* Alert Notice */}
+      {alertNotice && (
+        <div className="p-3 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-mono flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            <span>{alertNotice}</span>
+          </div>
+          <button onClick={() => setAlertNotice(null)} className="text-slate-400 hover:text-white text-xs">
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1222] border border-[#17223b]">
         <div>
@@ -81,7 +184,7 @@ export default function CasesPage() {
             <FolderGit2 className="w-5 h-5 text-indigo-400" />
             <span>Case Investigation Registry</span>
             <span className="text-xs font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              {cases.length} REGISTERED
+              {cases.length} ACTIVE DOSSIERS
             </span>
           </h2>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -89,206 +192,217 @@ export default function CasesPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsNewCaseModalOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-medium transition-all shadow-lg shadow-indigo-900/30"
-        >
-          <Plus className="w-4 h-4" />
-          <span>REGISTER NEW CASE DOSSIER</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          {/* View toggle */}
+          <div className="flex items-center p-1 rounded-xl bg-slate-900 border border-slate-800">
+            <button
+              onClick={() => setViewMode("kanban")}
+              className={`p-1.5 rounded-lg text-xs font-mono flex items-center gap-1 transition-all ${
+                viewMode === "kanban"
+                  ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              title="Kanban Board View"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Kanban</span>
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={`p-1.5 rounded-lg text-xs font-mono flex items-center gap-1 transition-all ${
+                viewMode === "table"
+                  ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              title="Registry Table View"
+            >
+              <List className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Table</span>
+            </button>
+          </div>
+
+          <button
+            onClick={() => setIsNewCaseModalOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-semibold transition-all shadow-lg shadow-indigo-900/30"
+          >
+            <Plus className="w-4 h-4" />
+            <span>REGISTER CASE DOSSIER</span>
+          </button>
+        </div>
       </div>
 
-      {/* Filter Tabs & Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-        {/* Status Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-mono">
-          {(["ALL", "NEW", "UNDER_INVESTIGATION", "ESCALATED", "CLOSED"] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
-                statusFilter === status
-                  ? "bg-indigo-600 text-white font-semibold shadow"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-              }`}
-            >
-              {status.replace(/_/g, " ")}
-            </button>
-          ))}
-        </div>
-
-        {/* Search */}
-        <div className="relative max-w-xs w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0b1222] border border-[#17223b] text-xs font-mono">
+        <div className="relative flex-1 w-full sm:w-auto">
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search case #, title, or mule..."
-            className="w-full bg-[#0d1424] text-xs text-slate-200 placeholder-slate-500 pl-9 pr-3 py-2 rounded-lg border border-slate-800 focus:outline-none focus:border-indigo-500 font-mono"
+            placeholder="Search by Case No (CR-2026-0842), suspect entity, or mule UPI..."
+            className="w-full pl-9 pr-3 py-2 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/60"
           />
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <span className="text-slate-500 flex items-center gap-1">
+            <Filter className="w-3.5 h-3.5" /> Status:
+          </span>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as any)}
+            className="px-2.5 py-1.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500/60"
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="NEW">NEW</option>
+            <option value="UNDER_INVESTIGATION">UNDER_INVESTIGATION</option>
+            <option value="ESCALATED">ESCALATED</option>
+            <option value="CLOSED">CLOSED</option>
+          </select>
         </div>
       </div>
 
-      {/* Cases Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredCases.map((c) => {
-          const isCritical = c.priority === "P1_CRITICAL";
-          return (
-            <div
-              key={c.id}
-              className={`fintech-card p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 group hover:border-indigo-500/40 ${
-                isCritical ? "border-rose-900/50 bg-rose-950/10" : "border-slate-800"
-              }`}
-            >
-              <div className="space-y-3">
-                {/* Top Row: Case Number & Status */}
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-indigo-400">{c.caseNumber}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
-                        c.priority === "P1_CRITICAL"
-                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
-                          : c.priority === "P2_HIGH"
-                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                          : "bg-slate-800 text-slate-300 border border-slate-700"
-                      }`}
-                    >
-                      {c.priority.replace(/_/g, " ")}
-                    </span>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded ${
-                        c.status === "ESCALATED"
-                          ? "bg-rose-900/40 text-rose-400"
-                          : c.status === "UNDER_INVESTIGATION"
-                          ? "bg-cyan-900/40 text-cyan-400"
-                          : "bg-slate-800 text-slate-400"
-                      }`}
-                    >
-                      {c.status.replace(/_/g, " ")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Case Title */}
-                <div>
-                  <h3 className="font-semibold text-sm text-slate-100 group-hover:text-indigo-200 transition-colors line-clamp-2">
-                    {c.title}
-                  </h3>
-                  <p className="text-xs text-slate-400 font-mono mt-1 line-clamp-2">{c.summary}</p>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {c.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/60"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bottom Meta & Action Link */}
-              <div className="pt-3 border-t border-slate-800/80 space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-400">Amount at Risk:</span>
-                  <span className="font-bold text-slate-200">₹{c.totalAmountAtRisk.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-400">Assigned:</span>
-                  <span className="text-slate-300">{c.assignedTo}</span>
-                </div>
-                <div className="pt-2">
-                  <Link
-                    href={`/cases/${c.id}`}
-                    className="w-full py-2 px-3 rounded-lg bg-slate-800/80 hover:bg-indigo-600/30 text-indigo-300 font-mono text-xs flex items-center justify-center gap-1.5 transition-colors border border-slate-700 hover:border-indigo-500/40"
-                  >
-                    <span>OPEN INVESTIGATION FILE</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* Main Content: Kanban or Table */}
+      {viewMode === "kanban" ? (
+        <CaseKanban cases={filteredCases} onStatusChange={handleStatusChange} />
+      ) : (
+        <div className="rounded-2xl border border-slate-800 bg-[#0c1222]/90 overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left font-mono text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-900/80 text-[11px] text-slate-400">
+                  <th className="px-4 py-3">CASE NUMBER</th>
+                  <th className="px-4 py-3">TITLE / SYNDICATE</th>
+                  <th className="px-4 py-3">PRIORITY</th>
+                  <th className="px-4 py-3">STATUS</th>
+                  <th className="px-4 py-3">AT RISK</th>
+                  <th className="px-4 py-3">LEAD OFFICER</th>
+                  <th className="px-4 py-3 text-right">DOSSIER</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCases.map((c) => (
+                  <tr key={c.id} className="border-b border-slate-800/60 hover:bg-slate-900/40">
+                    <td className="px-4 py-3 font-semibold text-cyan-400">
+                      <Link href={`/cases/${c.caseNumber || c.id}`}>{c.caseNumber}</Link>
+                    </td>
+                    <td className="px-4 py-3 text-slate-200 max-w-xs truncate">{c.title}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                        {c.priority}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-slate-100">
+                      ₹{c.totalAmountAtRisk.toLocaleString("en-IN")}
+                    </td>
+                    <td className="px-4 py-3 text-slate-400">{c.assignedTo}</td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/cases/${c.caseNumber || c.id}`}
+                        className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 inline-flex items-center gap-1"
+                      >
+                        <span>Open</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* New Case Modal */}
       {isNewCaseModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="fintech-card w-full max-w-lg rounded-2xl border border-slate-800 p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono">
+          <div className="w-full max-w-lg p-6 rounded-2xl bg-[#0c1220] border border-cyan-500/40 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="font-bold text-sm text-slate-100 flex items-center gap-2">
-                <FolderGit2 className="w-4 h-4 text-indigo-400" />
-                <span>Initialize Cybercrime Case Dossier</span>
-              </h3>
+              <div className="flex items-center gap-2">
+                <FolderGit2 className="w-5 h-5 text-cyan-400" />
+                <h3 className="font-semibold text-sm text-slate-100">
+                  Register Cybercrime Case Dossier
+                </h3>
+              </div>
               <button
                 onClick={() => setIsNewCaseModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-white text-sm"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleCreateCase} className="space-y-4">
+            <form onSubmit={handleCreateCase} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1">
-                  CASE INCIDENT TITLE *
-                </label>
+                <label className="text-slate-300 block mb-1">Incident / Case Title *</label>
                 <input
                   type="text"
                   required
                   value={newCaseTitle}
                   onChange={(e) => setNewCaseTitle(e.target.value)}
-                  placeholder="e.g. Distributed SIM Swap & ATM Cashout Cluster"
-                  className="w-full bg-[#070b14] border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-indigo-500"
+                  placeholder="e.g. Investigation into SIM-Swap Ring in North Mumbai"
+                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60"
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-slate-300 block mb-1">Priority Classification</label>
+                  <select
+                    value={newCasePriority}
+                    onChange={(e) => setNewCasePriority(e.target.value as any)}
+                    className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  >
+                    <option value="P1_CRITICAL">P1_CRITICAL (&gt; ₹5L / Multi-city)</option>
+                    <option value="P2_HIGH">P2_HIGH (&gt; ₹1L / Repeat Mule)</option>
+                    <option value="P3_MEDIUM">P3_MEDIUM (Isolated Fraud)</option>
+                    <option value="P4_LOW">P4_LOW (Pre-FIR Inquiry)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-slate-300 block mb-1">Initial Disputed Txn ID</label>
+                  <input
+                    type="text"
+                    value={newCaseTxnId}
+                    onChange={(e) => setNewCaseTxnId(e.target.value)}
+                    placeholder="e.g. TXN-1002"
+                    className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1">
-                  TARGET BENEFICIARY / MULE IDENTIFIER (SYNTHETIC)
-                </label>
+                <label className="text-slate-300 block mb-1">Target Mule Account / Suspect UPI</label>
                 <input
                   type="text"
                   value={newCaseMule}
                   onChange={(e) => setNewCaseMule(e.target.value)}
-                  placeholder="e.g. mule-acc-302@example.org"
-                  className="w-full bg-[#070b14] border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-indigo-500"
+                  placeholder="e.g. mule.extracted@okhdfcbank"
+                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1">TRIAGE PRIORITY</label>
-                <select
-                  value={newCasePriority}
-                  onChange={(e) => setNewCasePriority(e.target.value as InvestigationCase["priority"])}
-                  className="w-full bg-[#070b14] border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="P1_CRITICAL">P1 - Critical (Immediate Active Exfiltration)</option>
-                  <option value="P2_HIGH">P2 - High (Velocity Burst / Multi-account)</option>
-                  <option value="P3_MEDIUM">P3 - Medium (Suspicious Geo Anomaly)</option>
-                  <option value="P4_LOW">P4 - Low (Low Confidence Heuristic)</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsNewCaseModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs"
+                  className="px-3.5 py-2 rounded-xl border border-slate-800 text-slate-400 hover:text-white"
                 >
-                  CANCEL
+                  Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-medium shadow-md shadow-indigo-900/40"
+                  disabled={isSubmitting || !newCaseTitle.trim()}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold transition-all disabled:opacity-40"
                 >
-                  CREATE DOSSIER
+                  {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>Sign & Register FIR</span>
                 </button>
               </div>
             </form>
