@@ -185,7 +185,19 @@ export const mockReports: InvestigationReport[] = [
 class ApiClient {
   private isOfflineOnly: boolean = false;
 
-  async getTransactions(): Promise<ApiResponse<Transaction[]>> {
+  async getTransactions(limit: number = 50): Promise<ApiResponse<Transaction[]>> {
+    try {
+      const res = await fetch(`/api/v1/transactions?limit=${limit}`, {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { data, source: "backend" };
+      }
+    } catch {
+      // Fallback
+    }
     return {
       data: initialTransactions,
       source: "synthetic_cache",
@@ -193,6 +205,18 @@ class ApiClient {
   }
 
   async getCases(): Promise<ApiResponse<InvestigationCase[]>> {
+    try {
+      const res = await fetch("/api/v1/cases", {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { data, source: "backend" };
+      }
+    } catch {
+      // Fallback
+    }
     return {
       data: mockCases,
       source: "synthetic_cache",
@@ -200,6 +224,18 @@ class ApiClient {
   }
 
   async getAuditLogs(): Promise<ApiResponse<AuditLogEntry[]>> {
+    try {
+      const res = await fetch("/api/v1/audit/logs", {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { data, source: "backend" };
+      }
+    } catch {
+      // Fallback
+    }
     return {
       data: mockAuditLogs,
       source: "synthetic_cache",
@@ -207,6 +243,18 @@ class ApiClient {
   }
 
   async getReports(): Promise<ApiResponse<InvestigationReport[]>> {
+    try {
+      const res = await fetch("/api/v1/reports", {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { data, source: "backend" };
+      }
+    } catch {
+      // Fallback
+    }
     return {
       data: mockReports,
       source: "synthetic_cache",
@@ -215,7 +263,7 @@ class ApiClient {
 
   async getMetrics(): Promise<ApiResponse<ModelMetrics>> {
     try {
-      const res = await fetch("http://localhost:8000/v1/model/metrics", {
+      const res = await fetch("/api/v1/models/metrics", {
         headers: { Accept: "application/json" },
         cache: "no-store",
       });
@@ -231,7 +279,7 @@ class ApiClient {
 
   async evaluateSimulation(params: SimulationParams) {
     try {
-      const res = await fetch("http://localhost:8000/v1/risk/evaluate", {
+      const res = await fetch("/api/v1/transactions/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
