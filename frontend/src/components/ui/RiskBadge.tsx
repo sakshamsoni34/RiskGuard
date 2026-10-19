@@ -7,9 +7,10 @@ interface RiskBadgeProps {
   score?: number;
   showIcon?: boolean;
   className?: string;
+  size?: "sm" | "md" | "lg";
 }
 
-export function RiskBadge({ level, score, showIcon = true, className = "" }: RiskBadgeProps) {
+export function RiskBadge({ level, score, showIcon = true, className = "", size = "md" }: RiskBadgeProps) {
   const configs: Record<
     RiskLevel,
     {
@@ -61,7 +62,9 @@ export function RiskBadge({ level, score, showIcon = true, className = "" }: Ris
   return (
     <span
       data-testid={`risk-badge-${level.toLowerCase()}`}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium border ${config.bg} ${config.border} ${config.text} ${className}`}
+      className={`inline-flex items-center gap-1.5 ${
+        size === "sm" ? "px-2 py-0.5 text-[10px]" : size === "lg" ? "px-3 py-1.5 text-sm" : "px-2.5 py-1 text-xs"
+      } rounded-full font-mono font-medium border ${config.bg} ${config.border} ${config.text} ${className}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
       {showIcon && <Icon className="w-3.5 h-3.5 shrink-0" />}

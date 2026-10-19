@@ -35,7 +35,54 @@ export default function DashboardPage() {
   const [metrics, setMetrics] = useState<ModelMetrics>(initialMetrics);
   const [isStreaming, setIsStreaming] = useState<boolean>(true);
   const [selectedTxn, setSelectedTxn] = useState<Transaction>(initialTransactions[1] || initialTransactions[0]);
-  const [cases] = useState<InvestigationCase[]>(mockCases);
+  const [cases, setCases] = useState<InvestigationCase[]>(mockCases);
+
+  // Initialize from backend DB
+  useEffect(() => {
+    async function loadBackendData() {
+      try {
+        const txnRes = await fetch("/api/v1/transactions?limit=60");
+        if (txnRes.ok) {
+          const txnData = await txnRes.json();
+          if (Array.isArray(txnData) && txnData.length > 0) {
+            setTransactions(txnData);
+            setSelectedTxn(txnData.find((t: any) => t.riskLevel === "HIGH" || t.riskLevel === "CRITICAL") || txnData[0]);
+
+            // Compute DB-driven stats
+            const total = txnData.length;
+            const blocked = txnData.filter((t: any) => t.decision === "BLOCKED");
+            const otp = txnData.filter((t: any) => t.decision === "OTP_REQUIRED");
+            const approved = txnData.filter((t: any) => t.decision === "APPROVED");
+            const blockedAmt = blocked.reduce((acc: number, t: any) => acc + (t.amount || 0), 0);
+
+            setMetrics((prev) => ({
+              ...prev,
+              totalProcessed: total,
+              fraudAttemptCount: blocked.length,
+              otpChallengeCount: otp.length,
+              autoApprovedCount: approved.length,
+              fraudBlockedAmount: blockedAmt,
+            }));
+          }
+        }
+      } catch {
+        // Fallback to initial mock if backend not yet ready
+      }
+
+      try {
+        const caseRes = await fetch("/api/v1/cases");
+        if (caseRes.ok) {
+          const caseData = await caseRes.json();
+          if (Array.isArray(caseData) && caseData.length > 0) {
+            setCases(caseData);
+          }
+        }
+      } catch {
+        // Fallback to mock cases
+      }
+    }
+    loadBackendData();
+  }, []);
 
   // Background synthetic transaction ingestion simulation
   useEffect(() => {
@@ -51,13 +98,14 @@ export default function DashboardPage() {
         soundEngine.playIngestBlip();
       }
 
-      setTransactions((prev) => [newTxn, ...prev.slice(0, 49)]);
+      setTransactions((prev) => [newTxn, ...prev.slice(0, 59)]);
       setMetrics((prev) => ({
         ...prev,
         totalProcessed: prev.totalProcessed + 1,
         fraudAttemptCount: newTxn.decision === "BLOCKED" ? prev.fraudAttemptCount + 1 : prev.fraudAttemptCount,
         otpChallengeCount: newTxn.decision === "OTP_REQUIRED" ? prev.otpChallengeCount + 1 : prev.otpChallengeCount,
         autoApprovedCount: newTxn.decision === "APPROVED" ? prev.autoApprovedCount + 1 : prev.autoApprovedCount,
+        fraudBlockedAmount: newTxn.decision === "BLOCKED" ? prev.fraudBlockedAmount + newTxn.amount : prev.fraudBlockedAmount,
       }));
     }, 4000);
 

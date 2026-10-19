@@ -88,4 +88,28 @@ class EvaluateRiskResponse(BaseModel):
     shap_explanation: List[ShapItem]
     anomaly_score: float
     rule_flags: List[str]
-    model_version: Optional[str] = "1.0.0"
+    model_version: Optional[str] = "2.0.0"
+    calibrated_probability: Optional[float] = None
+    risk_band: Optional[str] = None
+    top_reasons: Optional[List[str]] = []
+    source: Optional[str] = "ml_service"
+
+
+class BatchScoreRequest(BaseModel):
+    transaction_ids: List[str] = Field(..., max_length=100)
+
+
+class BatchScoreResultItem(BaseModel):
+    id: str
+    risk_score: float
+    risk_level: str
+    decision: str
+    anomaly_score: float
+    rule_flags: List[str]
+
+
+class BatchScoreResponse(BaseModel):
+    processed_count: int
+    results: List[BatchScoreResultItem]
+    source: str
+

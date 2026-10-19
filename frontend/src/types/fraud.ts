@@ -126,6 +126,7 @@ export interface Transaction {
   shapExplanation: ShapValue[];
   anomalyScore: number;
   ruleFlags: string[];
+  isSynthetic?: boolean;
 }
 
 export interface ModelMetrics {
