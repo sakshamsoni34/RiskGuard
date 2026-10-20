@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldAlert, ShieldCheck, KeyRound, Sparkles, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { ShieldAlert, ShieldCheck, KeyRound, Sparkles, TrendingUp, CheckCircle2 } from "lucide-react";
 import { ModelMetrics } from "@/types/fraud";
 
 interface StatsCardsProps {
@@ -27,8 +27,8 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         onClick={() => onFilterChange && onFilterChange("HIGH")}
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "HIGH"
-            ? "border-rose-500/70 bg-gradient-to-b from-rose-950/40 to-slate-900/90 ring-2 ring-rose-500/30 shadow-lg shadow-rose-950/20"
-            : "border-slate-800 bg-[#0c1220]/90 hover:border-slate-700 hover:bg-[#0e1628]"
+            ? "border-rose-500/50 bg-[#16121e] ring-1 ring-rose-500/30 shadow-md shadow-rose-950/20"
+            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -37,11 +37,11 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
               <ShieldAlert className="h-4.5 w-4.5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-300">Fraud Blocked</span>
-              <div className="text-[11px] text-slate-500">High Risk (Score &gt; 70)</div>
+              <span className="text-xs font-semibold text-slate-200">Fraud Prevented</span>
+              <div className="text-[11px] text-slate-400">High Risk (Score &gt; 70)</div>
             </div>
           </div>
-          <span className="rounded-full bg-rose-950/80 px-2 py-0.5 text-[10px] font-medium text-rose-300 border border-rose-800/50">
+          <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-rose-300 border border-rose-500/20">
             {metrics.fraudAttemptCount} attacks
           </span>
         </div>
@@ -60,21 +60,21 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         </p>
 
         <div className="mt-3.5 flex items-center justify-between border-t border-slate-800/80 pt-2.5 text-[11px]">
-          <span className="text-slate-500">Action taken:</span>
-          <span className="font-medium text-rose-300 flex items-center gap-1">
+          <span className="text-slate-400">Action:</span>
+          <span className="font-medium text-rose-300 flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
             Auto-blocked instantly
           </span>
         </div>
       </div>
 
-      {/* 2. 2FA Identity Verification (Medium Risk) */}
+      {/* 2. Identity Verification (Medium Risk) */}
       <div
         onClick={() => onFilterChange && onFilterChange("MEDIUM")}
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "MEDIUM"
-            ? "border-amber-500/70 bg-gradient-to-b from-amber-950/40 to-slate-900/90 ring-2 ring-amber-500/30 shadow-lg shadow-amber-950/20"
-            : "border-slate-800 bg-[#0c1220]/90 hover:border-slate-700 hover:bg-[#0e1628]"
+            ? "border-amber-500/50 bg-[#1b1713] ring-1 ring-amber-500/30 shadow-md shadow-amber-950/20"
+            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -83,11 +83,11 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
               <KeyRound className="h-4.5 w-4.5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-300">OTP Challenges</span>
-              <div className="text-[11px] text-slate-500">Medium Risk (Score 35–70)</div>
+              <span className="text-xs font-semibold text-slate-200">2FA Challenges</span>
+              <div className="text-[11px] text-slate-400">Medium Risk (Score 35–70)</div>
             </div>
           </div>
-          <span className="rounded-full bg-amber-950/80 px-2 py-0.5 text-[10px] font-medium text-amber-300 border border-amber-800/50">
+          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-300 border border-amber-500/20">
             {otpPct}% volume
           </span>
         </div>
@@ -97,17 +97,17 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
             {metrics.otpChallengeCount.toLocaleString()}
           </span>
           <span className="text-xs font-medium text-amber-400">
-            sent 2FA
+            step-up OTPs
           </span>
         </div>
 
         <p className="mt-2 text-xs text-slate-400 line-clamp-1">
-          Suspicious payments required OTP identity check
+          Anomalous activity checked via two-factor auth
         </p>
 
         <div className="mt-3.5 flex items-center justify-between border-t border-slate-800/80 pt-2.5 text-[11px]">
-          <span className="text-slate-500">Action taken:</span>
-          <span className="font-medium text-amber-300 flex items-center gap-1">
+          <span className="text-slate-400">Action:</span>
+          <span className="font-medium text-amber-300 flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
             3DS Step-Up Challenge
           </span>
@@ -119,8 +119,8 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         onClick={() => onFilterChange && onFilterChange("LOW")}
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "LOW"
-            ? "border-emerald-500/70 bg-gradient-to-b from-emerald-950/40 to-slate-900/90 ring-2 ring-emerald-500/30 shadow-lg shadow-emerald-950/20"
-            : "border-slate-800 bg-[#0c1220]/90 hover:border-slate-700 hover:bg-[#0e1628]"
+            ? "border-emerald-500/50 bg-[#101b17] ring-1 ring-emerald-500/30 shadow-md shadow-emerald-950/20"
+            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -129,11 +129,11 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
               <ShieldCheck className="h-4.5 w-4.5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-300">Safe Approvals</span>
-              <div className="text-[11px] text-slate-500">Low Risk (Score &lt; 35)</div>
+              <span className="text-xs font-semibold text-slate-200">Safe Approvals</span>
+              <div className="text-[11px] text-slate-400">Low Risk (Score &lt; 35)</div>
             </div>
           </div>
-          <span className="rounded-full bg-emerald-950/80 px-2 py-0.5 text-[10px] font-medium text-emerald-300 border border-emerald-800/50">
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300 border border-emerald-500/20">
             {approvedPct}% pass
           </span>
         </div>
@@ -152,8 +152,8 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         </p>
 
         <div className="mt-3.5 flex items-center justify-between border-t border-slate-800/80 pt-2.5 text-[11px]">
-          <span className="text-slate-500">Speed:</span>
-          <span className="font-medium text-emerald-300 flex items-center gap-1 font-mono">
+          <span className="text-slate-400">Speed:</span>
+          <span className="font-medium text-emerald-300 flex items-center gap-1.5 font-mono">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             32ms average
           </span>
@@ -165,8 +165,8 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         onClick={() => onFilterChange && onFilterChange("ALL")}
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "ALL"
-            ? "border-indigo-500/70 bg-gradient-to-b from-indigo-950/40 to-slate-900/90 ring-2 ring-indigo-500/30 shadow-lg shadow-indigo-950/20"
-            : "border-slate-800 bg-[#0c1220]/90 hover:border-slate-700 hover:bg-[#0e1628]"
+            ? "border-indigo-500/50 bg-[#141629] ring-1 ring-indigo-500/30 shadow-md shadow-indigo-950/20"
+            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -175,12 +175,12 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
               <Sparkles className="h-4.5 w-4.5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-300">AI Catch Rate</span>
-              <div className="text-[11px] text-slate-500">XGBoost + SHAP Engine</div>
+              <span className="text-xs font-semibold text-slate-200">Detection Rate</span>
+              <div className="text-[11px] text-slate-400">XGBoost + SHAP Engine</div>
             </div>
           </div>
-          <span className="rounded-full bg-indigo-950/80 px-2 py-0.5 text-[10px] font-medium text-indigo-300 border border-indigo-800/50">
-            96.8% Recall
+          <span className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-300 border border-indigo-500/20">
+            {(metrics.recall * 100).toFixed(1)}% Recall
           </span>
         </div>
 
@@ -188,7 +188,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
           <span className="text-2xl font-bold font-mono tracking-tight text-white">
             {(metrics.recall * 100).toFixed(1)}%
           </span>
-          <span className="text-xs font-medium text-cyan-400">
+          <span className="text-xs font-medium text-indigo-300">
             accuracy
           </span>
         </div>
@@ -198,10 +198,10 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         </p>
 
         <div className="mt-3.5 flex items-center justify-between border-t border-slate-800/80 pt-2.5 text-[11px]">
-          <span className="text-slate-500">Status:</span>
-          <span className="font-medium text-slate-300 flex items-center gap-1">
+          <span className="text-slate-400">Engine Status:</span>
+          <span className="font-medium text-slate-200 flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            AI Active & Healthy
+            Active & Calibrated
           </span>
         </div>
       </div>

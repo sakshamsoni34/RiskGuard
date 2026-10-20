@@ -12,19 +12,35 @@ import {
   Bell,
   Menu,
   X,
-  Radio,
-  ExternalLink,
+  User,
+  ChevronDown,
 } from "lucide-react";
 import { soundEngine } from "@/lib/soundFx";
+import { LogoutButton } from "./LogoutButton";
 
 export function TopBar() {
   const pathname = usePathname();
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [officerName, setOfficerName] = useState<string>("Insp. Vikram Sharma");
+  const [officerBadge, setOfficerBadge] = useState<string>("CC-8421");
+  const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMuted(soundEngine.isSoundMuted());
+
+    // Read officer name from cookies if available
+    if (typeof document !== "undefined") {
+      const matchName = document.cookie.match(/officer_name=([^;]+)/);
+      if (matchName) {
+        setOfficerName(decodeURIComponent(matchName[1]));
+      }
+      const matchBadge = document.cookie.match(/officer_badge=([^;]+)/);
+      if (matchBadge) {
+        setOfficerBadge(decodeURIComponent(matchBadge[1]));
+      }
+    }
   }, []);
 
   const handleToggleSound = () => {
@@ -32,151 +48,201 @@ export function TopBar() {
     setIsMuted(nextState);
   };
 
-  const getPageTitle = () => {
-    if (pathname === "/dashboard") return "Command Center & Situational Awareness";
-    if (pathname.startsWith("/transactions")) return "Transaction Triage & Telemetry";
-    if (pathname.startsWith("/cases")) return "Case Investigation Registry";
-    if (pathname === "/simulator") return "Interactive Risk Simulation & SHAP Explorer";
-    if (pathname === "/models") return "Model Intelligence & Explainability Diagnostics";
-    if (pathname === "/audit") return "Cryptographic Audit Trail (Append-Only)";
-    if (pathname === "/reports") return "Evidentiary Briefing & Report Dispatch";
-    if (pathname === "/settings") return "Cyber Cell Platform Settings";
-    if (pathname === "/login") return "Officer Authentication Gateway";
-    return "Cybercrime Investigation Platform";
+  const getPageInfo = () => {
+    if (pathname === "/dashboard") {
+      return { section: "Operations", title: "Risk Command Center" };
+    }
+    if (pathname.startsWith("/transactions")) {
+      return { section: "Monitoring", title: "Live Transactions & Triage" };
+    }
+    if (pathname.startsWith("/cases")) {
+      return { section: "Investigations", title: "Case Files Registry" };
+    }
+    if (pathname === "/simulator") {
+      return { section: "Sandbox", title: "Transaction Risk Simulator" };
+    }
+    if (pathname === "/models") {
+      return { section: "Intelligence", title: "Model Performance & SHAP" };
+    }
+    if (pathname === "/audit") {
+      return { section: "Compliance", title: "Immutable Audit Log" };
+    }
+    if (pathname === "/reports") {
+      return { section: "Reporting", title: "Official Briefings & Exports" };
+    }
+    if (pathname === "/settings") {
+      return { section: "Administration", title: "Platform Settings" };
+    }
+    return { section: "RiskGuard", title: "Fraud Intelligence Platform" };
   };
 
+  const pageInfo = getPageInfo();
+
   return (
-    <header className="sticky top-[29px] z-40 bg-[#080d19]/90 backdrop-blur-md border-b border-[#141d30] px-4 py-2.5 flex items-center justify-between gap-4">
-      {/* Title & Path */}
+    <header className="sticky top-0 z-40 bg-[#0d1322]/90 backdrop-blur-xl border-b border-slate-800/80 px-4 py-2.5 sm:px-6 flex items-center justify-between gap-4 transition-colors">
+      {/* Breadcrumb & Title */}
       <div className="flex items-center gap-3">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+          className="md:hidden p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           aria-label="Toggle Navigation Menu"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
+
         <div>
-          <h1 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
-            <span>{getPageTitle()}</span>
-            <span className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-              CELL-AUTH-L2
-            </span>
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+            <span>{pageInfo.section}</span>
+            <span>/</span>
+            <span className="text-slate-300 font-medium">{pageInfo.title}</span>
+          </div>
+          <h1 className="text-sm font-semibold text-white tracking-tight">
+            {pageInfo.title}
           </h1>
-          <p className="text-[10px] font-mono text-slate-400 hidden lg:block">
-            LEGAL STATUS: Investigative Prioritization Aid • Not Admissible Evidence per Sec 65B
-          </p>
         </div>
       </div>
 
       {/* Global Quick Search */}
-      <div className="hidden md:flex items-center flex-1 max-w-xs relative">
-        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5" />
+      <div className="hidden lg:flex items-center flex-1 max-w-sm relative mx-4">
+        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Lookup Txn ID, Mule VPA, or Card..."
-          className="w-full bg-[#0d1424] text-xs text-slate-200 placeholder-slate-500 pl-8 pr-3 py-1.5 rounded-lg border border-[#1a2438] focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-mono"
+          placeholder="Search by transaction ID, customer, or card..."
+          className="w-full bg-[#0a0e17] text-xs text-slate-200 placeholder-slate-400 pl-9 pr-12 py-1.5 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all"
         />
+        <kbd className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 bg-slate-800/80 rounded border border-slate-700/60">
+          ⌘K
+        </kbd>
       </div>
 
-      {/* Action Controls */}
-      <div className="flex items-center gap-2 font-mono text-xs">
+      {/* Action Controls & Officer Menu */}
+      <div className="flex items-center gap-2.5">
         {/* ML Status Pill */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-slate-900/80 border border-slate-800 text-slate-300 text-[11px]">
-          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-slate-400">ML Engine:</span>
-          <span className="text-emerald-400 font-semibold flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
-            READY
+        <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
+          <span className="text-slate-400 text-[11px]">ML v2.4</span>
         </div>
 
-        {/* Telemetry Audio Toggle */}
+        {/* Audio Telemetry Toggle */}
         <button
           onClick={handleToggleSound}
-          title={isMuted ? "Sound muted (click to enable telemetry audio)" : "Sound active (click to mute)"}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs transition-colors ${
+          title={isMuted ? "Enable sound notifications" : "Mute sound notifications"}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-medium transition-all ${
             isMuted
-              ? "bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200"
-              : "bg-indigo-600/20 border-indigo-500/50 text-indigo-300 shadow-sm shadow-indigo-950"
+              ? "bg-slate-900/50 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              : "bg-indigo-600/15 border-indigo-500/40 text-indigo-300"
           }`}
-          aria-label={isMuted ? "Unmute audio alerts" : "Mute audio alerts"}
+          aria-label={isMuted ? "Unmute audio" : "Mute audio"}
         >
-          {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />}
-          <span className="text-[11px] font-mono hidden sm:inline">{isMuted ? "MUTED" : "AUDIO ON"}</span>
+          {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-indigo-400" />}
+          <span className="hidden xl:inline text-[11px]">{isMuted ? "Audio Off" : "Audio On"}</span>
         </button>
 
-        {/* Rapid Alert Action */}
+        {/* Flagged Cases Alert */}
         <Link
           href="/cases"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 hover:bg-rose-500/25 transition-colors text-xs"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300 hover:bg-rose-500/15 transition-colors text-xs font-medium"
         >
           <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-          <span className="hidden sm:inline font-mono text-[11px]">3 HIGH-PRIORITY</span>
+          <span className="hidden sm:inline text-[11px]">3 High Risk</span>
         </Link>
+
+        {/* Divider */}
+        <div className="h-5 w-px bg-slate-800 hidden sm:block mx-0.5" />
+
+        {/* Officer Profile & Direct Log Out Button */}
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 px-2 py-1 rounded-xl bg-slate-900/40 border border-slate-800/80">
+            <div className="w-6 h-6 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-[10px] font-semibold text-indigo-300">
+              VS
+            </div>
+            <div className="text-left hidden md:block">
+              <div className="text-xs font-medium text-slate-200 leading-tight">
+                {officerName}
+              </div>
+              <div className="text-[10px] text-slate-400 leading-tight">
+                {officerBadge}
+              </div>
+            </div>
+          </div>
+
+          {/* Primary TopBar Log Out Action */}
+          <LogoutButton variant="solid" showText={true} />
+        </div>
       </div>
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-[#070b14] border-b border-slate-800 p-4 space-y-2 shadow-2xl z-50">
-          <Link
-            href="/dashboard"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Command Center
-          </Link>
-          <Link
-            href="/transactions"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Live Ingestion
-          </Link>
-          <Link
-            href="/cases"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Case Registry
-          </Link>
-          <Link
-            href="/simulator"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Risk Simulator
-          </Link>
-          <Link
-            href="/models"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Model Intelligence
-          </Link>
-          <Link
-            href="/audit"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Audit Trail
-          </Link>
-          <Link
-            href="/reports"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Official Reports
-          </Link>
-          <Link
-            href="/settings"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded text-sm text-slate-200 hover:bg-slate-800"
-          >
-            Settings
-          </Link>
+        <div className="md:hidden absolute top-full left-0 right-0 bg-[#0d1322] border-b border-slate-800 p-4 space-y-3 shadow-2xl z-50">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-xs font-semibold text-indigo-300">
+                VS
+              </div>
+              <div>
+                <div className="text-xs font-medium text-slate-200">{officerName}</div>
+                <div className="text-[10px] text-slate-400">{officerBadge} • Online</div>
+              </div>
+            </div>
+            <LogoutButton variant="solid" showText={true} />
+          </div>
+
+          <nav className="space-y-1 text-xs">
+            <Link
+              href="/dashboard"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Command Center
+            </Link>
+            <Link
+              href="/transactions"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Live Transactions
+            </Link>
+            <Link
+              href="/cases"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Case Files
+            </Link>
+            <Link
+              href="/simulator"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Risk Simulator
+            </Link>
+            <Link
+              href="/models"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Model Diagnostics
+            </Link>
+            <Link
+              href="/audit"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Audit Trail
+            </Link>
+            <Link
+              href="/reports"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
+            >
+              Official Reports
+            </Link>
+          </nav>
         </div>
       )}
     </header>

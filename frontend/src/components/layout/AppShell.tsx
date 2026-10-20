@@ -2,7 +2,6 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 
@@ -15,12 +14,13 @@ export function AppShell({ children }: AppShellProps) {
   const isLoginPage = pathname === "/login";
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#080d19] text-slate-100 font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
-      {/* Persistent synthetic data banner across all views */}
-      <DemoBanner />
-
+    <div
+      className={`${
+        isLoginPage ? "h-screen overflow-hidden" : "min-h-screen"
+      } flex flex-col bg-[#0b0f19] text-slate-100 font-sans selection:bg-indigo-500/25 selection:text-indigo-200`}
+    >
       {isLoginPage ? (
-        <main className="flex-1 flex flex-col">{children}</main>
+        <main className="h-full w-full overflow-hidden flex flex-col">{children}</main>
       ) : (
         <div className="flex-1 flex w-full">
           {/* Officer Navigation Sidebar */}

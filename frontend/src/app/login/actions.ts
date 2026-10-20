@@ -74,7 +74,13 @@ export async function loginAction(
       path: "/",
       maxAge: 60 * 60 * 8,
     });
-    cookieStore.set("officer_name", "Insp. Vikram Sharma", {
+    const officerNames: Record<string, string> = {
+      "CC-8421": "Insp. Vikram Sharma",
+      "CC-9104": "Sub-Insp. Priya Patel",
+      "SUP-010": "ACP Rajesh Nair",
+      "ADM-001": "Maya Desai",
+    };
+    cookieStore.set("officer_name", officerNames[badgeNumber] || "Insp. Vikram Sharma", {
       httpOnly: false,
       path: "/",
       maxAge: 60 * 60 * 8,

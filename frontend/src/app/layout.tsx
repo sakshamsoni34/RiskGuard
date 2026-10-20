@@ -3,12 +3,16 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
-  title: "RiskGuard Investigator | Cybercrime Investigation Support Platform",
+  title: "RiskGuard — Fraud & Risk Intelligence Operations",
   description:
-    "AI-assisted financial fraud investigation support platform for authorized Cyber Cell officers. Decision support with SHAP explainability.",
+    "Real-time financial transaction monitoring, ML risk scoring, and fraud investigation workspace.",
 };
 
 export default function RootLayout({
@@ -18,7 +22,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} min-h-screen bg-[#080d19] text-slate-100 antialiased`}>
+      <body
+        className={`${inter.className} min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-indigo-500/25 selection:text-indigo-200`}
+      >
         <AppShell>{children}</AppShell>
       </body>
     </html>

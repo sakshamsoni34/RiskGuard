@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setApiMode,
 }) => {
   const [showSimulateMenu, setShowSimulateMenu] = useState<boolean>(false);
-  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(soundEngine.getMuted());
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
 
   useEffect(() => {
     setIsAudioMuted(soundEngine.getMuted());
@@ -143,6 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Audio Telemetry */}
           <button
             onClick={handleToggleAudio}
+            suppressHydrationWarning
             className={`flex h-8.5 items-center gap-1.5 rounded-xl border px-2.5 text-xs font-medium transition-all ${
               !isAudioMuted
                 ? "border-indigo-500/50 bg-indigo-950/40 text-indigo-300 shadow-sm shadow-indigo-900/30"
