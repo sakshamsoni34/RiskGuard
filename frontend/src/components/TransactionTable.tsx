@@ -106,17 +106,17 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-[#0c1220]/90 shadow-xl backdrop-blur-sm">
+    <div className="overflow-hidden rounded-2xl border border-[#222226] bg-[#0d0d10] shadow-xl backdrop-blur-sm">
       {/* Table Header & Toolbar */}
-      <div className="flex flex-col gap-3.5 border-b border-slate-800/80 p-5 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-3.5 border-b border-[#222226] p-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <h2 className="text-sm font-bold text-white tracking-wide">Live Transaction Stream</h2>
-            <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-[11px] font-mono text-cyan-400 border border-slate-700/60">
+            <span className="rounded-full bg-[#18181c] px-2.5 py-0.5 text-[11px] font-mono text-zinc-300 border border-[#27272a]">
               {filtered.length} showing
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-zinc-400 mt-0.5">
             Real-time authorizations analyzed in under 40 milliseconds
           </p>
         </div>
@@ -124,24 +124,24 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Box */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               placeholder="Search customer, merchant, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-52 sm:w-60 rounded-xl border border-slate-700/80 bg-slate-900/90 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+              className="h-9 w-52 sm:w-60 rounded-xl border border-[#242429] bg-[#121215] pl-9 pr-3 text-xs text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-600 transition-all"
             />
           </div>
 
           {/* Clean Filter Pills with Counts */}
-          <div className="flex rounded-xl border border-slate-800 bg-slate-900/90 p-1 text-xs">
+          <div className="flex rounded-xl border border-[#222226] bg-[#141418] p-1 text-xs">
             <button
               onClick={() => handleFilterClick("ALL")}
               className={`rounded-lg px-3 py-1 font-medium transition-all ${
                 currentFilter === "ALL"
-                  ? "bg-slate-800 text-white shadow-sm font-semibold"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#222228] text-white shadow-sm font-semibold border border-[#2e2e36]"
+                  : "text-zinc-400 hover:text-white"
               }`}
             >
               All ({transactions.length})
@@ -151,7 +151,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
                 currentFilter === "HIGH"
                   ? "bg-rose-950/80 text-rose-300 font-semibold border border-rose-800/50 shadow-sm"
-                  : "text-slate-400 hover:text-rose-400"
+                  : "text-zinc-400 hover:text-rose-400"
               }`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
@@ -162,7 +162,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
                 currentFilter === "MEDIUM"
                   ? "bg-amber-950/80 text-amber-300 font-semibold border border-amber-800/50 shadow-sm"
-                  : "text-slate-400 hover:text-amber-400"
+                  : "text-zinc-400 hover:text-amber-400"
               }`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
@@ -173,7 +173,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
                 currentFilter === "LOW"
                   ? "bg-emerald-950/80 text-emerald-300 font-semibold border border-emerald-800/50 shadow-sm"
-                  : "text-slate-400 hover:text-emerald-400"
+                  : "text-zinc-400 hover:text-emerald-400"
               }`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -184,10 +184,10 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
           {/* Export CSV */}
           <button
             onClick={handleExportCSV}
-            className="flex h-9 items-center gap-1.5 rounded-xl border border-slate-700/80 bg-slate-800/80 px-3 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-[#27272a] bg-[#18181c] px-3 text-xs font-semibold text-zinc-300 hover:bg-[#222227] hover:text-white transition-colors"
             title="Export filtered records to CSV"
           >
-            <Download className="h-3.5 w-3.5 text-slate-400" />
+            <Download className="h-3.5 w-3.5 text-zinc-400" />
             <span className="hidden sm:inline">Export</span>
           </button>
         </div>
@@ -196,7 +196,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
       {/* Table Data View */}
       <div className="overflow-x-auto max-h-[580px] overflow-y-auto">
         <table className="w-full text-left text-xs">
-          <thead className="sticky top-0 z-10 border-b border-slate-800/80 bg-[#090e1a] font-semibold text-slate-400 text-[11px] uppercase tracking-wider">
+          <thead className="sticky top-0 z-10 border-b border-[#222226] bg-[#08080a] font-semibold text-zinc-400 text-[11px] uppercase tracking-wider">
             <tr>
               <th className="py-3 px-4">Decision</th>
               <th className="py-3 px-4">Customer & ID</th>
@@ -207,14 +207,14 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               <th className="py-3 pr-4 pl-1"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/50">
+          <tbody className="divide-y divide-[#1e1e24]">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-14 text-center text-slate-400">
+                <td colSpan={7} className="py-14 text-center text-zinc-400">
                   <div className="flex flex-col items-center justify-center space-y-2">
-                    <Filter className="h-8 w-8 text-slate-600" />
-                    <p className="font-medium text-slate-300">No transactions match your search filter</p>
-                    <p className="text-xs text-slate-500">Try changing your search keywords or switching filters</p>
+                    <Filter className="h-8 w-8 text-zinc-600" />
+                    <p className="font-medium text-zinc-300">No transactions match your search filter</p>
+                    <p className="text-xs text-zinc-500">Try changing your search keywords or switching filters</p>
                   </div>
                 </td>
               </tr>
@@ -232,8 +232,8 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                       idx === 0 ? "animate-row-enter" : ""
                     } ${
                       isSelected
-                        ? "bg-slate-800/70 border-l-4 border-indigo-500"
-                        : "hover:bg-slate-800/30 border-l-4 border-transparent"
+                        ? "bg-[#18181c] border-l-4 border-zinc-300"
+                        : "hover:bg-[#141418] border-l-4 border-transparent"
                     }`}
                   >
                     {/* Decision Badge */}

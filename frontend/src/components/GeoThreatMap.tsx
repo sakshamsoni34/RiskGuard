@@ -59,18 +59,18 @@ export const GeoThreatMap: React.FC<GeoThreatMapProps> = ({
   const pathD = `M ${homeX} ${homeY} Q ${midX} ${midY} ${targetX} ${targetY}`;
 
   return (
-    <div className="rounded-xl border border-slate-800/90 bg-[#0a101d] p-4.5 space-y-4">
+    <div className="rounded-xl border border-[#222226] bg-[#0d0d10] p-4.5 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex items-center justify-between border-b border-[#222226] pb-3">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="h-6 w-6 rounded-md bg-[#18181c] border border-[#27272a] flex items-center justify-center text-zinc-300">
             <Globe2 className="h-3.5 w-3.5" />
           </div>
           <div>
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
               Geospatial Telemetry & Travel Velocity
             </h4>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-zinc-400">
               Correlating IP location hops against cardholder behavioral billing anchor
             </p>
           </div>

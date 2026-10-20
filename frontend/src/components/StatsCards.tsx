@@ -28,7 +28,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "HIGH"
             ? "border-rose-500/50 bg-[#16121e] ring-1 ring-rose-500/30 shadow-md shadow-rose-950/20"
-            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
+            : "border-[#222226] bg-[#0d0d10] hover:border-zinc-700 hover:bg-[#141418] shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "MEDIUM"
             ? "border-amber-500/50 bg-[#1b1713] ring-1 ring-amber-500/30 shadow-md shadow-amber-950/20"
-            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
+            : "border-[#222226] bg-[#0d0d10] hover:border-zinc-700 hover:bg-[#141418] shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -120,7 +120,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "LOW"
             ? "border-emerald-500/50 bg-[#101b17] ring-1 ring-emerald-500/30 shadow-md shadow-emerald-950/20"
-            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
+            : "border-[#222226] bg-[#0d0d10] hover:border-zinc-700 hover:bg-[#141418] shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -165,21 +165,21 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         onClick={() => onFilterChange && onFilterChange("ALL")}
         className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === "ALL"
-            ? "border-indigo-500/50 bg-[#141629] ring-1 ring-indigo-500/30 shadow-md shadow-indigo-950/20"
-            : "border-slate-800/80 bg-[#111827]/75 hover:border-slate-700 hover:bg-[#141d30]/80 shadow-sm"
+            ? "border-zinc-500/60 bg-[#16161c] ring-1 ring-zinc-500/30 shadow-md shadow-black/40"
+            : "border-[#222226] bg-[#0d0d10] hover:border-zinc-700 hover:bg-[#141418] shadow-sm"
         }`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1b1b22] text-zinc-200 border border-[#2b2b32]">
               <Sparkles className="h-4.5 w-4.5" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-200">Detection Rate</span>
-              <div className="text-[11px] text-slate-400">XGBoost + SHAP Engine</div>
+              <span className="text-xs font-semibold text-zinc-200">Detection Rate</span>
+              <div className="text-[11px] text-zinc-400">XGBoost + SHAP Engine</div>
             </div>
           </div>
-          <span className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-300 border border-indigo-500/20">
+          <span className="rounded-full bg-[#1b1b22] px-2 py-0.5 text-[10px] font-medium text-zinc-300 border border-[#2b2b32]">
             {(metrics.recall * 100).toFixed(1)}% Recall
           </span>
         </div>
@@ -188,18 +188,18 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
           <span className="text-2xl font-bold font-mono tracking-tight text-white">
             {(metrics.recall * 100).toFixed(1)}%
           </span>
-          <span className="text-xs font-medium text-indigo-300">
+          <span className="text-xs font-medium text-zinc-400">
             accuracy
           </span>
         </div>
 
-        <p className="mt-2 text-xs text-slate-400 line-clamp-1">
+        <p className="mt-2 text-xs text-zinc-400 line-clamp-1">
           Catches 96.8% of attacks with only 1.2% false alarms
         </p>
 
-        <div className="mt-3.5 flex items-center justify-between border-t border-slate-800/80 pt-2.5 text-[11px]">
-          <span className="text-slate-400">Engine Status:</span>
-          <span className="font-medium text-slate-200 flex items-center gap-1.5">
+        <div className="mt-3.5 flex items-center justify-between border-t border-[#222226] pt-2.5 text-[11px]">
+          <span className="text-zinc-400">Engine Status:</span>
+          <span className="font-medium text-zinc-200 flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             Active & Calibrated
           </span>

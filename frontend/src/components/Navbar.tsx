@@ -68,71 +68,71 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-800/90 bg-[#090d16]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-[#222226] bg-[#08080a]/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Brand & Tabs */}
         <div className="flex items-center gap-7">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 shadow-sm shadow-indigo-950/40">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#18181c] border border-[#27272a] text-zinc-200 shadow-sm shadow-black/40">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold tracking-tight text-white">RiskGuard</span>
-                <span className="rounded-full bg-emerald-950/80 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-800/50">
+                <span className="rounded-full bg-[#18181c] px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-[#27272a]">
                   Live ML
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">
+              <p className="text-[11px] text-zinc-400 hidden sm:block">
                 Real-Time AI Fraud Prevention
               </p>
             </div>
           </div>
 
           {/* Desktop Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-slate-900/60 p-1 rounded-xl border border-slate-800/80">
+          <nav className="hidden md:flex items-center gap-1.5 bg-[#121215] p-1 rounded-xl border border-[#222226]">
             <button
               onClick={() => setActiveTab("monitor")}
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 activeTab === "monitor"
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-[#222228] text-white border border-[#2e2e36] shadow-sm"
+                  : "text-zinc-400 hover:text-white hover:bg-[#18181c]"
               }`}
             >
-              <Activity className="h-3.5 w-3.5 text-cyan-300" />
+              <Activity className="h-3.5 w-3.5 text-zinc-300" />
               Live Monitor
             </button>
             <button
               onClick={() => setActiveTab("simulator")}
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 activeTab === "simulator"
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-[#222228] text-white border border-[#2e2e36] shadow-sm"
+                  : "text-zinc-400 hover:text-white hover:bg-[#18181c]"
               }`}
             >
-              <Sliders className="h-3.5 w-3.5 text-amber-300" />
+              <Sliders className="h-3.5 w-3.5 text-zinc-300" />
               Rule Sandbox
             </button>
             <button
               onClick={() => setActiveTab("analytics")}
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 activeTab === "analytics"
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-[#222228] text-white border border-[#2e2e36] shadow-sm"
+                  : "text-zinc-400 hover:text-white hover:bg-[#18181c]"
               }`}
             >
-              <BarChart3 className="h-3.5 w-3.5 text-indigo-300" />
+              <BarChart3 className="h-3.5 w-3.5 text-zinc-300" />
               AI Accuracy
             </button>
             <button
               onClick={() => setActiveTab("architecture")}
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 activeTab === "architecture"
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-[#222228] text-white border border-[#2e2e36] shadow-sm"
+                  : "text-zinc-400 hover:text-white hover:bg-[#18181c]"
               }`}
             >
-              <Server className="h-3.5 w-3.5 text-emerald-300" />
+              <Server className="h-3.5 w-3.5 text-zinc-300" />
               System Info
             </button>
           </nav>
@@ -146,42 +146,42 @@ export const Navbar: React.FC<NavbarProps> = ({
             suppressHydrationWarning
             className={`flex h-8.5 items-center gap-1.5 rounded-xl border px-2.5 text-xs font-medium transition-all ${
               !isAudioMuted
-                ? "border-indigo-500/50 bg-indigo-950/40 text-indigo-300 shadow-sm shadow-indigo-900/30"
-                : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
+                ? "border-[#2b2b32] bg-[#18181c] text-zinc-200 shadow-sm"
+                : "border-[#222226] bg-[#121215] text-zinc-400 hover:text-zinc-200"
             }`}
             title={!isAudioMuted ? "Sound alerts on (click to mute)" : "Sound muted (click to unmute)"}
           >
             {!isAudioMuted ? (
               <>
-                <Volume2 className="h-3.5 w-3.5 text-indigo-400" />
+                <Volume2 className="h-3.5 w-3.5 text-zinc-300" />
                 <span className="hidden xl:inline text-[11px]">Audio On</span>
               </>
             ) : (
               <>
-                <VolumeX className="h-3.5 w-3.5 text-slate-500" />
+                <VolumeX className="h-3.5 w-3.5 text-zinc-500" />
                 <span className="hidden xl:inline text-[11px]">Muted</span>
               </>
             )}
           </button>
 
           {/* Streaming Toggle */}
-          <div className="flex items-center rounded-xl border border-slate-800 bg-slate-900/60 p-0.5 text-xs">
+          <div className="flex items-center rounded-xl border border-[#222226] bg-[#121215] p-0.5 text-xs">
             <button
               onClick={() => setIsStreaming(!isStreaming)}
               className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-semibold text-xs transition-colors ${
                 isStreaming
-                  ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800/60"
-                  : "bg-slate-800 text-slate-400"
+                  ? "bg-[#18181c] text-emerald-300 border border-[#27272a]"
+                  : "bg-[#141418] text-zinc-400"
               }`}
               title="Pause or resume live incoming transactions"
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${isStreaming ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
+              <span className={`h-1.5 w-1.5 rounded-full ${isStreaming ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"}`} />
               <span className="hidden sm:inline">{isStreaming ? "Streaming" : "Paused"}</span>
             </button>
             {isStreaming && (
               <button
                 onClick={() => setStreamSpeed(streamSpeed === "normal" ? "fast" : "normal")}
-                className="px-2 py-1.5 text-[11px] font-mono text-slate-400 hover:text-white transition-colors"
+                className="px-2 py-1.5 text-[11px] font-mono text-zinc-400 hover:text-white transition-colors"
                 title="Adjust stream pace"
               >
                 {streamSpeed === "normal" ? "4.5s" : "1.5s"}
@@ -193,14 +193,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowSimulateMenu(!showSimulateMenu)}
-              className="flex items-center gap-1.5 rounded-xl border border-indigo-600/50 bg-indigo-600/20 px-3 py-1.5 text-xs font-semibold text-indigo-200 hover:bg-indigo-600 hover:text-white transition-all shadow-sm shadow-indigo-950/30"
+              className="flex items-center gap-1.5 rounded-xl border border-[#2b2b32] bg-[#18181c] px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-[#222228] hover:text-white transition-all shadow-sm"
             >
               <span>Simulate Attack</span>
-              <ChevronDown className="h-3 w-3 text-indigo-300" />
+              <ChevronDown className="h-3 w-3 text-zinc-400" />
             </button>
 
             {showSimulateMenu && (
-              <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-slate-800 bg-[#0f172a] p-2 shadow-2xl z-50 animate-fade-in text-xs space-y-1">
+              <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-[#222226] bg-[#0d0d10] p-2 shadow-2xl z-50 animate-fade-in text-xs space-y-1">
                 <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                   Inject Test Scenario into Stream
                 </div>
@@ -262,10 +262,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Mobile Navigation */}
-      <div className="flex md:hidden border-t border-slate-800 px-3 py-2 justify-around bg-[#090d16] text-xs">
+      <div className="flex md:hidden border-t border-[#222226] px-3 py-2 justify-around bg-[#08080a] text-xs">
         <button
           onClick={() => setActiveTab("monitor")}
-          className={`px-3 py-1 rounded-lg ${activeTab === "monitor" ? "text-white font-bold bg-slate-800" : "text-slate-400"}`}
+          className={`px-3 py-1 rounded-lg ${activeTab === "monitor" ? "text-white font-bold bg-[#18181c]" : "text-zinc-400"}`}
         >
           Monitor
         </button>

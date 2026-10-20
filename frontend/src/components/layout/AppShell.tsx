@@ -17,7 +17,7 @@ export function AppShell({ children }: AppShellProps) {
     <div
       className={`${
         isLoginPage ? "h-screen overflow-hidden" : "min-h-screen"
-      } flex flex-col bg-[#0b0f19] text-slate-100 font-sans selection:bg-indigo-500/25 selection:text-indigo-200`}
+      } flex flex-col bg-[#000000] text-zinc-100 font-sans selection:bg-zinc-800 selection:text-white`}
     >
       {isLoginPage ? (
         <main className="h-full w-full overflow-hidden flex flex-col">{children}</main>

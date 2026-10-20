@@ -36,21 +36,21 @@ export const EntityGraph: React.FC<EntityGraphProps> = ({
   ];
 
   return (
-    <div className="p-4 rounded-2xl bg-[#0b1222] border border-[#17223b] space-y-3 font-mono">
+    <div className="p-4 rounded-2xl bg-[#0d0d10] border border-[#222226] space-y-3 font-mono">
       <div className="flex items-center justify-between">
-        <h4 className="text-xs font-semibold text-slate-200 uppercase flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400" />
+        <h4 className="text-xs font-semibold text-zinc-200 uppercase flex items-center gap-2">
+          <Layers className="w-4 h-4 text-zinc-300" />
           <span>Entity Relationship Intelligence Graph</span>
         </h4>
-        <span className="text-[10px] text-slate-500">Interactive SVG Node Topology</span>
+        <span className="text-[10px] text-zinc-500">Interactive SVG Node Topology</span>
       </div>
 
-      <div className="relative border border-slate-800/80 rounded-xl bg-[#070b14] overflow-hidden">
+      <div className="relative border border-[#222226] rounded-xl bg-[#08080a] overflow-hidden">
         <svg viewBox="0 0 500 320" className="w-full h-72">
           {/* Background grid */}
           <defs>
             <pattern id="graph-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#17223b" strokeWidth="0.5" />
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#222226" strokeWidth="0.5" />
             </pattern>
           </defs>
           <rect width="500" height="320" fill="url(#graph-grid)" opacity="0.6" />
@@ -107,7 +107,7 @@ export const EntityGraph: React.FC<EntityGraphProps> = ({
                 cx={node.x}
                 cy={node.y}
                 r="18"
-                fill="#0b1222"
+                fill="#121215"
                 stroke={node.color}
                 strokeWidth="2"
                 className="hover:scale-110 transition-transform"
@@ -124,11 +124,11 @@ export const EntityGraph: React.FC<EntityGraphProps> = ({
 
         {/* Selected Node Inspector Flyout */}
         {selectedNode && (
-          <div className="absolute bottom-2 left-2 right-2 p-3 rounded-lg bg-[#0c1222]/95 border border-cyan-500/40 backdrop-blur-md flex items-center justify-between text-xs">
+          <div className="absolute bottom-2 left-2 right-2 p-3 rounded-lg bg-[#0e0e11] border border-[#27272a] shadow-2xl backdrop-blur-md flex items-center justify-between text-xs">
             <div className="space-y-0.5">
-              <span className="text-[10px] text-cyan-400 font-bold block">{selectedNode.type}</span>
-              <span className="font-semibold text-slate-100">{selectedNode.label}</span>
-              <p className="text-[11px] text-slate-400">{selectedNode.detail}</p>
+              <span className="text-[10px] text-zinc-300 font-bold block">{selectedNode.type}</span>
+              <span className="font-semibold text-zinc-100">{selectedNode.label}</span>
+              <p className="text-[11px] text-zinc-400">{selectedNode.detail}</p>
             </div>
             <button
               onClick={() => setSelectedNode(null)}

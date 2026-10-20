@@ -27,7 +27,7 @@ export default function LoginPage() {
       role: "INVESTIGATOR",
       name: "Insp. Vikram Sharma",
       title: "Lead Investigator",
-      avatarBg: "bg-indigo-500/15 text-indigo-400 border-indigo-500/30",
+      avatarBg: "bg-[#18181c] text-zinc-200 border-[#2b2b30]",
       initials: "VS",
     },
     {
@@ -36,7 +36,7 @@ export default function LoginPage() {
       role: "INVESTIGATOR",
       name: "Sub-Insp. Priya Patel",
       title: "Risk Analyst",
-      avatarBg: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+      avatarBg: "bg-[#18181c] text-zinc-200 border-[#2b2b30]",
       initials: "PP",
     },
     {
@@ -66,7 +66,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-4 select-none">
+    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-4 select-none bg-[#000000]">
       {/* Centered Stationary Rotating Neural Network Globe */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
         <NeuralGlobe size={720} nodeCount={135} />
@@ -75,24 +75,24 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md flex flex-col justify-center space-y-3">
         {/* Brand & Introduction */}
         <div className="text-center space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-[10px] font-medium backdrop-blur-md shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-700/80 text-zinc-300 text-[10px] font-medium backdrop-blur-md shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Global Neural Mesh</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-slate-400">135 Nodes Online</span>
+            <span className="text-zinc-500">•</span>
+            <span className="text-zinc-400">135 Nodes Online</span>
           </div>
 
           <h1 className="text-xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-indigo-400" />
+            <ShieldCheck className="w-5 h-5 text-zinc-100" />
             <span>RiskGuard Operations</span>
           </h1>
-          <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-tight">
+          <p className="text-[11px] text-zinc-400 max-w-xs mx-auto leading-tight">
             Real-time transaction risk triage & fraud investigation
           </p>
         </div>
 
         {/* Auth Card */}
-        <div className="bg-[#111827]/85 backdrop-blur-xl rounded-2xl border border-slate-800/90 p-4 sm:p-5 shadow-2xl shadow-black/50 space-y-3">
+        <div className="bg-[#0e0e11] rounded-2xl border border-[#26262b] p-4 sm:p-5 shadow-2xl shadow-black space-y-3">
           {state?.error && (
             <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300 text-[11px] flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0" />
@@ -102,11 +102,11 @@ export default function LoginPage() {
 
           <form action={formAction} className="space-y-2.5">
             <div>
-              <label className="block text-[11px] font-medium text-slate-300 mb-1">
+              <label className="block text-[11px] font-medium text-zinc-300 mb-1">
                 Officer / Analyst ID
               </label>
               <div className="relative">
-                <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2" />
+                <User className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2" />
                 <input
                   type="text"
                   name="badge_number"
@@ -114,22 +114,22 @@ export default function LoginPage() {
                   value={badgeId}
                   onChange={(e) => setBadgeId(e.target.value)}
                   placeholder="e.g. CC-8421"
-                  className="w-full bg-[#0a0e17] border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all font-mono"
+                  className="w-full bg-[#121215] border border-[#242429] rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-600 transition-all font-mono"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-[11px] font-medium text-slate-300">
+                <label className="block text-[11px] font-medium text-zinc-300">
                   Password
                 </label>
-                <span className="text-[10px] text-slate-400 hover:text-slate-300 cursor-pointer transition-colors">
+                <span className="text-[10px] text-zinc-400 hover:text-zinc-300 cursor-pointer transition-colors">
                   Need assistance?
                 </span>
               </div>
               <div className="relative">
-                <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2" />
+                <Lock className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2" />
                 <input
                   type="password"
                   name="password"
@@ -137,22 +137,22 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full bg-[#0a0e17] border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  className="w-full bg-[#121215] border border-[#242429] rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-600 transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-slate-300 mb-1">
+              <label className="block text-[11px] font-medium text-zinc-300 mb-1">
                 Assigned Unit & Role
               </label>
               <div className="relative">
-                <Briefcase className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2" />
+                <Briefcase className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2" />
                 <select
                   name="role"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full bg-[#0a0e17] border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all appearance-none cursor-pointer"
+                  className="w-full bg-[#121215] border border-[#242429] rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-600 transition-all appearance-none cursor-pointer"
                 >
                   <option value="INVESTIGATOR">Investigator (Cyber Fraud Triage)</option>
                   <option value="SUPERVISOR">Supervisor / ACP (Review & Oversight)</option>
@@ -163,12 +163,12 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-between pt-0.5">
-              <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-slate-400 select-none">
+              <label className="flex items-center gap-1.5 cursor-pointer text-[11px] text-zinc-400 select-none">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-3 h-3 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  className="w-3 h-3 rounded bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-0 focus:ring-offset-0 cursor-pointer"
                 />
                 <span>Keep session active for 8 hrs</span>
               </label>
@@ -177,11 +177,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-2 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-950/50 hover:shadow-indigo-900/40 disabled:opacity-50"
+              className="w-full py-2 px-4 rounded-xl bg-zinc-100 hover:bg-white text-zinc-900 font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow-md disabled:opacity-50"
             >
               {isPending ? (
                 <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-3.5 h-3.5 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
                   <span>Verifying credentials...</span>
                 </>
               ) : (
@@ -194,11 +194,11 @@ export default function LoginPage() {
           </form>
 
           {/* Quick Demo Evaluation Profiles */}
-          <div className="pt-2.5 border-t border-slate-800/80 space-y-1.5">
-            <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
+          <div className="pt-2.5 border-t border-[#222226] space-y-1.5">
+            <div className="flex items-center justify-between text-[10px] text-zinc-400 font-medium">
               <span>Quick Demo Profiles</span>
-              <span className="text-[10px] text-indigo-400 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
+              <span className="text-[10px] text-zinc-300 flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-zinc-400" />
                 1-Click Autofill
               </span>
             </div>
@@ -213,8 +213,8 @@ export default function LoginPage() {
                     onClick={() => handleSelectDemo(acc)}
                     className={`p-1.5 rounded-lg border text-left transition-all flex items-center gap-2 ${
                       isSelected
-                        ? "bg-indigo-950/40 border-indigo-500/50 ring-1 ring-indigo-500/30"
-                        : "bg-slate-900/40 hover:bg-slate-800/50 border-slate-800/80 hover:border-slate-700"
+                        ? "bg-[#1c1c21] border-zinc-500 ring-1 ring-zinc-500/40"
+                        : "bg-[#121215] hover:bg-[#18181c] border-[#222226] hover:border-zinc-700"
                     }`}
                   >
                     <div
@@ -223,10 +223,10 @@ export default function LoginPage() {
                       {acc.initials}
                     </div>
                     <div className="truncate flex-1 leading-tight">
-                      <div className="font-medium text-slate-200 text-[11px] truncate">
+                      <div className="font-medium text-zinc-200 text-[11px] truncate">
                         {acc.name}
                       </div>
-                      <div className="text-[9px] text-slate-400 truncate">
+                      <div className="text-[9px] text-zinc-400 truncate">
                         {acc.title}
                       </div>
                     </div>
@@ -238,8 +238,8 @@ export default function LoginPage() {
         </div>
 
         {/* Security & Compliance Footer */}
-        <p className="text-[10px] text-slate-400 text-center flex items-center justify-center gap-1">
-          <Shield className="w-3 h-3 text-slate-400" />
+        <p className="text-[10px] text-zinc-500 text-center flex items-center justify-center gap-1">
+          <Shield className="w-3 h-3 text-zinc-500" />
           <span>Encrypted Session • RiskGuard v2.4 • Authorized Access Only</span>
         </p>
       </div>

@@ -92,7 +92,7 @@ export function NeuralGlobe({
 
     // 3. Synaptic signal pulses
     const pulses: Pulse3D[] = [];
-    const pulseColors = ["#818cf8", "#38bdf8", "#a78bfa", "#6ee7b7"];
+    const pulseColors = ["#f4f4f5", "#a1a1aa", "#10b981", "#f59e0b"];
 
     const spawnPulse = () => {
       if (pulses.length >= 24) return;
@@ -164,7 +164,7 @@ export function NeuralGlobe({
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-      // Core ambient glow behind sphere
+      // Core ambient glow behind sphere (clean neutral charcoal, no blue)
       const ambientGlow = ctx.createRadialGradient(
         centerX,
         centerY,
@@ -173,9 +173,9 @@ export function NeuralGlobe({
         centerY,
         sphereRadius * 1.15
       );
-      ambientGlow.addColorStop(0, "rgba(79, 70, 229, 0.18)");
-      ambientGlow.addColorStop(0.4, "rgba(99, 102, 241, 0.08)");
-      ambientGlow.addColorStop(0.75, "rgba(56, 189, 248, 0.03)");
+      ambientGlow.addColorStop(0, "rgba(255, 255, 255, 0.05)");
+      ambientGlow.addColorStop(0.4, "rgba(255, 255, 255, 0.02)");
+      ambientGlow.addColorStop(0.75, "rgba(255, 255, 255, 0.005)");
       ambientGlow.addColorStop(1, "transparent");
 
       ctx.fillStyle = ambientGlow;
@@ -263,8 +263,8 @@ export function NeuralGlobe({
         ctx.restore();
       };
 
-      drawOrbitRing(totalAngleX, [4, 6], "rgba(99, 102, 241, 0.14)", sphereRadius * 1.05);
-      drawOrbitRing(totalAngleX + 0.5, [2, 8], "rgba(56, 189, 248, 0.09)", sphereRadius * 1.15);
+      drawOrbitRing(totalAngleX, [4, 6], "rgba(255, 255, 255, 0.08)", sphereRadius * 1.05);
+      drawOrbitRing(totalAngleX + 0.5, [2, 8], "rgba(255, 255, 255, 0.05)", sphereRadius * 1.15);
 
       // Draw Synaptic Connection Lines (sorted by average depth)
       for (let i = 0; i < projected.length; i++) {
@@ -275,19 +275,15 @@ export function NeuralGlobe({
 
           const avgZ = (p1.pz + p2.pz) / 2;
           const normZ = (avgZ + 1) / 2; // 0 to 1
-          const lineAlpha = Math.max(0.04, Math.min(0.45, normZ * 0.45));
+          const lineAlpha = Math.max(0.04, Math.min(0.4, normZ * 0.4));
 
           ctx.beginPath();
           ctx.moveTo(p1.px, p1.py);
           ctx.lineTo(p2.px, p2.py);
 
-          // Subtle gradient on connection line
-          const lineGrad = ctx.createLinearGradient(p1.px, p1.py, p2.px, p2.py);
-          lineGrad.addColorStop(0, `rgba(99, 102, 241, ${lineAlpha})`);
-          lineGrad.addColorStop(1, `rgba(56, 189, 248, ${lineAlpha * 0.85})`);
-
-          ctx.strokeStyle = lineGrad;
-          ctx.lineWidth = Math.max(0.6, 1.2 * p1.scale);
+          // Neutral monochrome connection lines
+          ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha * 0.45})`;
+          ctx.lineWidth = Math.max(0.6, 1.1 * p1.scale);
           ctx.stroke();
         }
       }
@@ -334,8 +330,8 @@ export function NeuralGlobe({
         // Outer glow halo on front nodes
         if (p.pz > 0.2) {
           ctx.beginPath();
-          ctx.arc(p.px, p.py, p.radius * 2.4, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(99, 102, 241, ${p.alpha * 0.18})`;
+          ctx.arc(p.px, p.py, p.radius * 2.2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.12})`;
           ctx.fill();
         }
 
@@ -344,9 +340,9 @@ export function NeuralGlobe({
         ctx.arc(p.px, p.py, p.radius, 0, Math.PI * 2);
 
         if (p.pz > 0) {
-          ctx.fillStyle = `rgba(224, 231, 255, ${p.alpha})`; // crisp warm white/indigo
+          ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; // crisp neutral white
         } else {
-          ctx.fillStyle = `rgba(129, 140, 248, ${p.alpha * 0.75})`;
+          ctx.fillStyle = `rgba(161, 161, 170, ${p.alpha * 0.75})`; // neutral zinc
         }
         ctx.fill();
       }

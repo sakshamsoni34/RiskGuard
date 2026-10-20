@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${inter.className} min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-indigo-500/25 selection:text-indigo-200`}
+        className={`${inter.className} min-h-screen bg-[#000000] text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white`}
       >
         <AppShell>{children}</AppShell>
       </body>

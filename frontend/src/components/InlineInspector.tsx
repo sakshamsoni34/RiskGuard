@@ -37,13 +37,13 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
 
   if (!transaction) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[460px]">
-        <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+      <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[460px]">
+        <div className="h-12 w-12 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300">
           <CreditCard className="h-6 w-6" />
         </div>
         <div className="space-y-1.5 max-w-xs">
-          <div className="text-sm font-semibold text-slate-200">No Transaction Selected</div>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <div className="text-sm font-semibold text-zinc-200">No Transaction Selected</div>
+          <p className="text-xs text-zinc-400 leading-relaxed">
             Click any row in the live table to inspect the transaction details, risk explanation, and AI verdict.
           </p>
         </div>
@@ -78,11 +78,11 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/95 p-5 shadow-xl space-y-4.5 backdrop-blur-sm">
+    <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] p-5 shadow-xl space-y-4.5 backdrop-blur-sm">
       {/* Top Header */}
-      <div className="flex items-center justify-between border-b border-slate-800/80 pb-3.5">
+      <div className="flex items-center justify-between border-b border-[#222226] pb-3.5">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-white bg-slate-800/80 px-2 py-1 rounded-md border border-slate-700/60">
+          <span className="font-mono text-xs font-bold text-white bg-[#18181c] px-2 py-1 rounded-md border border-[#27272a]">
             {transaction.id}
           </span>
           <span
@@ -104,7 +104,7 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={onExpandModal}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/40 transition-colors border border-indigo-900/40"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors border border-zinc-700/60"
             title="Expand Full Investigation Modal"
           >
             <Maximize2 className="h-3.5 w-3.5" />
@@ -112,7 +112,7 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
           </button>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="rounded-lg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
             title="Close Panel"
           >
             <X className="h-4 w-4" />
@@ -129,7 +129,7 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
       )}
 
       {/* Charge & Customer Hero Card */}
-      <div className="rounded-xl border border-slate-800/90 bg-gradient-to-br from-slate-900/80 to-[#080d17] p-4 space-y-3">
+      <div className="rounded-xl border border-[#222226] bg-[#121215] p-4 space-y-3">
         <div className="flex items-baseline justify-between">
           <div>
             <div className="text-[11px] text-slate-400 font-medium">Transaction Amount</div>
@@ -187,59 +187,20 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
         </div>
 
         {/* Plain English AI Assessment */}
-        <p className="text-[11px] text-slate-300 leading-relaxed bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/60 flex items-start gap-2">
-          <Info className="h-3.5 w-3.5 text-indigo-400 flex-shrink-0 mt-0.5" />
+        <p className="text-[11px] text-zinc-300 leading-relaxed bg-[#121215] p-2.5 rounded-xl border border-[#222226] flex items-start gap-2">
+          <Info className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0 mt-0.5" />
           <span>{getPlainEnglishSummary()}</span>
         </p>
       </div>
 
-      {/* Top Reasons Why AI Flagged / Approved */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-300">Why was this scored this way?</span>
-          <span className="text-[10px] text-slate-500 font-mono">Top Signals</span>
-        </div>
-
-        <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-0.5">
-          {transaction.shapExplanation.slice(0, 3).map((item, idx) => {
-            const isIncrease = item.direction === "increase";
-            return (
-              <div
-                key={idx}
-                className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-2.5 text-xs flex items-center justify-between gap-2"
-              >
-                <div className="truncate flex-1">
-                  <div className="font-medium text-slate-200 text-xs truncate">
-                    {item.feature}
-                  </div>
-                  <div className="text-[10px] text-slate-400 truncate mt-0.5">
-                    {item.description}
-                  </div>
-                </div>
-
-                <span
-                  className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    isIncrease
-                      ? "text-rose-300 bg-rose-950/70 border border-rose-800/40"
-                      : "text-emerald-300 bg-emerald-950/70 border border-emerald-800/40"
-                  }`}
-                >
-                  {isIncrease ? `+${item.contribution}` : item.contribution} pts
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Location & Device Snapshot */}
-      <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-3 text-xs space-y-2">
-        <div className="flex items-center justify-between text-slate-300">
-          <span className="text-slate-400 flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 text-cyan-400" />
+      <div className="rounded-xl border border-[#222226] bg-[#121215] p-3 text-xs space-y-2">
+        <div className="flex items-center justify-between text-zinc-300">
+          <span className="text-zinc-400 flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 text-zinc-400" />
             Location
           </span>
-          <span className="font-medium text-slate-200">
+          <span className="font-medium text-zinc-200">
             {transaction.location.city}, {transaction.location.country}
             {transaction.location.isVpnOrProxy && (
               <span className="ml-1.5 rounded bg-rose-950/80 px-1.5 py-0.5 text-[9px] font-bold text-rose-300 border border-rose-800/50">
@@ -249,12 +210,12 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center justify-between text-slate-300 border-t border-slate-800/60 pt-2">
-          <span className="text-slate-400 flex items-center gap-1.5">
-            <Smartphone className="h-3.5 w-3.5 text-indigo-400" />
+        <div className="flex items-center justify-between text-zinc-300 border-t border-[#222226] pt-2">
+          <span className="text-zinc-400 flex items-center gap-1.5">
+            <Smartphone className="h-3.5 w-3.5 text-zinc-400" />
             Device
           </span>
-          <span className="text-slate-200 text-[11px] truncate max-w-[170px]">
+          <span className="text-zinc-200 text-[11px] truncate max-w-[170px]">
             {transaction.device.isNewDevice ? (
               <span className="text-amber-400 font-medium">Unrecognized Hardware</span>
             ) : (
@@ -265,14 +226,14 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
       </div>
 
       {/* Manual Override Action Buttons */}
-      <div className="pt-2 border-t border-slate-800/80 space-y-2">
-        <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
+      <div className="pt-2 border-t border-[#222226] space-y-2">
+        <div className="text-[10px] uppercase font-semibold text-zinc-400 tracking-wider">
           Analyst Decision Action
         </div>
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={() => handleAction("APPROVED", "Transaction marked as Allowed")}
-            className="rounded-xl border border-slate-700 bg-slate-800/90 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
+            className="rounded-xl border border-[#27272a] bg-[#18181c] py-2 text-xs font-semibold text-zinc-200 hover:bg-[#222227] hover:text-white transition-colors"
           >
             Allow
           </button>

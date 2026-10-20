@@ -67,7 +67,7 @@ export const AnalystFeedbackButton: React.FC<AnalystFeedbackButtonProps> = ({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 font-mono text-xs transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18181c] hover:bg-[#222226] border border-[#27272a] text-zinc-300 hover:text-white font-mono text-xs transition-colors"
       >
         <BrainCircuit className="w-3.5 h-3.5" />
         <span>ML Feedback</span>
@@ -75,33 +75,33 @@ export const AnalystFeedbackButton: React.FC<AnalystFeedbackButtonProps> = ({
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono">
-          <div className="w-full max-w-md p-6 rounded-2xl bg-[#0c1220] border border-cyan-500/40 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div className="w-full max-w-md p-6 rounded-2xl bg-[#0d0d10] border border-[#222226] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#222226]">
               <div className="flex items-center gap-2">
-                <BrainCircuit className="w-4 h-4 text-cyan-400" />
-                <h3 className="font-semibold text-sm text-slate-100">
+                <BrainCircuit className="w-4 h-4 text-zinc-300" />
+                <h3 className="font-semibold text-sm text-zinc-100">
                   Officer Model Feedback Loop
                 </h3>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="text-zinc-400 hover:text-white text-sm"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-zinc-400 leading-relaxed">
               Log officer ground-truth determination on transaction <strong>{transactionId}</strong> to retrain future XGBoost models and reduce false positives.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="text-slate-300 block mb-1.5">Ground Truth Assessment:</label>
+                <label className="text-zinc-300 block mb-1.5">Ground Truth Assessment:</label>
                 <select
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 focus:outline-none focus:border-zinc-500"
                 >
                   <option value="TRUE_POSITIVE">True Positive (Confirmed Malicious)</option>
                   <option value="FALSE_POSITIVE">False Positive (Innocent Customer Inconvenienced)</option>
@@ -111,11 +111,11 @@ export const AnalystFeedbackButton: React.FC<AnalystFeedbackButtonProps> = ({
               </div>
 
               <div>
-                <label className="text-slate-300 block mb-1.5">Fraud Typology Attribution:</label>
+                <label className="text-zinc-300 block mb-1.5">Fraud Typology Attribution:</label>
                 <select
                   value={typology}
                   onChange={(e) => setTypology(e.target.value)}
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 focus:outline-none focus:border-zinc-500"
                 >
                   <option value="MULE_ACCOUNT_EXTRACTION">Mule Account Rapid Extraction</option>
                   <option value="ACCOUNT_TAKEOVER">Account Takeover / SIM Swap</option>
@@ -127,13 +127,13 @@ export const AnalystFeedbackButton: React.FC<AnalystFeedbackButtonProps> = ({
               </div>
 
               <div>
-                <label className="text-slate-300 block mb-1.5">Investigator Notes:</label>
+                <label className="text-zinc-300 block mb-1.5">Investigator Notes:</label>
                 <textarea
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g. Verified with complainant bank branch. Confirmed unauthorized remote access."
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60 resize-none"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 resize-none"
                 />
               </div>
 
@@ -144,18 +144,18 @@ export const AnalystFeedbackButton: React.FC<AnalystFeedbackButtonProps> = ({
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#222226]">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-800 text-slate-400 hover:text-white"
+                  className="px-3.5 py-2 rounded-xl border border-[#27272a] text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold transition-all disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-100 hover:bg-white text-zinc-900 font-bold transition-all disabled:opacity-40 shadow-md"
                 >
                   {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Submit Calibration</span>

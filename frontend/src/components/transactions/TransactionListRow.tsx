@@ -54,12 +54,12 @@ export const TransactionListRow: React.FC<TransactionListRowProps> = ({
   return (
     <tr
       onClick={onSelect}
-      className={`border-b border-slate-800/80 transition-all cursor-pointer font-mono text-xs ${
+      className={`border-b border-[#1e1e22] transition-all cursor-pointer font-mono text-xs ${
         isSelected
-          ? "bg-cyan-950/25 border-cyan-500/40"
+          ? "bg-[#18181c] border-l-2 border-zinc-300"
           : isChecked
-          ? "bg-purple-950/15"
-          : "hover:bg-slate-900/60"
+          ? "bg-[#141418]"
+          : "hover:bg-[#121215]"
       }`}
     >
       {/* Checkbox for bulk actions */}
@@ -68,29 +68,29 @@ export const TransactionListRow: React.FC<TransactionListRowProps> = ({
           type="checkbox"
           checked={isChecked}
           onChange={onToggleCheck}
-          className="rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/30 cursor-pointer"
+          className="rounded border-[#2b2b30] bg-[#121215] text-zinc-100 focus:ring-0 cursor-pointer"
         />
       </td>
 
       {/* Timestamp */}
-      <td className="px-3 py-3 text-slate-400 whitespace-nowrap">
+      <td className="px-3 py-3 text-zinc-400 whitespace-nowrap">
         {formattedTime}
       </td>
 
       {/* Transaction ID */}
       <td className="px-3 py-3 whitespace-nowrap">
-        <span className="font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
+        <span className="font-semibold text-zinc-200 hover:text-white flex items-center gap-1">
           {transaction.id}
           {transaction.isSynthetic && (
-            <span className="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-500">MOCK</span>
+            <span className="text-[9px] px-1 py-0.2 rounded bg-[#18181c] text-zinc-400 border border-[#2b2b30]">MOCK</span>
           )}
         </span>
       </td>
 
       {/* Customer / Origin */}
       <td className="px-3 py-3">
-        <div className="font-medium text-slate-200 line-clamp-1">{transaction.customerName}</div>
-        <div className="text-[10px] text-slate-500 flex items-center gap-1.5">
+        <div className="font-medium text-zinc-200 line-clamp-1">{transaction.customerName}</div>
+        <div className="text-[10px] text-zinc-500 flex items-center gap-1.5">
           <span>{transaction.location.city}</span>
           {transaction.location.isVpnOrProxy && (
             <span className="px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 text-[9px] border border-purple-500/30">
@@ -106,14 +106,14 @@ export const TransactionListRow: React.FC<TransactionListRowProps> = ({
       </td>
 
       {/* Amount */}
-      <td className="px-3 py-3 whitespace-nowrap font-semibold text-slate-100">
+      <td className="px-3 py-3 whitespace-nowrap font-semibold text-zinc-100">
         ₹{transaction.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
       </td>
 
       {/* Merchant & Category */}
       <td className="px-3 py-3">
-        <div className="text-slate-300 line-clamp-1">{transaction.merchant}</div>
-        <div className="text-[10px] text-slate-500">{transaction.merchantCategory}</div>
+        <div className="text-zinc-300 line-clamp-1">{transaction.merchant}</div>
+        <div className="text-[10px] text-zinc-500">{transaction.merchantCategory}</div>
       </td>
 
       {/* Risk Score */}
@@ -139,14 +139,14 @@ export const TransactionListRow: React.FC<TransactionListRowProps> = ({
           <button
             onClick={onOpenModal}
             title="Inspect Telemetry Modal"
-            className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/80 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
+            className="p-1.5 rounded-lg border border-[#222226] bg-[#121215] text-zinc-400 hover:text-zinc-100 hover:border-[#2b2b30] transition-all"
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
           <Link
             href={`/transactions/${transaction.id}`}
             title="Open Full Investigation Dossier"
-            className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/80 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all inline-flex"
+            className="p-1.5 rounded-lg border border-[#222226] bg-[#121215] text-zinc-400 hover:text-zinc-100 hover:border-[#2b2b30] transition-all inline-flex"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>

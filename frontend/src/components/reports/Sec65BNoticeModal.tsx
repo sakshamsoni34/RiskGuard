@@ -13,21 +13,21 @@ export const Sec65BNoticeModal: React.FC<Sec65BNoticeModalProps> = ({ isOpen, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono text-xs">
-      <div className="w-full max-w-2xl p-6 rounded-2xl bg-[#0c1220] border border-cyan-500/40 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="w-full max-w-2xl p-6 rounded-2xl bg-[#0d0d10] border border-[#222226] shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between pb-3 border-b border-[#222226]">
           <div className="flex items-center gap-2">
-            <Lock className="w-5 h-5 text-cyan-400" />
-            <h3 className="font-bold text-sm text-slate-100 uppercase">
+            <Lock className="w-5 h-5 text-zinc-300" />
+            <h3 className="font-bold text-sm text-zinc-100 uppercase">
               Statutory Certificate — Section 65B Compliance
             </h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white text-sm">
+          <button onClick={onClose} className="text-zinc-400 hover:text-white text-sm">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="space-y-3 text-slate-300 leading-relaxed text-xs">
-          <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-cyan-200">
+        <div className="space-y-3 text-zinc-300 leading-relaxed text-xs">
+          <div className="p-3 rounded-xl bg-[#18181c] border border-[#2b2b30] text-zinc-200">
             <strong>CERTIFICATE PURSUANT TO SECTION 65B OF THE INDIAN EVIDENCE ACT, 1872 / IT ACT, 2000</strong>
           </div>
 
@@ -58,10 +58,10 @@ export const Sec65BNoticeModal: React.FC<Sec65BNoticeModalProps> = ({ isOpen, on
           </div>
         </div>
 
-        <div className="pt-3 border-t border-slate-800 flex justify-end">
+        <div className="pt-3 border-t border-[#222226] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold transition-all"
+            className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-white text-zinc-900 font-bold transition-all shadow-md"
           >
             Acknowledge & Close
           </button>

@@ -339,34 +339,34 @@ export default function CaseDetailPage({
       {/* Link Transaction Modal */}
       {isLinkingOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono text-xs">
-          <div className="w-full max-w-sm p-5 rounded-2xl bg-[#0c1220] border border-cyan-500/40 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-              <span className="font-bold text-slate-100">Attach Disputed Transaction</span>
-              <button onClick={() => setIsLinkingOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+          <div className="w-full max-w-sm p-5 rounded-2xl bg-[#0d0d10] border border-[#222226] shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#222226]">
+              <span className="font-bold text-zinc-100">Attach Disputed Transaction</span>
+              <button onClick={() => setIsLinkingOpen(false)} className="text-zinc-400 hover:text-white">✕</button>
             </div>
             <form onSubmit={handleLinkTransaction} className="space-y-3">
               <div>
-                <label className="text-slate-400 block mb-1">Transaction ID:</label>
+                <label className="text-zinc-400 block mb-1">Transaction ID:</label>
                 <input
                   type="text"
                   required
                   value={newTxnId}
                   onChange={(e) => setNewTxnId(e.target.value)}
                   placeholder="e.g. TXN-1005"
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 focus:outline-none focus:border-zinc-500"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsLinkingOpen(false)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400"
+                  className="px-3 py-1.5 rounded-lg border border-[#27272a] text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 font-bold shadow-md"
                 >
                   Link Evidence
                 </button>

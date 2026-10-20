@@ -34,17 +34,17 @@ export default function SimulatorPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1222] border border-[#17223b]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0d0d10] border border-[#222226]">
         <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+            <Sliders className="w-5 h-5 text-zinc-300" />
             <span>Interactive Risk Scoring & SHAP Explainer Simulator</span>
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-zinc-400 font-mono mt-0.5">
             Test custom transaction parameters against the XGBoost scoring pipeline in real-time
           </p>
         </div>
-        <div className="text-[11px] font-mono px-2 py-1 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300">
+        <div className="text-[11px] font-mono px-2 py-1 rounded bg-[#18181c] border border-[#27272a] text-zinc-300">
           SANDBOX TESTBENCH
         </div>
       </div>

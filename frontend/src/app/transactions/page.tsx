@@ -269,11 +269,11 @@ function TransactionsContent() {
       {/* Main Table + Side Inspector View */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className={selectedTxn ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/90 overflow-hidden shadow-2xl">
+          <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-900/80 text-[11px] font-mono text-slate-400">
+                  <tr className="border-b border-[#222226] bg-[#08080a] text-[11px] font-mono text-zinc-400">
                     <th className="px-3 py-3 w-8">
                       <input
                         type="checkbox"

@@ -119,16 +119,16 @@ export default function ReportsPage() {
       )}
 
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1222] border border-[#17223b]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0d0d10] border border-[#222226]">
         <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <FileCheck2 className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+            <FileCheck2 className="w-5 h-5 text-zinc-300" />
             <span>Evidentiary Briefing & Report Dispatch</span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#18181c] text-zinc-300 border border-[#27272a]">
               SEC 65B SEALED DOSSIERS
             </span>
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-zinc-400 font-mono mt-0.5">
             Cryptographically sealed investigative summaries with watermark and legal admissible metadata
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function ReportsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsGenerateOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-mono text-xs font-bold transition-all shadow-lg shadow-cyan-950/40"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-white text-zinc-900 font-mono text-xs font-bold transition-all shadow-md"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>GENERATE NEW DOSSIER</span>
@@ -168,12 +168,12 @@ export default function ReportsPage() {
                 onClick={() => setSelectedReport(rep)}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   selectedReport.id === rep.id
-                    ? "bg-cyan-950/20 border-cyan-500/50 shadow-md ring-1 ring-cyan-500/30"
-                    : "bg-[#0c1220]/80 border-slate-800 hover:border-slate-700 hover:bg-[#0e1628]"
+                    ? "bg-[#18181c] border-zinc-500 shadow-md ring-1 ring-zinc-500/30"
+                    : "bg-[#0d0d10] border-[#222226] hover:border-zinc-700 hover:bg-[#141418]"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="font-bold text-cyan-300">{rep.reportNumber}</span>
+                  <span className="font-bold text-zinc-200">{rep.reportNumber}</span>
                   <span
                     className={`text-[9px] px-1.5 py-0.5 rounded font-semibold ${
                       rep.status === "SEALED"
@@ -184,10 +184,10 @@ export default function ReportsPage() {
                     {rep.status}
                   </span>
                 </div>
-                <h4 className="text-slate-200 font-semibold line-clamp-1">{rep.title}</h4>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-800/80">
+                <h4 className="text-zinc-200 font-semibold line-clamp-1">{rep.title}</h4>
+                <div className="flex items-center justify-between text-[11px] text-zinc-400 mt-2 pt-2 border-t border-[#1e1e22]">
                   <span>Case: {rep.caseId}</span>
-                  <span className="font-bold text-slate-200">₹{rep.totalDisputedAmount.toLocaleString("en-IN")}</span>
+                  <span className="font-bold text-zinc-200">₹{rep.totalDisputedAmount.toLocaleString("en-IN")}</span>
                 </div>
               </div>
             ))}
@@ -202,8 +202,8 @@ export default function ReportsPage() {
 
       {/* Generate Dossier Modal */}
       {isGenerateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono text-xs">
-          <div className="w-full max-w-md p-6 rounded-2xl bg-[#0c1220] border border-cyan-500/40 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm text-xs">
+          <div className="w-full max-w-md p-6 rounded-2xl bg-[#0d0d10] border border-[#222226] shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <FileCheck2 className="w-5 h-5 text-cyan-400" />
@@ -223,28 +223,28 @@ export default function ReportsPage() {
                   value={newCaseId}
                   onChange={(e) => setNewCaseId(e.target.value)}
                   placeholder="e.g. CR-2026-0842"
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-slate-300 block mb-1">Dossier Brief Title:</label>
+                <label className="text-zinc-300 block mb-1">Dossier Brief Title:</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Comprehensive Evidentiary Report on Syndicate Mule Alpha"
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-slate-300 block mb-1">Primary Typology Classification:</label>
+                <label className="text-zinc-300 block mb-1">Primary Typology Classification:</label>
                 <select
                   value={newTypology}
                   onChange={(e) => setNewTypology(e.target.value)}
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 focus:outline-none focus:border-zinc-500"
                 >
                   <option value="Account Takeover / Mule Exfiltration">Account Takeover / Mule Exfiltration</option>
                   <option value="Credential Stuffing & Proxy Anonymization">Credential Stuffing & Proxy Anonymization</option>

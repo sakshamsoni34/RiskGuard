@@ -70,13 +70,13 @@ export const CaseNoteEditor: React.FC<CaseNoteEditorProps> = ({ caseId, onNoteAd
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 rounded-2xl bg-[#0b1222] border border-[#17223b] space-y-3 font-mono">
+    <form onSubmit={handleSubmit} className="p-4 rounded-2xl bg-[#0d0d10] border border-[#222226] space-y-3 font-mono">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-semibold text-slate-200 flex items-center gap-1.5">
-          <FileText className="w-3.5 h-3.5 text-cyan-400" />
+        <span className="font-semibold text-zinc-200 flex items-center gap-1.5">
+          <FileText className="w-3.5 h-3.5 text-zinc-300" />
           <span>Append Case Observation</span>
         </span>
-        <span className="text-[11px] text-slate-500 flex items-center gap-1">
+        <span className="text-[11px] text-zinc-500 flex items-center gap-1">
           <ShieldCheck className="w-3 h-3 text-emerald-400" />
           <span>Signed: Insp. Vikram Sharma (#CC-8421)</span>
         </span>
@@ -88,7 +88,7 @@ export const CaseNoteEditor: React.FC<CaseNoteEditorProps> = ({ caseId, onNoteAd
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Enter investigative finding, mule account verification, or subpoena update... (Press Cmd+Enter to submit)"
-        className="w-full p-3 bg-[#070b14] border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all resize-none"
+        className="w-full p-3 bg-[#121215] border border-[#242429] rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-600 transition-all resize-none"
       />
 
       <div className="flex items-center justify-between pt-1">

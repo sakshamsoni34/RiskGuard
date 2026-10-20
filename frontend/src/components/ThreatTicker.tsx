@@ -22,7 +22,7 @@ export const ThreatTicker: React.FC<ThreatTickerProps> = ({
   const isHigh = latestAlert.riskLevel === "HIGH";
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-2xl border border-slate-800/80 bg-[#111827]/75 px-4 py-2.5 gap-3 text-xs shadow-sm backdrop-blur-md">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-2xl border border-[#222226] bg-[#0d0d10] px-4 py-2.5 gap-3 text-xs shadow-sm backdrop-blur-md">
       <div className="flex flex-wrap items-center gap-3">
         {/* Live Status indicator */}
         <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export const ThreatTicker: React.FC<ThreatTickerProps> = ({
 
       <button
         onClick={() => onSelectTransaction(latestAlert)}
-        className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors whitespace-nowrap self-end sm:self-auto rounded-lg px-2.5 py-1 hover:bg-indigo-500/10"
+        className="flex items-center gap-1.5 text-xs font-medium text-zinc-300 hover:text-white transition-colors whitespace-nowrap self-end sm:self-auto rounded-lg px-2.5 py-1 hover:bg-[#18181c] border border-transparent hover:border-[#27272a]"
       >
         <span>Inspect incident</span>
         <ArrowRight className="h-3.5 w-3.5" />

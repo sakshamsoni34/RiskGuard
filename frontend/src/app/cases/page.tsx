@@ -178,29 +178,29 @@ export default function CasesPage() {
       )}
 
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1222] border border-[#17223b]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0d0d10] border border-[#222226]">
         <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <FolderGit2 className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+            <FolderGit2 className="w-5 h-5 text-zinc-300" />
             <span>Case Investigation Registry</span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#18181c] text-zinc-300 border border-[#27272a]">
               {cases.length} ACTIVE DOSSIERS
             </span>
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-zinc-400 font-mono mt-0.5">
             Dossier tracking for cybercrime incidents, financial mule clusters, and legal escalation
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           {/* View toggle */}
-          <div className="flex items-center p-1 rounded-xl bg-slate-900 border border-slate-800">
+          <div className="flex items-center p-1 rounded-xl bg-[#141418] border border-[#242429]">
             <button
               onClick={() => setViewMode("kanban")}
               className={`p-1.5 rounded-lg text-xs font-mono flex items-center gap-1 transition-all ${
                 viewMode === "kanban"
-                  ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-[#222228] text-white border border-[#2e2e36] shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
               title="Kanban Board View"
             >
@@ -211,8 +211,8 @@ export default function CasesPage() {
               onClick={() => setViewMode("table")}
               className={`p-1.5 rounded-lg text-xs font-mono flex items-center gap-1 transition-all ${
                 viewMode === "table"
-                  ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-[#222228] text-white border border-[#2e2e36] shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
               title="Registry Table View"
             >
@@ -223,7 +223,7 @@ export default function CasesPage() {
 
           <button
             onClick={() => setIsNewCaseModalOpen(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-semibold transition-all shadow-lg shadow-indigo-900/30"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-white text-zinc-900 font-mono text-xs font-semibold transition-all shadow-md"
           >
             <Plus className="w-4 h-4" />
             <span>REGISTER CASE DOSSIER</span>
@@ -232,26 +232,26 @@ export default function CasesPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0b1222] border border-[#17223b] text-xs font-mono">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0d0d10] border border-[#222226] text-xs font-mono">
         <div className="relative flex-1 w-full sm:w-auto">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by Case No (CR-2026-0842), suspect entity, or mule UPI..."
-            className="w-full pl-9 pr-3 py-2 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/60"
+            className="w-full pl-9 pr-3 py-2 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
           />
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
-          <span className="text-slate-500 flex items-center gap-1">
+          <span className="text-zinc-500 flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" /> Status:
           </span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="px-2.5 py-1.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500/60"
+            className="px-2.5 py-1.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 focus:outline-none focus:border-zinc-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="NEW">NEW</option>
@@ -266,11 +266,11 @@ export default function CasesPage() {
       {viewMode === "kanban" ? (
         <CaseKanban cases={filteredCases} onStatusChange={handleStatusChange} />
       ) : (
-        <div className="rounded-2xl border border-slate-800 bg-[#0c1222]/90 overflow-hidden shadow-2xl">
+        <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/80 text-[11px] text-slate-400">
+                <tr className="border-b border-[#222226] bg-[#08080a] text-[11px] text-zinc-400">
                   <th className="px-4 py-3">CASE NUMBER</th>
                   <th className="px-4 py-3">TITLE / SYNDICATE</th>
                   <th className="px-4 py-3">PRIORITY</th>
@@ -320,8 +320,8 @@ export default function CasesPage() {
 
       {/* New Case Modal */}
       {isNewCaseModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm font-mono">
-          <div className="w-full max-w-lg p-6 rounded-2xl bg-[#0c1220] border border-cyan-500/40 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="w-full max-w-lg p-6 rounded-2xl bg-[#0d0d10] border border-[#222226] shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <FolderGit2 className="w-5 h-5 text-cyan-400" />
@@ -346,17 +346,17 @@ export default function CasesPage() {
                   value={newCaseTitle}
                   onChange={(e) => setNewCaseTitle(e.target.value)}
                   placeholder="e.g. Investigation into SIM-Swap Ring in North Mumbai"
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-300 block mb-1">Priority Classification</label>
+                  <label className="text-zinc-300 block mb-1">Priority Classification</label>
                   <select
                     value={newCasePriority}
                     onChange={(e) => setNewCasePriority(e.target.value as any)}
-                    className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500/60"
+                    className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-200 focus:outline-none focus:border-zinc-500"
                   >
                     <option value="P1_CRITICAL">P1_CRITICAL (&gt; ₹5L / Multi-city)</option>
                     <option value="P2_HIGH">P2_HIGH (&gt; ₹1L / Repeat Mule)</option>
@@ -366,33 +366,33 @@ export default function CasesPage() {
                 </div>
 
                 <div>
-                  <label className="text-slate-300 block mb-1">Initial Disputed Txn ID</label>
+                  <label className="text-zinc-300 block mb-1">Initial Disputed Txn ID</label>
                   <input
                     type="text"
                     value={newCaseTxnId}
                     onChange={(e) => setNewCaseTxnId(e.target.value)}
                     placeholder="e.g. TXN-1002"
-                    className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60"
+                    className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-slate-300 block mb-1">Target Mule Account / Suspect UPI</label>
+                <label className="text-zinc-300 block mb-1">Target Mule Account / Suspect UPI</label>
                 <input
                   type="text"
                   value={newCaseMule}
                   onChange={(e) => setNewCaseMule(e.target.value)}
                   placeholder="e.g. mule.extracted@okhdfcbank"
-                  className="w-full p-2.5 bg-[#070b14] border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500/60"
+                  className="w-full p-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#222226]">
                 <button
                   type="button"
                   onClick={() => setIsNewCaseModalOpen(false)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-800 text-slate-400 hover:text-white"
+                  className="px-3.5 py-2 rounded-xl border border-[#27272a] text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>

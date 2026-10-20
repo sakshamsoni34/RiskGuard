@@ -159,12 +159,12 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
   return (
     <div className="space-y-6">
       {/* Overview & Quick Scenario Cards */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-5 space-y-4">
+      <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] p-5 space-y-4">
         <div>
           <h2 className="text-base font-bold text-white tracking-wide">
             Interactive Rule Testing Sandbox
           </h2>
-          <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
             Test how the AI model evaluates different transaction scenarios in real time. Click a preset scenario below or adjust the sliders to watch how risk rules calculate scores.
           </p>
         </div>
@@ -177,15 +177,15 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
               activeScenario === "velocity"
                 ? "border-rose-500/70 bg-rose-950/30 ring-1 ring-rose-500/30"
-                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
             }`}
           >
             <div className="flex items-center gap-2">
               <Flame className="h-4 w-4 text-rose-400" />
-              <span className="text-xs font-semibold text-slate-200">Velocity Attack</span>
+              <span className="text-xs font-semibold text-zinc-200">Velocity Attack</span>
             </div>
             <div className="mt-2 text-sm font-bold font-mono text-white">₹85,000</div>
-            <p className="text-[11px] text-slate-400 mt-1">3 attempts in 2 min + Lagos IP</p>
+            <p className="text-[11px] text-zinc-400 mt-1">3 attempts in 2 min + Lagos IP</p>
             <span className="inline-block mt-2 text-[10px] font-semibold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">
               Expected: Auto-Blocked
             </span>
@@ -197,15 +197,15 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
               activeScenario === "crypto"
                 ? "border-rose-500/70 bg-rose-950/30 ring-1 ring-rose-500/30"
-                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
             }`}
           >
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-purple-400" />
-              <span className="text-xs font-semibold text-slate-200">Crypto Account Drain</span>
+              <span className="text-xs font-semibold text-zinc-200">Crypto Account Drain</span>
             </div>
             <div className="mt-2 text-sm font-bold font-mono text-white">₹1,45,000</div>
-            <p className="text-[11px] text-slate-400 mt-1">Brand new device + VPN Proxy</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Brand new device + VPN Proxy</p>
             <span className="inline-block mt-2 text-[10px] font-semibold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">
               Expected: Auto-Blocked
             </span>
@@ -217,15 +217,15 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
               activeScenario === "discretionary"
                 ? "border-amber-500/70 bg-amber-950/30 ring-1 ring-amber-500/30"
-                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
             }`}
           >
             <div className="flex items-center gap-2">
               <KeyRound className="h-4 w-4 text-amber-400" />
-              <span className="text-xs font-semibold text-slate-200">Unusual High Spend</span>
+              <span className="text-xs font-semibold text-zinc-200">Unusual High Spend</span>
             </div>
             <div className="mt-2 text-sm font-bold font-mono text-white">₹32,000</div>
-            <p className="text-[11px] text-slate-400 mt-1">Jewelry store on new browser</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Jewelry store on new browser</p>
             <span className="inline-block mt-2 text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40">
               Expected: 2FA OTP Challenge
             </span>
@@ -237,15 +237,15 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
               activeScenario === "legitimate"
                 ? "border-emerald-500/70 bg-emerald-950/30 ring-1 ring-emerald-500/30"
-                : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
+                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
             }`}
           >
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span className="text-xs font-semibold text-slate-200">Normal Grocery</span>
+              <span className="text-xs font-semibold text-zinc-200">Normal Grocery</span>
             </div>
             <div className="mt-2 text-sm font-bold font-mono text-white">₹1,850</div>
-            <p className="text-[11px] text-slate-400 mt-1">Known laptop + domestic home ISP</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Known laptop + domestic home ISP</p>
             <span className="inline-block mt-2 text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">
               Expected: Instant Approval
             </span>
@@ -256,10 +256,10 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
       {/* Main Grid: Parameters on Left, Output on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Parameters Column (7 cols) */}
-        <div className="lg:col-span-7 space-y-4 rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-5">
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+        <div className="lg:col-span-7 space-y-4 rounded-2xl border border-[#222226] bg-[#0d0d10] p-5">
+          <div className="flex items-center justify-between border-b border-[#222226] pb-3">
             <span className="text-xs font-bold text-white uppercase tracking-wider">Configure Transaction</span>
-            <span className="text-xs font-mono text-slate-400">FastAPI Model Scoring</span>
+            <span className="text-xs font-mono text-zinc-400">FastAPI Model Scoring</span>
           </div>
 
           {/* Amount Slider */}
@@ -403,19 +403,19 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
         {/* Output Column (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Result Card */}
-          <div className="rounded-2xl border border-slate-800 bg-[#0c1220]/90 p-5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] p-5 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-[#222226] pb-3">
               <span className="text-xs font-bold text-white uppercase tracking-wider">AI Evaluation Verdict</span>
               <span className="text-xs font-mono text-emerald-400">Response: 32ms</span>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs text-slate-400">Calculated Risk Score</div>
+                <div className="text-xs text-zinc-400">Calculated Risk Score</div>
                 <div className="text-4xl font-bold font-mono text-white mt-1">
-                  {result.riskScore} <span className="text-sm font-normal text-slate-500">/ 100</span>
+                  {result.riskScore} <span className="text-sm font-normal text-zinc-500">/ 100</span>
                 </div>
-                <div className="text-xs font-semibold text-slate-300 mt-1">
+                <div className="text-xs font-semibold text-zinc-300 mt-1">
                   Classification: <span className={isHigh ? "text-rose-400" : isMedium ? "text-amber-400" : "text-emerald-400"}>{result.riskLevel} Risk</span>
                 </div>
               </div>
@@ -442,17 +442,17 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
               </div>
             </div>
 
-            <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div className="w-full bg-[#1b1b22] h-2.5 rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all duration-300 ${isHigh ? "bg-rose-500" : isMedium ? "bg-amber-500" : "bg-emerald-500"}`}
                 style={{ width: `${result.riskScore}%` }}
               />
             </div>
 
-            <div className="pt-2 border-t border-slate-800/80">
+            <div className="pt-2 border-t border-[#222226]">
               <button
                 onClick={handleInject}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-xs font-bold text-white hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-950/40"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-100 hover:bg-white px-4 py-3 text-xs font-bold text-zinc-900 transition-colors shadow-lg shadow-black/40"
               >
                 <Send className="h-4 w-4" />
                 Inject this Test into Live Stream

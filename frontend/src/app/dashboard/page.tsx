@@ -139,17 +139,17 @@ export default function DashboardPage() {
       />
 
       {/* Stream Control & Quick Actions Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#111827]/75 border border-slate-800/80 text-xs shadow-sm backdrop-blur-md">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#0d0d10] border border-[#222226] text-xs shadow-sm backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span
               className={`w-2 h-2 rounded-full ${
-                isStreaming ? "bg-emerald-400 animate-pulse" : "bg-slate-500"
+                isStreaming ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"
               }`}
             />
-            <span className="text-slate-200 font-medium">
+            <span className="text-zinc-200 font-medium">
               Live Ingestion:{" "}
-              <span className={isStreaming ? "text-emerald-400 font-semibold" : "text-slate-400"}>
+              <span className={isStreaming ? "text-emerald-400 font-semibold" : "text-zinc-400"}>
                 {isStreaming ? "Active" : "Paused"}
               </span>
             </span>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setIsStreaming(!isStreaming)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 transition-colors border border-slate-700/60 font-medium"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#141418] hover:bg-[#1a1a20] text-zinc-200 transition-colors border border-[#27272a] font-medium"
           >
             {isStreaming ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 text-emerald-400" />}
             <span>{isStreaming ? "Pause Feed" : "Resume Feed"}</span>
@@ -167,16 +167,16 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/simulator"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-300 border border-indigo-500/30 font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-200 border border-zinc-700/60 font-medium transition-colors"
           >
-            <Sliders className="w-3.5 h-3.5 text-indigo-400" />
+            <Sliders className="w-3.5 h-3.5 text-zinc-300" />
             <span>Simulate Attack</span>
           </Link>
           <Link
             href="/transactions"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 text-slate-200 border border-slate-700/60 font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#141418] hover:bg-[#1a1a20] text-zinc-200 border border-[#27272a] font-medium transition-colors"
           >
-            <Activity className="w-3.5 h-3.5 text-slate-400" />
+            <Activity className="w-3.5 h-3.5 text-zinc-400" />
             <span>All Transactions ({transactions.length})</span>
           </Link>
         </div>
@@ -190,29 +190,29 @@ export default function DashboardPage() {
         {/* Left 2 Cols: Triage Queue & Cases */}
         <div className="lg:col-span-2 space-y-6">
           {/* Urgent Review Queue */}
-          <div className="bg-[#111827]/75 backdrop-blur-md rounded-2xl border border-slate-800/80 overflow-hidden shadow-sm">
-            <div className="p-4 sm:p-5 border-b border-slate-800/80 flex items-center justify-between">
+          <div className="bg-[#0d0d10] backdrop-blur-md rounded-2xl border border-[#222226] overflow-hidden shadow-sm">
+            <div className="p-4 sm:p-5 border-b border-[#222226] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400">
                   <ShieldAlert className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm text-slate-100">
+                  <h3 className="font-semibold text-sm text-zinc-100">
                     Urgent Review Queue
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-zinc-400">
                     High risk anomalies requiring immediate analyst evaluation
                   </p>
                 </div>
               </div>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium border border-slate-700/60">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#18181c] text-zinc-300 font-medium border border-[#27272a]">
                 {highRiskQueue.length} Flagged
               </span>
             </div>
 
-            <div className="divide-y divide-slate-800/60">
+            <div className="divide-y divide-[#1e1e22]">
               {highRiskQueue.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-400">
+                <div className="p-8 text-center text-xs text-zinc-400">
                   No critical incidents currently pending review. Live traffic is clean.
                 </div>
               ) : (
@@ -220,34 +220,34 @@ export default function DashboardPage() {
                   <div
                     key={txn.id}
                     onClick={() => setSelectedTxn(txn)}
-                    className={`p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-800/30 cursor-pointer transition-colors ${
+                    className={`p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-[#121215] cursor-pointer transition-colors ${
                       selectedTxn.id === txn.id
-                        ? "bg-indigo-950/20 border-l-2 border-indigo-500"
+                        ? "bg-[#18181c] border-l-2 border-zinc-400"
                         : ""
                     }`}
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-slate-200">
+                        <span className="font-mono text-xs font-bold text-zinc-200">
                           {txn.id}
                         </span>
                         <RiskBadge level={txn.riskLevel} score={txn.riskScore} size="sm" />
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-zinc-400">
                           {txn.merchantCategory}
                         </span>
                       </div>
-                      <div className="text-xs text-slate-400 flex flex-wrap items-center gap-2">
-                        <span className="text-slate-200 font-medium">
+                      <div className="text-xs text-zinc-400 flex flex-wrap items-center gap-2">
+                        <span className="text-zinc-200 font-medium">
                           {txn.customerName}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <MapPin className="w-3 h-3 text-zinc-500" />
                           {txn.location.city}, {txn.location.country}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1 text-[11px]">
-                          <Smartphone className="w-3 h-3 text-slate-400" />
+                          <Smartphone className="w-3 h-3 text-zinc-500" />
                           {txn.device.isNewDevice ? "New Device" : "Known Device"}
                         </span>
                       </div>
@@ -270,14 +270,14 @@ export default function DashboardPage() {
                         <div className="font-mono font-bold text-sm text-white">
                           ₹{txn.amount.toLocaleString("en-IN")}
                         </div>
-                        <div className="text-[10px] text-slate-400 uppercase">
+                        <div className="text-[10px] text-zinc-400 uppercase">
                           {txn.paymentMethod.brand} • {txn.paymentMethod.last4}
                         </div>
                       </div>
                       <Link
                         href={`/transactions/${txn.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                        className="flex items-center gap-1 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
                       >
                         <span>Inspect Dossier</span>
                         <ArrowRight className="w-3 h-3" />
@@ -288,10 +288,10 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="p-3 bg-[#0d1322] border-t border-slate-800/80 text-center">
+            <div className="p-3 bg-[#08080a] border-t border-[#222226] text-center">
               <Link
                 href="/transactions"
-                className="text-xs font-medium text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1"
+                className="text-xs font-medium text-zinc-300 hover:text-white inline-flex items-center gap-1"
               >
                 <span>Open Complete Transactions Table</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -300,24 +300,24 @@ export default function DashboardPage() {
           </div>
 
           {/* Active Case Files */}
-          <div className="bg-[#111827]/75 backdrop-blur-md rounded-2xl border border-slate-800/80 p-5 space-y-4 shadow-sm">
+          <div className="bg-[#0d0d10] backdrop-blur-md rounded-2xl border border-[#222226] p-5 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-200 border border-zinc-700">
                   <FolderGit2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm text-slate-100">
+                  <h3 className="font-semibold text-sm text-zinc-100">
                     Active Investigation Cases
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-zinc-400">
                     Escalated cases assigned to fraud specialists
                   </p>
                 </div>
               </div>
               <Link
                 href="/cases"
-                className="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                className="text-xs font-medium text-zinc-300 hover:text-white flex items-center gap-1"
               >
                 <span>View All</span>
                 <ChevronRight className="w-3 h-3" />
@@ -329,10 +329,10 @@ export default function DashboardPage() {
                 <Link
                   key={c.id}
                   href={`/cases/${c.id}`}
-                  className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80 hover:border-slate-700 transition-all group block space-y-2.5 shadow-sm"
+                  className="p-4 rounded-xl bg-[#121215] border border-[#222226] hover:border-zinc-700 transition-all group block space-y-2.5 shadow-sm"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-indigo-300">
+                    <span className="font-mono text-xs font-bold text-zinc-200">
                       {c.caseNumber}
                     </span>
                     <span
@@ -345,14 +345,14 @@ export default function DashboardPage() {
                       {c.status}
                     </span>
                   </div>
-                  <h4 className="text-xs text-slate-200 font-medium line-clamp-1 group-hover:text-white transition-colors">
+                  <h4 className="text-xs text-zinc-200 font-medium line-clamp-1 group-hover:text-white transition-colors">
                     {c.title}
                   </h4>
-                  <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80">
-                    <span className="font-mono font-medium text-slate-300">
+                  <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-[#1e1e22]">
+                    <span className="font-mono font-medium text-zinc-200">
                       ₹{c.totalAmountAtRisk.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-[11px] text-slate-400">{c.assignedTo}</span>
+                    <span className="text-[11px] text-zinc-400">{c.assignedTo}</span>
                   </div>
                 </Link>
               ))}
@@ -362,34 +362,34 @@ export default function DashboardPage() {
 
         {/* Right Col: Selected Incident Geo Threat Vector */}
         <div className="space-y-6">
-          <div className="bg-[#111827]/75 backdrop-blur-md rounded-2xl border border-slate-800/80 p-5 space-y-4 shadow-sm">
+          <div className="bg-[#0d0d10] backdrop-blur-md rounded-2xl border border-[#222226] p-5 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-indigo-400" />
-                <h3 className="font-semibold text-sm text-slate-100">
+                <span className="w-2 h-2 rounded-full bg-zinc-400" />
+                <h3 className="font-semibold text-sm text-zinc-100">
                   Geographic Risk Vector
                 </h3>
               </div>
-              <span className="text-xs font-mono text-slate-400">
+              <span className="text-xs font-mono text-zinc-400">
                 Focus: {selectedTxn.id}
               </span>
             </div>
 
             <GeoThreatMap location={selectedTxn.location} />
 
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2.5 text-xs">
+            <div className="p-3.5 rounded-xl bg-[#121215] border border-[#222226] space-y-2.5 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Merchant Target:</span>
-                <span className="text-slate-200 font-medium">{selectedTxn.merchant}</span>
+                <span className="text-zinc-400">Merchant Target:</span>
+                <span className="text-zinc-200 font-medium">{selectedTxn.merchant}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Origin Location:</span>
-                <span className="text-slate-200">
+                <span className="text-zinc-400">Origin Location:</span>
+                <span className="text-zinc-200">
                   {selectedTxn.location.city}, {selectedTxn.location.country}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">VPN / Anonymizer:</span>
+                <span className="text-zinc-400">VPN / Anonymizer:</span>
                 <span
                   className={
                     selectedTxn.location.isVpnOrProxy
@@ -401,8 +401,8 @@ export default function DashboardPage() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Travel Distance Jump:</span>
-                <span className="text-slate-200 font-mono">
+                <span className="text-zinc-400">Travel Distance Jump:</span>
+                <span className="text-zinc-200 font-mono">
                   {selectedTxn.location.distanceFromHomeKm.toLocaleString()} km
                 </span>
               </div>
@@ -410,7 +410,7 @@ export default function DashboardPage() {
 
             <Link
               href={`/transactions/${selectedTxn.id}`}
-              className="w-full py-2 px-3 rounded-xl bg-indigo-600/15 hover:bg-indigo-600/25 border border-indigo-500/30 text-indigo-300 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+              className="w-full py-2 px-3 rounded-xl bg-[#18181c] hover:bg-[#222226] border border-[#27272a] text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
             >
               <span>Inspect SHAP Feature Breakdown</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -418,18 +418,18 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Platform Status */}
-          <div className="p-4 rounded-xl bg-[#0e1422] border border-slate-800/80 space-y-2.5 text-xs">
-            <div className="flex items-center justify-between text-slate-400">
+          <div className="p-4 rounded-xl bg-[#0d0d10] border border-[#222226] space-y-2.5 text-xs">
+            <div className="flex items-center justify-between text-zinc-400">
               <span>Environment Security</span>
               <span className="text-emerald-400 font-medium">Verified Active</span>
             </div>
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-zinc-400">
               <span>Audit Chain Integrity</span>
-              <span className="text-indigo-400 font-mono text-[11px]">SHA-256 Validated</span>
+              <span className="text-zinc-300 font-mono text-[11px]">SHA-256 Validated</span>
             </div>
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-zinc-400">
               <span>Model Latency</span>
-              <span className="text-slate-300 font-mono text-[11px]">38ms Average</span>
+              <span className="text-zinc-300 font-mono text-[11px]">38ms Average</span>
             </div>
           </div>
         </div>

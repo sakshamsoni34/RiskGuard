@@ -18,25 +18,25 @@ export default function ModelsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1222] border border-[#17223b]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0d0d10] border border-[#222226]">
         <div>
-          <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <BrainCircuit className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+            <BrainCircuit className="w-5 h-5 text-zinc-300" />
             <span>Model Intelligence & System Architecture</span>
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-zinc-400 font-mono mt-0.5">
             XGBoost classifier telemetry, Precision-Recall curves, confusion matrices, and pipeline topography
           </p>
         </div>
 
         {/* Sub-tab toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#141418] border border-[#242429] text-xs font-mono">
           <button
             onClick={() => setActiveSubTab("analytics")}
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
               activeSubTab === "analytics"
-                ? "bg-indigo-600 text-white font-semibold"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-[#222228] text-white font-semibold border border-[#2e2e36] shadow-sm"
+                : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
             <BrainCircuit className="w-3.5 h-3.5" />
@@ -46,8 +46,8 @@ export default function ModelsPage() {
             onClick={() => setActiveSubTab("architecture")}
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
               activeSubTab === "architecture"
-                ? "bg-indigo-600 text-white font-semibold"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-[#222228] text-white font-semibold border border-[#2e2e36] shadow-sm"
+                : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
             <Workflow className="w-3.5 h-3.5" />

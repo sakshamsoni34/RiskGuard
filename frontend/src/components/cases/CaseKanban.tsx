@@ -15,30 +15,30 @@ export const CaseKanban: React.FC<CaseKanbanProps> = ({ cases, onStatusChange })
     {
       status: "NEW",
       label: "NEW DOSSIERS",
-      border: "border-cyan-500/30",
-      bg: "bg-cyan-950/20",
-      dot: "bg-cyan-400",
+      border: "border-[#27272a]",
+      bg: "bg-[#0d0d10]",
+      dot: "bg-zinc-300",
     },
     {
       status: "UNDER_INVESTIGATION",
       label: "IN TRIAGE / ACTIVE",
-      border: "border-indigo-500/30",
-      bg: "bg-indigo-950/20",
-      dot: "bg-indigo-400",
+      border: "border-[#27272a]",
+      bg: "bg-[#0d0d10]",
+      dot: "bg-zinc-300",
     },
     {
       status: "ESCALATED",
       label: "ESCALATED TO LEA",
-      border: "border-rose-500/30",
-      bg: "bg-rose-950/20",
+      border: "border-rose-900/40",
+      bg: "bg-[#141014]",
       dot: "bg-rose-400",
     },
     {
       status: "CLOSED",
       label: "RESOLVED / CLOSED",
-      border: "border-slate-700/40",
-      bg: "bg-slate-900/30",
-      dot: "bg-slate-500",
+      border: "border-[#222226]",
+      bg: "bg-[#08080a]",
+      dot: "bg-zinc-600",
     },
   ];
 
@@ -102,13 +102,13 @@ export const CaseKanban: React.FC<CaseKanbanProps> = ({ cases, onStatusChange })
                   return (
                     <div
                       key={c.id}
-                      className="group p-4 rounded-xl bg-[#070b14]/90 border border-slate-800/90 hover:border-cyan-500/40 transition-all shadow-md font-mono space-y-3"
+                      className="group p-4 rounded-xl bg-[#121215] border border-[#222226] hover:border-zinc-500 hover:bg-[#18181c] transition-all shadow-md font-mono space-y-3"
                     >
                       {/* Top Row: Case Number & Priority */}
                       <div className="flex items-center justify-between">
                         <Link
                           href={`/cases/${c.caseNumber || c.id}`}
-                          className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                          className="text-xs font-bold text-zinc-200 hover:text-white flex items-center gap-1"
                         >
                           <FolderGit2 className="w-3.5 h-3.5" />
                           <span>{c.caseNumber}</span>
