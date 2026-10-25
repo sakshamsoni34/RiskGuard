@@ -30,6 +30,47 @@
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.01em;
   }
+
+  /* Global Button & Link Micro-Interactions */
+  button, a {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  button:active:not(:disabled), a:active {
+    transform: scale(0.98);
+  }
+
+  /* Global Inputs and Selects Hover */
+  input[type="text"],
+  input[type="search"],
+  input[type="password"],
+  input[type="email"],
+  select,
+  textarea {
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  input[type="text"]:hover,
+  input[type="search"]:hover,
+  input[type="password"]:hover,
+  input[type="email"]:hover,
+  select:hover,
+  textarea:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+  }
+
+  /* Range Sliders Interactive Hover */
+  input[type="range"]::-webkit-slider-thumb {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.7);
+  }
 }
 
 /* Custom dark scrollbars */
@@ -45,28 +86,89 @@
 ::-webkit-scrollbar-thumb {
   background: #222226;
   border-radius: 9999px;
+  transition: background-color 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #333338;
+  background: #44444e;
 }
 
-/* Dark Black & Lightish Black Surface Card System */
+/* Card Surface System with Interactive Depth */
 .fintech-card {
   background: #0d0d10;
   border: 1px solid #222226;
   box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.7);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fintech-card:hover {
+  border-color: #33333e;
+  background: #111115;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.85);
 }
 
 .fintech-card-hover {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fintech-card-hover:hover {
-  border-color: #33333a;
+  border-color: #383844;
   background: #121216;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.85);
-  transform: translateY(-1px);
+  box-shadow: 0 10px 32px -4px rgba(0, 0, 0, 0.85);
+  transform: translateY(-2px);
+}
+
+/* Universal Hover Lift Utility */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.8), 0 0 16px -2px rgba(255, 255, 255, 0.04);
+}
+
+/* Themed Glow Hover Effects */
+.hover-glow-rose:hover {
+  border-color: rgba(244, 63, 94, 0.6) !important;
+  box-shadow: 0 8px 26px -4px rgba(244, 63, 94, 0.25), 0 0 16px rgba(244, 63, 94, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.hover-glow-amber:hover {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 8px 26px -4px rgba(245, 158, 11, 0.25), 0 0 16px rgba(245, 158, 11, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.hover-glow-emerald:hover {
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  box-shadow: 0 8px 26px -4px rgba(16, 185, 129, 0.25), 0 0 16px rgba(16, 185, 129, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.hover-glow-sky:hover {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 8px 26px -4px rgba(56, 189, 248, 0.25), 0 0 16px rgba(56, 189, 248, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.hover-glow-indigo:hover {
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 8px 26px -4px rgba(99, 102, 241, 0.3), 0 0 16px rgba(99, 102, 241, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+/* Table Row & Triage Item Hover */
+tr, tbody tr, .hover-row {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+tbody tr:hover, .hover-row:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
 /* Calm state indicators */
@@ -74,18 +176,33 @@
   background-color: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.28);
   color: #fca5a5;
+  transition: all 0.2s ease;
+}
+.status-pill-high:hover {
+  background-color: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.45);
 }
 
 .status-pill-medium {
   background-color: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.28);
   color: #fcd34d;
+  transition: all 0.2s ease;
+}
+.status-pill-medium:hover {
+  background-color: rgba(245, 158, 11, 0.22);
+  border-color: rgba(245, 158, 11, 0.45);
 }
 
 .status-pill-low {
   background-color: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.28);
   color: #6ee7b7;
+  transition: all 0.2s ease;
+}
+.status-pill-low:hover {
+  background-color: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.45);
 }
 
 /* Gentle transaction row highlight */

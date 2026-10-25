@@ -104,7 +104,7 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={onExpandModal}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors border border-zinc-700/60"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-500 hover:scale-105 active:scale-95 transition-all border border-zinc-700/60 shadow-sm"
             title="Expand Full Investigation Modal"
           >
             <Maximize2 className="h-3.5 w-3.5" />
@@ -112,7 +112,7 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
           </button>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            className="rounded-lg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 hover:scale-110 active:scale-95 transition-all"
             title="Close Panel"
           >
             <X className="h-4 w-4" />
@@ -233,19 +233,19 @@ export const InlineInspector: React.FC<InlineInspectorProps> = ({
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={() => handleAction("APPROVED", "Transaction marked as Allowed")}
-            className="rounded-xl border border-[#27272a] bg-[#18181c] py-2 text-xs font-semibold text-zinc-200 hover:bg-[#222227] hover:text-white transition-colors"
+            className="rounded-xl border border-[#27272a] bg-[#18181c] py-2 text-xs font-semibold text-zinc-200 hover:bg-[#222227] hover:text-emerald-300 hover:border-emerald-600/50 hover:-translate-y-0.5 active:scale-95 transition-all shadow-sm hover:shadow-emerald-950/20"
           >
             Allow
           </button>
           <button
             onClick={() => handleAction("OTP_REQUIRED", "3DS OTP challenge initiated")}
-            className="rounded-xl border border-amber-800/50 bg-amber-950/60 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-900/80 transition-colors"
+            className="rounded-xl border border-amber-800/50 bg-amber-950/60 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-900/80 hover:text-amber-200 hover:border-amber-600 hover:-translate-y-0.5 active:scale-95 transition-all shadow-sm hover:shadow-amber-950/20"
           >
             Send OTP
           </button>
           <button
             onClick={() => handleAction("BLOCKED", "Confirmed as Fraud & Blocked")}
-            className="rounded-xl border border-rose-800/50 bg-rose-950/60 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-900/80 transition-colors"
+            className="rounded-xl border border-rose-800/50 bg-rose-950/60 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-900/80 hover:text-rose-200 hover:border-rose-600 hover:-translate-y-0.5 active:scale-95 transition-all shadow-sm hover:shadow-rose-950/20"
           >
             Block
           </button>

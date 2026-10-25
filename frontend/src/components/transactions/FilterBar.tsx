@@ -65,10 +65,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onToggleStreaming}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all hover:scale-[1.02] active:scale-95 ${
               isStreaming
                 ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                : "bg-[#18181c] border-[#27272a] text-zinc-300 hover:bg-[#222227]"
+                : "bg-[#18181c] border-[#27272a] text-zinc-300 hover:bg-[#222227] hover:border-zinc-600 hover:text-white"
             }`}
           >
             {isStreaming ? (
@@ -88,7 +88,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <button
             onClick={onReset}
             title="Reset Filters"
-            className="p-2.5 rounded-xl border border-[#242429] bg-[#121215] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 transition-all text-xs flex items-center gap-1.5"
+            className="p-2.5 rounded-xl border border-[#242429] bg-[#121215] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 hover:scale-[1.05] active:scale-95 transition-all text-xs flex items-center gap-1.5"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Reset</span>
@@ -105,20 +105,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </span>
           {riskTabs.map((tab) => {
             const active = filters.riskLevel === tab;
-            let colorCls = "text-zinc-400 border-[#242429] hover:border-zinc-700 bg-[#121215]";
+            let colorCls = "text-zinc-400 border-[#242429] hover:border-zinc-600 hover:text-zinc-200 bg-[#121215]";
             if (active) {
-              if (tab === "CRITICAL") colorCls = "bg-purple-950/70 border-purple-500 text-purple-300 ring-1 ring-purple-500/50";
-              else if (tab === "HIGH") colorCls = "bg-rose-950/70 border-rose-500 text-rose-300 ring-1 ring-rose-500/50";
-              else if (tab === "MEDIUM") colorCls = "bg-amber-950/70 border-amber-500 text-amber-300 ring-1 ring-amber-500/50";
-              else if (tab === "LOW") colorCls = "bg-emerald-950/70 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/50";
-              else colorCls = "bg-[#222228] border-zinc-500 text-white ring-1 ring-zinc-500/50";
+              if (tab === "CRITICAL") colorCls = "bg-purple-950/70 border-purple-500 text-purple-300 ring-1 ring-purple-500/50 shadow-sm";
+              else if (tab === "HIGH") colorCls = "bg-rose-950/70 border-rose-500 text-rose-300 ring-1 ring-rose-500/50 shadow-sm";
+              else if (tab === "MEDIUM") colorCls = "bg-amber-950/70 border-amber-500 text-amber-300 ring-1 ring-amber-500/50 shadow-sm";
+              else if (tab === "LOW") colorCls = "bg-emerald-950/70 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/50 shadow-sm";
+              else colorCls = "bg-[#222228] border-zinc-500 text-white ring-1 ring-zinc-500/50 shadow-sm";
             }
 
             return (
               <button
                 key={tab}
                 onClick={() => onFilterChange({ riskLevel: tab })}
-                className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-all ${colorCls}`}
+                className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-all hover:scale-[1.04] active:scale-95 ${colorCls}`}
               >
                 {tab}
               </button>

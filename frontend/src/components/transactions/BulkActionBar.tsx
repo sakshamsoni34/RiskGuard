@@ -56,7 +56,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
           <button
             onClick={handleScore}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#18181c] hover:bg-[#222227] border border-[#2b2b30] text-zinc-200 font-semibold transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#18181c] hover:bg-[#222227] hover:border-zinc-500 hover:scale-[1.03] active:scale-95 border border-[#2b2b30] text-zinc-200 font-semibold transition-all disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Cpu className="w-3.5 h-3.5" />}
             <span>Batch Re-score (ML 2.0)</span>
@@ -64,7 +64,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
 
           <button
             onClick={onExportSelected}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#18181c] hover:bg-[#222227] border border-[#2b2b30] text-zinc-300 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#18181c] hover:bg-[#222227] hover:border-zinc-500 hover:text-white hover:scale-[1.03] active:scale-95 border border-[#2b2b30] text-zinc-300 transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -73,7 +73,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
           <button
             onClick={onClearSelection}
             title="Clear Selection"
-            className="p-1.5 rounded-xl border border-[#27272a] text-zinc-400 hover:text-white hover:bg-[#18181c] transition-all"
+            className="p-1.5 rounded-xl border border-[#27272a] text-zinc-400 hover:text-white hover:bg-[#18181c] hover:border-zinc-500 hover:scale-110 active:scale-95 transition-all"
           >
             <X className="w-3.5 h-3.5" />
           </button>

@@ -12,7 +12,7 @@ import { FilterBar, FilterState } from "@/components/transactions/FilterBar";
 import { TransactionListRow } from "@/components/transactions/TransactionListRow";
 import { BulkActionBar } from "@/components/transactions/BulkActionBar";
 import { ScoringUnavailableBanner } from "@/components/transactions/ScoringUnavailableBanner";
-import { CheckCircle2, ShieldAlert, Cpu, ArrowUpDown } from "lucide-react";
+import { CheckCircle2, ShieldAlert, Cpu, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 
 function TransactionsContent() {
   const router = useRouter();
@@ -26,6 +26,7 @@ function TransactionsContent() {
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [showAll, setShowAll] = useState<boolean>(false);
   const [selectedTxn, setSelectedTxn] = useState<Transaction | null>(initialTransactions[0]);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -300,7 +301,7 @@ function TransactionsContent() {
                       </td>
                     </tr>
                   ) : (
-                    transactions.map((txn) => (
+                    (showAll ? transactions : transactions.slice(0, 5)).map((txn) => (
                       <TransactionListRow
                         key={txn.id}
                         transaction={txn}
@@ -318,6 +319,33 @@ function TransactionsContent() {
                 </tbody>
               </table>
             </div>
+
+            {/* Show All / Show Less Pagination Control */}
+            {transactions.length > 5 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t border-[#222226] bg-[#09090c] text-xs">
+                <div className="text-zinc-400">
+                  Showing <strong className="text-zinc-200">{showAll ? transactions.length : 5}</strong> of{" "}
+                  <span className="text-zinc-400">{transactions.length}</span> live transactions
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAll(!showAll)}
+                  className="mt-2 sm:mt-0 px-3.5 py-1.5 rounded-xl bg-[#141418] hover:bg-[#1e1e24] text-zinc-200 hover:text-white border border-[#27272a] font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  {showAll ? (
+                    <>
+                      <ChevronUp className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>Show Less (Top 5)</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>Show All ({transactions.length})</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

@@ -19,163 +19,201 @@ export function calculateRisk(params: SimulationParams): {
 } {
   const shapExplanation: ShapValue[] = [];
   const ruleFlags: string[] = [];
-  let baseScore = 14;
+  
+  // Base expectation score for any card transaction
+  const baseScore = 5;
 
-  // 1. Amount ratio vs user historical baseline
-  const amountRatio = params.amount / (params.avgUserAmount || 1);
-  if (amountRatio > 5) {
-    const impact = Math.min(30, Math.round(18 + (amountRatio - 5) * 2));
-    baseScore += impact;
+  // 1. Transaction Amount (0 to 22 pts continuous with slider)
+  const amountFraction = Math.min(1, Math.max(0, (params.amount - 500) / 149500));
+  const amountPoints = Math.round(amountFraction * 22);
+  if (amountPoints >= 15) {
+    ruleFlags.push("AMOUNT_DEVIATION_HIGH");
     shapExplanation.push({
       feature: "High Purchase Deviation",
-      contribution: impact,
+      contribution: amountPoints,
       direction: "increase",
-      rawValue: `₹${params.amount.toLocaleString("en-IN")} (${amountRatio.toFixed(1)}x user avg)`,
-      description: `Amount is significantly higher than customer's habitual ₹${params.avgUserAmount.toLocaleString("en-IN")} average.`,
+      rawValue: `₹${params.amount.toLocaleString("en-IN")}`,
+      description: "Significant high-ticket transfer exceeding cardholder baseline.",
     });
-    ruleFlags.push("AMOUNT_DEVIATION_HIGH");
-  } else if (amountRatio > 2.5) {
-    const impact = 14;
-    baseScore += impact;
+  } else if (amountPoints >= 7) {
     shapExplanation.push({
-      feature: "Moderate Amount Deviation",
-      contribution: impact,
+      feature: "Moderate Amount Spend",
+      contribution: amountPoints,
       direction: "increase",
-      rawValue: `₹${params.amount.toLocaleString("en-IN")} (${amountRatio.toFixed(1)}x user avg)`,
-      description: "Amount is above customer's typical purchase profile.",
+      rawValue: `₹${params.amount.toLocaleString("en-IN")}`,
+      description: "Medium ticket authorization above average card spend.",
     });
   } else {
-    const reduction = -8;
-    baseScore += reduction;
     shapExplanation.push({
       feature: "Consistent Spend Profile",
-      contribution: reduction,
+      contribution: amountPoints,
       direction: "decrease",
       rawValue: `₹${params.amount.toLocaleString("en-IN")}`,
-      description: "Conforms to customer's habitual transaction size.",
+      description: "Standard checkout amount conforming to habitual patterns.",
     });
   }
 
-  // 2. Transaction Velocity
+  // 2. Transaction Velocity in last 2 minutes (0 to 19 pts continuous)
+  const velocityFraction = Math.min(1, Math.max(0, (params.velocityLast2Min - 1) / 7));
+  const velocityPoints = Math.round(velocityFraction * 19);
   if (params.velocityLast2Min >= 4) {
-    const impact = 34;
-    baseScore += impact;
+    ruleFlags.push("VELOCITY_BURST_CRITICAL");
     shapExplanation.push({
       feature: "Card Velocity Burst",
-      contribution: impact,
+      contribution: velocityPoints,
       direction: "increase",
       rawValue: `${params.velocityLast2Min} attempts in 2 min`,
       description: "Rapid burst cadence indicating automated card testing or script attack.",
     });
-    ruleFlags.push("VELOCITY_BURST_CRITICAL");
   } else if (params.velocityLast2Min >= 2) {
-    const impact = 18;
-    baseScore += impact;
+    ruleFlags.push("VELOCITY_ELEVATED");
     shapExplanation.push({
       feature: "Elevated Velocity",
-      contribution: impact,
+      contribution: velocityPoints,
       direction: "increase",
       rawValue: `${params.velocityLast2Min} attempts in 2 min`,
       description: "Multiple attempts detected within a short window.",
     });
-    ruleFlags.push("VELOCITY_ELEVATED");
   } else {
-    const reduction = -6;
-    baseScore += reduction;
     shapExplanation.push({
       feature: "Normal Velocity",
-      contribution: reduction,
+      contribution: 0,
       direction: "decrease",
       rawValue: `${params.velocityLast2Min} tx / 2 min`,
-      description: "Standard human checkout pacing.",
+      description: "Standard single human checkout pacing.",
     });
   }
 
-  // 3. Device Fingerprint
+  // 3. Device Fingerprint (+14 pts if unrecognized)
+  const devicePoints = params.isNewDevice ? 14 : 0;
   if (params.isNewDevice) {
-    const impact = 22;
-    baseScore += impact;
+    ruleFlags.push("NEW_DEVICE_DETECTED");
     shapExplanation.push({
       feature: "Unrecognized Device Fingerprint",
-      contribution: impact,
+      contribution: devicePoints,
       direction: "increase",
       rawValue: "New Browser / Client Token",
-      description: "Transaction initiated from a hardware token never previously used by this customer.",
+      description: "Transaction initiated from hardware never previously used by this customer.",
     });
-    ruleFlags.push("NEW_DEVICE_DETECTED");
   } else {
-    const reduction = -14;
-    baseScore += reduction;
     shapExplanation.push({
       feature: "Trusted Device Token",
-      contribution: reduction,
+      contribution: 0,
       direction: "decrease",
       rawValue: "Recognized Device",
       description: "Matches trusted hardware fingerprint with frequent verified logins.",
     });
   }
 
-  // 4. Geolocation & Proxy/VPN
+  // 4. Network Connection / VPN Proxy (+14 pts if VPN/Proxy)
+  const networkPoints = params.isVpnOrProxy ? 14 : 0;
   if (params.isVpnOrProxy) {
-    const impact = 24;
-    baseScore += impact;
+    ruleFlags.push("ANONYMOUS_PROXY_DETECTED");
     shapExplanation.push({
       feature: "Anonymized Proxy / VPN Origin",
-      contribution: impact,
+      contribution: networkPoints,
       direction: "increase",
       rawValue: "Datacenter IP / Tor Exit Node",
       description: "Connection origin masked by a commercial VPN or datacenter proxy.",
     });
-    ruleFlags.push("ANONYMOUS_PROXY_DETECTED");
   }
 
-  if (params.distanceJumpKm > 1000) {
-    const impact = 21;
-    baseScore += impact;
+  // 5. Geolocation / Distance Jump (0 to 14 pts)
+  let distancePoints = 0;
+  if (params.distanceJumpKm >= 6000) {
+    distancePoints = 14;
+    ruleFlags.push("IMPOSSIBLE_TRAVEL");
     shapExplanation.push({
       feature: "Impossible Travel Velocity",
-      contribution: impact,
+      contribution: distancePoints,
       direction: "increase",
       rawValue: `${Math.round(params.distanceJumpKm)} km from billing location`,
       description: "Physical distance between consecutive sessions implies impossible travel speed.",
     });
-    ruleFlags.push("IMPOSSIBLE_TRAVEL");
-  } else if (params.distanceJumpKm < 50 && !params.isVpnOrProxy) {
-    const reduction = -10;
-    baseScore += reduction;
+  } else if (params.distanceJumpKm >= 3000) {
+    distancePoints = 10;
+    ruleFlags.push("CROSS_BORDER_TRAVEL");
     shapExplanation.push({
-      feature: "Local Billing Anchor Match",
-      contribution: reduction,
+      feature: "Cross-Border International Jump",
+      contribution: distancePoints,
+      direction: "increase",
+      rawValue: `${Math.round(params.distanceJumpKm)} km`,
+      description: "Cross-border transaction detected far outside primary billing territory.",
+    });
+  } else if (params.distanceJumpKm >= 100) {
+    distancePoints = 5;
+    shapExplanation.push({
+      feature: "Domestic Interstate Hop",
+      contribution: distancePoints,
+      direction: "increase",
+      rawValue: `${Math.round(params.distanceJumpKm)} km`,
+      description: "Domestic intercity movement detected.",
+    });
+  } else {
+    shapExplanation.push({
+      feature: "Local Geo-Radius",
+      contribution: 0,
       direction: "decrease",
-      rawValue: "< 50 km local area",
-      description: "Origin coordinates match cardholder's primary home billing location.",
+      rawValue: `${Math.round(params.distanceJumpKm)} km`,
+      description: "Transaction originated within customer habitual home radius.",
     });
   }
 
-  // 5. Merchant Category Risk
-  if (params.merchantCategory === "Crypto" || params.merchantCategory === "Gaming") {
-    const impact = 15;
-    baseScore += impact;
+  // 6. Merchant Category (0 to 12 pts)
+  let merchantPoints = 0;
+  const mc = (params.merchantCategory || "").toLowerCase();
+  if (mc.includes("crypto") || mc.includes("gaming")) {
+    merchantPoints = 12;
     shapExplanation.push({
       feature: "High-Risk Merchant Category",
-      contribution: impact,
+      contribution: merchantPoints,
       direction: "increase",
       rawValue: params.merchantCategory,
       description: "Category has higher historical chargeback and non-refundable liquidation rates.",
     });
-  } else if (params.merchantCategory === "Grocery" || params.merchantCategory === "Utilities") {
-    const reduction = -7;
-    baseScore += reduction;
+  } else if (mc.includes("electronics")) {
+    merchantPoints = 9;
     shapExplanation.push({
-      feature: "Essential Services Merchant",
-      contribution: reduction,
+      feature: "High Resale Consumer Electronics",
+      contribution: merchantPoints,
+      direction: "increase",
+      rawValue: params.merchantCategory,
+      description: "High-value easily liquidatable consumer electronics.",
+    });
+  } else if (mc.includes("jewelry")) {
+    merchantPoints = 6;
+    shapExplanation.push({
+      feature: "Luxury Goods & Jewelry",
+      contribution: merchantPoints,
+      direction: "increase",
+      rawValue: params.merchantCategory,
+      description: "Precious metals and jewelry with elevated target rates.",
+    });
+  } else if (mc.includes("travel")) {
+    merchantPoints = 4;
+    shapExplanation.push({
+      feature: "Travel & Transit",
+      contribution: merchantPoints,
+      direction: "increase",
+      rawValue: params.merchantCategory,
+      description: "Airlines and booking portal transactions.",
+    });
+  } else if (mc.includes("utilities")) {
+    merchantPoints = 2;
+  } else {
+    merchantPoints = 0;
+    shapExplanation.push({
+      feature: "Low-Risk Retail Merchant",
+      contribution: 0,
       direction: "decrease",
       rawValue: params.merchantCategory,
-      description: "Low dispute rate recurring domestic category.",
+      description: "Standard daily necessities or low-chargeback category.",
     });
   }
 
-  const finalScore = Math.max(2, Math.min(99, Math.round(baseScore)));
+  // Aggregate final risk score with dynamic real-time sensitivity
+  const totalCalculated = baseScore + amountPoints + velocityPoints + devicePoints + networkPoints + distancePoints + merchantPoints;
+  const finalScore = Math.max(5, Math.min(99, totalCalculated));
 
   const anomalyFactors = (params.isNewDevice ? 0.3 : 0) +
     (params.isVpnOrProxy ? 0.35 : 0) +

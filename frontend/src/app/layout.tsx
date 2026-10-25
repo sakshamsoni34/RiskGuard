@@ -21,9 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark h-full">
       <body
-        className={`${inter.className} min-h-screen bg-[#000000] text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white`}
+        className={`${inter.className} h-full overflow-hidden bg-[#000000] text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white`}
       >
         <AppShell>{children}</AppShell>
       </body>

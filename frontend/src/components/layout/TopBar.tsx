@@ -61,8 +61,8 @@ export function TopBar() {
     if (pathname === "/models") {
       return { section: "Intelligence", title: "Model Performance & SHAP" };
     }
-    if (pathname === "/audit") {
-      return { section: "Compliance", title: "Immutable Audit Log" };
+    if (pathname === "/audit" || pathname === "/history") {
+      return { section: "Operations", title: "Transaction & Activity History" };
     }
     if (pathname === "/reports") {
       return { section: "Reporting", title: "Official Briefings & Exports" };
@@ -250,7 +250,7 @@ export function TopBar() {
               onClick={() => setMobileMenuOpen(false)}
               className="block px-3 py-2 rounded-lg text-slate-200 hover:bg-slate-800/70"
             >
-              Audit Trail
+              History
             </Link>
             <Link
               href="/reports"

@@ -10,7 +10,7 @@ import {
   Sliders,
   BrainCircuit,
   FileCheck2,
-  Shield,
+  History,
   Settings,
   ShieldCheck,
   ChevronRight,
@@ -55,11 +55,9 @@ const navItems: NavItem[] = [
     icon: BrainCircuit,
   },
   {
-    name: "Audit Trail",
+    name: "History",
     href: "/audit",
-    icon: Shield,
-    badge: "Verified",
-    badgeColor: "bg-[#18181c] text-zinc-300 border border-[#27272a]",
+    icon: History,
   },
   {
     name: "Official Reports",
@@ -94,7 +92,7 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Platform Navigation"
-      className="w-64 shrink-0 hidden md:flex flex-col bg-[#070709] border-r border-[#1a1a1e] select-none min-h-screen sticky top-0"
+      className="w-64 shrink-0 hidden md:flex flex-col bg-[#070709] border-r border-[#1a1a1e] select-none h-full overflow-hidden"
     >
       {/* Brand Header */}
       <div className="p-4 border-b border-[#1a1a1e]">
@@ -129,24 +127,24 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
+              className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 group ${
                 isActive
-                  ? "bg-[#18181c] text-white border border-[#2b2b30] shadow-sm"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-[#121215] border border-transparent"
+                  ? "bg-[#18181c] text-white border border-[#2e2e36] shadow-sm translate-x-1"
+                  : "text-zinc-400 hover:text-white hover:bg-[#141419] hover:border-[#26262e] hover:translate-x-1 border border-transparent hover:shadow-md hover:shadow-black/40"
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
-                  className={`w-4 h-4 transition-colors ${
-                    isActive ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+                  className={`w-4 h-4 transition-all duration-200 ${
+                    isActive ? "text-white" : "text-zinc-400 group-hover:text-white group-hover:scale-110"
                   }`}
                 />
-                <span>{item.name}</span>
+                <span className="transition-colors duration-200">{item.name}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 {item.badge && (
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-all duration-200 group-hover:scale-105 ${
                       item.badgeColor || "bg-[#18181c] text-zinc-300 border border-[#27272a]"
                     }`}
                   >

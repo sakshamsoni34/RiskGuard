@@ -138,7 +138,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
           <div className="flex rounded-xl border border-[#222226] bg-[#141418] p-1 text-xs">
             <button
               onClick={() => handleFilterClick("ALL")}
-              className={`rounded-lg px-3 py-1 font-medium transition-all ${
+              className={`rounded-lg px-3 py-1 font-medium transition-all hover:scale-[1.03] active:scale-95 ${
                 currentFilter === "ALL"
                   ? "bg-[#222228] text-white shadow-sm font-semibold border border-[#2e2e36]"
                   : "text-zinc-400 hover:text-white"
@@ -148,7 +148,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             </button>
             <button
               onClick={() => handleFilterClick("HIGH")}
-              className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
+              className={`rounded-lg px-2.5 py-1 font-medium transition-all hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 ${
                 currentFilter === "HIGH"
                   ? "bg-rose-950/80 text-rose-300 font-semibold border border-rose-800/50 shadow-sm"
                   : "text-zinc-400 hover:text-rose-400"
@@ -159,7 +159,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             </button>
             <button
               onClick={() => handleFilterClick("MEDIUM")}
-              className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
+              className={`rounded-lg px-2.5 py-1 font-medium transition-all hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 ${
                 currentFilter === "MEDIUM"
                   ? "bg-amber-950/80 text-amber-300 font-semibold border border-amber-800/50 shadow-sm"
                   : "text-zinc-400 hover:text-amber-400"
@@ -170,7 +170,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             </button>
             <button
               onClick={() => handleFilterClick("LOW")}
-              className={`rounded-lg px-2.5 py-1 font-medium transition-all flex items-center gap-1.5 ${
+              className={`rounded-lg px-2.5 py-1 font-medium transition-all hover:scale-[1.03] active:scale-95 flex items-center gap-1.5 ${
                 currentFilter === "LOW"
                   ? "bg-emerald-950/80 text-emerald-300 font-semibold border border-emerald-800/50 shadow-sm"
                   : "text-zinc-400 hover:text-emerald-400"
@@ -184,7 +184,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
           {/* Export CSV */}
           <button
             onClick={handleExportCSV}
-            className="flex h-9 items-center gap-1.5 rounded-xl border border-[#27272a] bg-[#18181c] px-3 text-xs font-semibold text-zinc-300 hover:bg-[#222227] hover:text-white transition-colors"
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-[#27272a] bg-[#18181c] px-3 text-xs font-semibold text-zinc-300 hover:bg-[#222227] hover:text-white hover:border-zinc-500 hover:scale-[1.02] active:scale-95 transition-all shadow-sm"
             title="Export filtered records to CSV"
           >
             <Download className="h-3.5 w-3.5 text-zinc-400" />

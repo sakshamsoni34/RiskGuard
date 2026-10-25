@@ -127,7 +127,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="rounded-xl p-2 text-zinc-400 hover:bg-[#18181c] hover:text-white transition-colors"
+              className="rounded-xl p-2 text-zinc-400 hover:bg-[#18181c] hover:text-white hover:scale-110 active:scale-95 transition-all"
             >
               <X className="h-5 w-5" />
             </button>
@@ -281,7 +281,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                     return (
                       <div
                         key={idx}
-                        className="rounded-xl border border-[#27272a] bg-[#18181c] p-3 flex items-start justify-between gap-3"
+                        className="rounded-xl border border-[#27272a] bg-[#18181c] hover:border-zinc-600 hover:bg-[#1c1c22] hover:-translate-y-0.5 transition-all duration-200 p-3 flex items-start justify-between gap-3"
                       >
                         <div>
                           <div className="font-semibold text-xs text-zinc-200">{item.feature}</div>
@@ -445,19 +445,19 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => handleAction("APPROVED", "Allowed")}
-              className="rounded-xl border border-[#27272a] bg-[#18181c] px-3.5 py-2 text-xs font-medium text-zinc-200 hover:bg-[#222227] hover:text-white transition-colors"
+              className="rounded-xl border border-[#27272a] bg-[#18181c] px-3.5 py-2 text-xs font-medium text-zinc-200 hover:bg-emerald-950/40 hover:border-emerald-500/50 hover:text-emerald-200 hover:scale-[1.03] active:scale-95 transition-all shadow-sm"
             >
               Approve Transaction
             </button>
             <button
               onClick={() => handleAction("OTP_REQUIRED", "3DS OTP Requested")}
-              className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition-colors"
+              className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-300 hover:bg-amber-950/40 hover:border-amber-500/50 hover:text-amber-200 hover:scale-[1.03] active:scale-95 transition-all shadow-sm"
             >
               Request 3DS OTP
             </button>
             <button
               onClick={() => handleAction("BLOCKED", "Fraud Block Confirmed")}
-              className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 transition-colors"
+              className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:border-rose-500/50 hover:text-rose-200 hover:scale-[1.03] active:scale-95 transition-all shadow-sm"
             >
               Confirm Fraud Block
             </button>

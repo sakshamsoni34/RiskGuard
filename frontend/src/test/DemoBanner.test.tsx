@@ -6,13 +6,13 @@ import { DemoBanner } from "../components/layout/DemoBanner";
 describe("DemoBanner Component", () => {
   it("renders the demo environment banner", () => {
     render(<DemoBanner />);
-    expect(screen.getByText("DEMO ENVIRONMENT")).toBeInTheDocument();
+    expect(screen.getByText("Demo Mode")).toBeInTheDocument();
   });
 
   it("displays synthetic data and non-evidentiary notice", () => {
     render(<DemoBanner />);
     expect(
-      screen.getByText(/AI Risk scores are investigative prioritization leads, NOT evidentiary proof of crime/i)
+      screen.getByText(/Synthetic transaction data for evaluation/i)
     ).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search, ShieldCheck, RefreshCw, X, Filter, SlidersHorizontal, Folder, Cpu, UserCheck } from "lucide-react";
+import { Search, ShieldCheck, RefreshCw, X, Filter, SlidersHorizontal, Folder, Cpu, UserCheck, CreditCard } from "lucide-react";
 
 interface AuditFilterBarProps {
   search: string;
@@ -53,17 +53,29 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
               : "bg-[#141418] text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a20]"
           }`}
         >
-          <span>All Activities</span>
+          <span>All Activity</span>
           <span className="px-1.5 py-0.2 rounded-md bg-[#0a0a0c] text-[11px] text-zinc-300">
             {totalUnfiltered}
           </span>
         </button>
 
         <button
+          onClick={() => onSelectQuickFilter("TRANSACTIONS")}
+          className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
+            activeQuickFilter === "TRANSACTIONS"
+              ? "bg-cyan-500/20 text-cyan-200 border border-cyan-500/30 shadow-sm"
+              : "bg-[#141418] text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a20]"
+          }`}
+        >
+          <CreditCard className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Transactions</span>
+        </button>
+
+        <button
           onClick={() => onSelectQuickFilter("DECISIONS")}
           className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
             activeQuickFilter === "DECISIONS"
-              ? "bg-amber-500/20 text-amber-200 border border-amber-500/30"
+              ? "bg-amber-500/20 text-amber-200 border border-amber-500/30 shadow-sm"
               : "bg-[#141418] text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a20]"
           }`}
         >
@@ -84,18 +96,6 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
         </button>
 
         <button
-          onClick={() => onSelectQuickFilter("SYSTEM")}
-          className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
-            activeQuickFilter === "SYSTEM"
-              ? "bg-emerald-500/20 text-emerald-200 border border-emerald-500/30"
-              : "bg-[#141418] text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1a20]"
-          }`}
-        >
-          <Cpu className="w-3.5 h-3.5 text-emerald-400" />
-          <span>System & Integrity</span>
-        </button>
-
-        <button
           onClick={() => onSelectQuickFilter("SESSIONS")}
           className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
             activeQuickFilter === "SESSIONS"
@@ -108,8 +108,8 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
         </button>
       </div>
 
-      {/* Main Search and Actions */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      {/* Main Search and Transaction Focus */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -117,7 +117,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by investigator name, action, transaction ID (e.g. TXN-1002), or case..."
+            placeholder="Search by Transaction ID (e.g. TXN-1002, TXN-1065), investigator, or action..."
             className="w-full pl-10 pr-9 py-2.5 bg-[#121215] border border-[#242429] rounded-xl text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-600 transition-colors"
           />
           {search && (
@@ -131,14 +131,24 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
           )}
         </div>
 
-        {/* Verify Integrity Button */}
+        {/* Quick Transaction Filter Toggle */}
         <button
-          onClick={onVerifyChain}
-          disabled={isVerifying}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#18181c] hover:bg-[#222226] border border-[#27272a] text-zinc-200 hover:text-white text-xs font-medium transition-all disabled:opacity-50 whitespace-nowrap shadow-sm"
+          onClick={() => {
+            if (activeQuickFilter === "TRANSACTIONS") {
+              onSelectQuickFilter("ALL");
+            } else {
+              onSelectQuickFilter("TRANSACTIONS");
+            }
+          }}
+          className={`flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-medium transition-all whitespace-nowrap shadow-sm ${
+            activeQuickFilter === "TRANSACTIONS"
+              ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300"
+              : "bg-[#18181c] hover:bg-[#222226] border-[#27272a] text-zinc-300 hover:text-white"
+          }`}
+          title="Filter only transaction events"
         >
-          <ShieldCheck className={`w-4 h-4 text-emerald-400 ${isVerifying ? "animate-spin" : ""}`} />
-          <span>{isVerifying ? "Verifying Seals..." : "Verify Ledger Integrity"}</span>
+          <CreditCard className="w-4 h-4 text-cyan-400" />
+          <span>{activeQuickFilter === "TRANSACTIONS" ? "Showing Transactions" : "Filter Transactions"}</span>
         </button>
       </div>
 

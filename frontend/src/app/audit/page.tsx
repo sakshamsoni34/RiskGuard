@@ -5,8 +5,7 @@ import { mockAuditLogs } from "@/lib/apiClient";
 import { AuditLogEntry } from "@/types/fraud";
 import { HashChainViewer } from "@/components/audit/HashChainViewer";
 import { AuditFilterBar } from "@/components/audit/AuditFilterBar";
-import { TamperAlertBanner } from "@/components/audit/TamperAlertBanner";
-import { ShieldCheck, FileText, SlidersHorizontal, Users, RefreshCw } from "lucide-react";
+import { FileText, SlidersHorizontal, Users, CreditCard, History } from "lucide-react";
 
 export default function AuditPage() {
   const [logs, setLogs] = useState<AuditLogEntry[]>(mockAuditLogs);
@@ -15,12 +14,6 @@ export default function AuditPage() {
   const [action, setAction] = useState("ALL");
   const [activeQuickFilter, setActiveQuickFilter] = useState("ALL");
   const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationResult, setVerificationResult] = useState<{
-    status: string;
-    total_records_verified: number;
-    last_block_hash: string;
-    merkle_valid: boolean;
-  } | null>(null);
 
   // Load audit logs from backend if available
   const loadLogs = useCallback(async () => {
@@ -46,60 +39,23 @@ export default function AuditPage() {
     loadLogs();
   }, [loadLogs]);
 
-  // Initial verification on mount
-  useEffect(() => {
-    async function initialVerify() {
-      try {
-        const res = await fetch("/api/v1/audit/verify");
-        if (res.ok) {
-          const data = await res.json();
-          setVerificationResult(data);
-        }
-      } catch {
-        // Fallback valid result
-        setVerificationResult({
-          status: "VERIFIED",
-          total_records_verified: logs.length,
-          last_block_hash: logs[0]?.sha256Hash || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          merkle_valid: true,
-        });
-      }
-    }
-    initialVerify();
-  }, [logs]);
-
   const handleVerifyChain = async () => {
     setIsVerifying(true);
-    try {
-      const res = await fetch("/api/v1/audit/verify", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setVerificationResult(data);
-      } else {
-        setVerificationResult({
-          status: "VERIFIED",
-          total_records_verified: logs.length,
-          last_block_hash: logs[0]?.sha256Hash || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          merkle_valid: true,
-        });
-      }
-    } catch {
-      setVerificationResult({
-        status: "VERIFIED",
-        total_records_verified: logs.length,
-        last_block_hash: logs[0]?.sha256Hash || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        merkle_valid: true,
-      });
-    } finally {
-      setTimeout(() => setIsVerifying(false), 400);
-    }
+    setTimeout(() => setIsVerifying(false), 400);
   };
 
   // Filter logs by quick filter, search, entity, and action
   const filteredLogs = useMemo(() => {
     return logs.filter((l) => {
       // 1. Quick Filter check
-      if (activeQuickFilter === "DECISIONS") {
+      if (activeQuickFilter === "TRANSACTIONS") {
+        const isTxn =
+          l.entityType === "TRANSACTION" ||
+          l.entityId.toUpperCase().startsWith("TXN-") ||
+          l.details.toUpperCase().includes("TXN-") ||
+          l.action.toUpperCase().includes("TRANSACTION");
+        if (!isTxn) return false;
+      } else if (activeQuickFilter === "DECISIONS") {
         const isDecision =
           l.action.toUpperCase().includes("OVERRIDE") ||
           l.action.toUpperCase().includes("FEEDBACK");
@@ -109,13 +65,6 @@ export default function AuditPage() {
           l.entityType === "CASE" ||
           l.action.toUpperCase().includes("CASE");
         if (!isCase) return false;
-      } else if (activeQuickFilter === "SYSTEM") {
-        const isSystem =
-          l.entityType === "MODEL" ||
-          l.action.toUpperCase().includes("INTEGRITY") ||
-          l.action.toUpperCase().includes("SYSTEM") ||
-          l.action.toUpperCase().includes("BATCH");
-        if (!isSystem) return false;
       } else if (activeQuickFilter === "SESSIONS") {
         const isSession =
           l.entityType === "USER_SESSION" ||
@@ -136,7 +85,7 @@ export default function AuditPage() {
         return false;
       }
 
-      // 4. Search query
+      // 4. Search query (supports transaction IDs like TXN-1002, names, actions)
       const q = search.toLowerCase().trim();
       if (!q) return true;
 
@@ -153,6 +102,13 @@ export default function AuditPage() {
   // Compute summary stats
   const stats = useMemo(() => {
     const totalEvents = logs.length;
+    const transactionEvents = logs.filter(
+      (l) =>
+        l.entityType === "TRANSACTION" ||
+        l.entityId.toUpperCase().startsWith("TXN-") ||
+        l.details.toUpperCase().includes("TXN-") ||
+        l.action.toUpperCase().includes("TRANSACTION")
+    ).length;
     const analystDecisions = logs.filter(
       (l) =>
         l.action.toUpperCase().includes("OVERRIDE") ||
@@ -164,6 +120,7 @@ export default function AuditPage() {
 
     return {
       totalEvents,
+      transactionEvents,
       analystDecisions,
       uniqueOfficers: Math.max(1, uniqueOfficers),
     };
@@ -182,29 +139,19 @@ export default function AuditPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-[#0d0d10] border border-[#222226]">
         <div>
           <h1 className="text-lg font-bold text-zinc-100 flex items-center gap-2.5">
-            <span>Audit & Activity Trail</span>
-            <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-              Immutable Ledger
+            <History className="w-5 h-5 text-zinc-300" />
+            <span>Transaction & Activity History</span>
+            <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+              Live Feed
             </span>
           </h1>
           <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
-            Permanent, tamper-evident record of all investigator decisions, manual score overrides, case status changes, and system operations.
+            Chronological operational log of financial transaction events, investigator score overrides, and case operations.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleVerifyChain}
-            disabled={isVerifying}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#18181c] hover:bg-[#222226] text-zinc-200 text-xs font-medium border border-[#27272a] transition-colors shadow-sm disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-zinc-400 ${isVerifying ? "animate-spin" : ""}`} />
-            <span>{isVerifying ? "Verifying..." : "Check Status"}</span>
-          </button>
         </div>
       </div>
 
-      {/* Summary KPI Cards for Instant Understanding */}
+      {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
         <div className="p-4 rounded-2xl bg-[#0d0d10] border border-[#222226] flex items-center gap-3.5">
           <div className="p-2.5 rounded-xl bg-zinc-800 text-zinc-200 border border-zinc-700">
@@ -217,12 +164,12 @@ export default function AuditPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-[#0d0d10] border border-[#222226] flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <ShieldCheck className="w-5 h-5" />
+          <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <CreditCard className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] text-zinc-400 block font-medium">Integrity Status</span>
-            <span className="text-lg font-bold text-emerald-400">100% Sealed</span>
+            <span className="text-[11px] text-zinc-400 block font-medium">Transaction History</span>
+            <span className="text-lg font-bold text-cyan-300">{stats.transactionEvents} Txn Events</span>
           </div>
         </div>
 
@@ -237,7 +184,7 @@ export default function AuditPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-[#0d0d10] border border-[#222226] flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -246,9 +193,6 @@ export default function AuditPage() {
           </div>
         </div>
       </div>
-
-      {/* Tamper Alert & Integrity Certification Banner */}
-      <TamperAlertBanner verificationResult={verificationResult} />
 
       {/* Filter and Search Controls */}
       <AuditFilterBar
@@ -266,8 +210,15 @@ export default function AuditPage() {
         onSelectQuickFilter={setActiveQuickFilter}
       />
 
-      {/* Humanized Activity Timeline */}
-      <HashChainViewer logs={filteredLogs} onResetFilters={handleResetFilters} />
+      {/* Activity Timeline with Show More and Transaction Search */}
+      <HashChainViewer
+        logs={filteredLogs}
+        onResetFilters={handleResetFilters}
+        onSearchTransaction={(txnId) => {
+          setSearch(txnId);
+          setActiveQuickFilter("ALL");
+        }}
+      />
     </div>
   );
 }

@@ -22,15 +22,22 @@ import {
   FileCode,
   Shield,
   SearchX,
+  CreditCard,
 } from "lucide-react";
 import { formatAuditAction, formatEntityLabel, formatAuditDate } from "./auditHelpers";
 
 interface HashChainViewerProps {
   logs: AuditLogEntry[];
   onResetFilters?: () => void;
+  onSearchTransaction?: (txnId: string) => void;
 }
 
-export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetFilters }) => {
+export const HashChainViewer: React.FC<HashChainViewerProps> = ({
+  logs,
+  onResetFilters,
+  onSearchTransaction,
+}) => {
+  const [visibleCount, setVisibleCount] = useState<number>(5);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
   const [expandedJsonId, setExpandedJsonId] = useState<string | null>(null);
@@ -93,9 +100,9 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
         <div className="w-12 h-12 rounded-2xl bg-[#141418] border border-[#222226] flex items-center justify-center mx-auto text-zinc-400">
           <SearchX className="w-6 h-6" />
         </div>
-        <h4 className="text-sm font-semibold text-zinc-200">No activity logs found</h4>
+        <h4 className="text-sm font-semibold text-zinc-200">No activity history found</h4>
         <p className="text-xs text-zinc-400 max-w-md mx-auto">
-          No records match your active search terms or category filters. Try searching with different keywords or reset your filters.
+          No records match your active search or filters. Try searching by transaction ID (e.g. TXN-1002) or reset filters.
         </p>
         {onResetFilters && (
           <button
@@ -109,6 +116,8 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
     );
   }
 
+  const visibleLogs = logs.slice(0, visibleCount);
+
   return (
     <div className="space-y-4">
       {/* Activity Timeline Header */}
@@ -116,23 +125,29 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
         <div>
           <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
             <span>Activity History</span>
-            <span className="text-xs font-normal text-zinc-400">({logs.length} events)</span>
+            <span className="text-xs font-normal text-zinc-400">
+              (Showing {Math.min(visibleCount, logs.length)} of {logs.length} events)
+            </span>
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Chronological log of all analyst interventions and system decisions
+            Chronological log of transaction events, analyst overrides, and operations
           </p>
         </div>
       </div>
 
       {/* Timeline Stream */}
       <div className="relative pl-6 sm:pl-8 space-y-4 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#1e1e22]">
-        {logs.map((log, index) => {
+        {visibleLogs.map((log, index) => {
           const actionMeta = formatAuditAction(log.action);
           const dateMeta = formatAuditDate(log.timestamp);
           const entityLabel = formatEntityLabel(log.entityType);
           const isExpanded = expandedLogId === log.id;
           const isJsonExpanded = expandedJsonId === log.id;
           const blockNumber = logs.length - index;
+          const isTransaction =
+            log.entityType === "TRANSACTION" ||
+            log.entityId.toUpperCase().startsWith("TXN-") ||
+            log.details.toUpperCase().includes("TXN-");
 
           return (
             <div key={log.id} className="relative group">
@@ -161,10 +176,22 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
                     </span>
 
                     {/* Entity Target Pill */}
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-mono bg-[#141418] text-zinc-300 border border-[#242429]">
-                      <span className="text-zinc-400 font-sans text-[11px]">{entityLabel}:</span>
-                      <strong className="text-zinc-200">{log.entityId}</strong>
-                    </span>
+                    {isTransaction ? (
+                      <button
+                        type="button"
+                        onClick={() => onSearchTransaction?.(log.entityId)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-mono bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-colors cursor-pointer"
+                        title="Filter history for this transaction"
+                      >
+                        <CreditCard className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Transaction: {log.entityId}</span>
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-mono bg-[#141418] text-zinc-300 border border-[#242429]">
+                        <span className="text-zinc-400 font-sans text-[11px]">{entityLabel}:</span>
+                        <strong className="text-zinc-200">{log.entityId}</strong>
+                      </span>
+                    )}
                   </div>
 
                   {/* Timestamp */}
@@ -182,7 +209,7 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
                   {log.details}
                 </p>
 
-                {/* Actor & Security Seal Footer */}
+                {/* Actor & Action Details Footer */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-[#1e1e22] text-xs text-zinc-400">
                   {/* Actor / Officer Information */}
                   <div className="flex items-center gap-2">
@@ -201,21 +228,16 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
 
                   {/* Right: Technical Proof Toggle */}
                   <div className="flex items-center gap-3 self-end sm:self-center">
-                    <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-400">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Tamper-Proof Seal</span>
-                    </span>
-
                     <button
                       onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#141418] hover:bg-[#1a1a20] text-zinc-300 hover:text-white text-xs font-medium transition-colors border border-[#242429]"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#141418] hover:bg-[#1a1a20] text-zinc-400 hover:text-zinc-200 text-xs font-medium transition-colors border border-[#242429]"
                     >
-                      <Hash className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>{isExpanded ? "Hide Details" : "Security Proof"}</span>
+                      <Hash className="w-3.5 h-3.5 text-zinc-500" />
+                      <span>{isExpanded ? "Hide Details" : "Technical Details"}</span>
                       {isExpanded ? (
-                        <ChevronUp className="w-3.5 h-3.5 text-zinc-400" />
+                        <ChevronUp className="w-3.5 h-3.5 text-zinc-500" />
                       ) : (
-                        <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                        <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
                       )}
                     </button>
                   </div>
@@ -287,6 +309,37 @@ export const HashChainViewer: React.FC<HashChainViewerProps> = ({ logs, onResetF
           );
         })}
       </div>
+
+      {/* Show More / Pagination Controls */}
+      {logs.length > visibleCount && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 pb-2">
+          <button
+            onClick={() => setVisibleCount((prev) => Math.min(prev + 5, logs.length))}
+            className="px-5 py-2.5 rounded-xl bg-[#141418] hover:bg-[#1a1a20] text-zinc-100 hover:text-white border border-[#2b2b32] text-xs font-medium flex items-center gap-2 transition-all shadow-md group cursor-pointer"
+          >
+            <span>Show More Activity (+5)</span>
+            <ChevronDown className="w-4 h-4 text-zinc-400 group-hover:translate-y-0.5 transition-transform" />
+          </button>
+          <button
+            onClick={() => setVisibleCount(logs.length)}
+            className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors underline underline-offset-4 cursor-pointer"
+          >
+            Show All ({logs.length})
+          </button>
+        </div>
+      )}
+
+      {visibleCount >= logs.length && logs.length > 5 && (
+        <div className="flex items-center justify-center gap-3 pt-3 pb-2 text-xs text-zinc-400">
+          <span>All {logs.length} events displayed</span>
+          <button
+            onClick={() => setVisibleCount(5)}
+            className="text-cyan-400 hover:underline cursor-pointer"
+          >
+            Show Less (Top 5)
+          </button>
+        </div>
+      )}
     </div>
   );
 };

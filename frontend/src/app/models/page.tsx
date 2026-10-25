@@ -1,20 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { ModelAnalytics } from "@/components/ModelAnalytics";
-import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
-import {
-  BrainCircuit,
-  Workflow,
-  AlertTriangle,
-  Info,
-  CheckCircle2,
-  Cpu,
-} from "lucide-react";
+import { BrainCircuit } from "lucide-react";
 
 export default function ModelsPage() {
-  const [activeSubTab, setActiveSubTab] = useState<"analytics" | "architecture">("analytics");
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -22,61 +12,25 @@ export default function ModelsPage() {
         <div>
           <h2 className="text-base font-bold text-zinc-100 flex items-center gap-2">
             <BrainCircuit className="w-5 h-5 text-zinc-300" />
-            <span>Model Intelligence & System Architecture</span>
+            <span>Model Intelligence & Diagnostics</span>
           </h2>
           <p className="text-xs text-zinc-400 font-mono mt-0.5">
-            XGBoost classifier telemetry, Precision-Recall curves, confusion matrices, and pipeline topography
+            XGBoost classifier telemetry, Precision-Recall curves, and confusion matrices
           </p>
         </div>
 
-        {/* Sub-tab toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#141418] border border-[#242429] text-xs font-mono">
-          <button
-            onClick={() => setActiveSubTab("analytics")}
-            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
-              activeSubTab === "analytics"
-                ? "bg-[#222228] text-white font-semibold border border-[#2e2e36] shadow-sm"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            <BrainCircuit className="w-3.5 h-3.5" />
+        {/* View Badge: Model Metrics only */}
+        <div className="flex items-center gap-2">
+          <div className="px-3.5 py-1.5 rounded-xl bg-[#141418] border border-[#282830] text-xs font-mono text-white flex items-center gap-2 font-semibold shadow-sm">
+            <BrainCircuit className="w-3.5 h-3.5 text-emerald-400" />
             <span>MODEL METRICS</span>
-          </button>
-          <button
-            onClick={() => setActiveSubTab("architecture")}
-            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
-              activeSubTab === "architecture"
-                ? "bg-[#222228] text-white font-semibold border border-[#2e2e36] shadow-sm"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            <Workflow className="w-3.5 h-3.5" />
-            <span>ARCHITECTURE</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Model Quality / Calibration Advisory Banner (Addresses Problem P1 transparently) */}
-      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs font-mono flex items-start gap-3">
-        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-        <div className="space-y-1">
-          <div className="font-semibold text-amber-300 flex items-center gap-2">
-            <span>MODEL CALIBRATION & BENCHMARK ADVISORY</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              AUDIT NOTE
-            </span>
           </div>
-          <p className="text-[11px] text-amber-200/90 leading-relaxed">
-            The initial synthetic dataset exhibits near-perfect class separability (Precision 1.0, ROC-AUC 0.9999).
-            These baseline numbers reflect synthetic feature purity and will be recalibrated in Phase 4 with
-            overlapping multi-typology distributions, temporal decay, and realistic fraud label noise.
-          </p>
         </div>
       </div>
 
-      {/* Content Area */}
+      {/* Content Area - Model Metrics Analytics */}
       <div className="fintech-card p-6 rounded-2xl border border-slate-800">
-        {activeSubTab === "analytics" ? <ModelAnalytics /> : <ArchitectureDiagram />}
+        <ModelAnalytics />
       </div>
     </div>
   );

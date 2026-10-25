@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import { Transaction } from "@/types/fraud";
 import { calculateRisk } from "@/lib/scoringEngine";
-import { ShapWaterfallChart } from "@/components/ShapWaterfallChart";
 import {
   Sliders,
   ShieldAlert,
@@ -14,8 +13,6 @@ import {
   Smartphone,
   Globe2,
   Check,
-  Flame,
-  Zap,
   Info,
   Layers,
   ArrowRight,
@@ -35,7 +32,6 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
   const [merchantCategory, setMerchantCategory] = useState<string>("Electronics");
   const [merchantName, setMerchantName] = useState<string>("Apple Store Online");
   const [injectedNotice, setInjectedNotice] = useState<boolean>(false);
-  const [activeScenario, setActiveScenario] = useState<string>("velocity");
 
   // Compute live score using the exact ML engine logic
   const result = useMemo(() => {
@@ -53,55 +49,6 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
 
   const isHigh = result.riskLevel === "HIGH";
   const isMedium = result.riskLevel === "MEDIUM";
-
-  // Preset Handlers
-  const applyAbstractFraudPreset = () => {
-    setActiveScenario("velocity");
-    setAmount(85000);
-    setAvgUserAmount(6000);
-    setIsNewDevice(true);
-    setVelocityLast2Min(3);
-    setIsVpnOrProxy(true);
-    setDistanceJumpKm(7200);
-    setMerchantCategory("Electronics");
-    setMerchantName("Apple Store Online");
-  };
-
-  const applyAtoCryptoPreset = () => {
-    setActiveScenario("crypto");
-    setAmount(145000);
-    setAvgUserAmount(12000);
-    setIsNewDevice(true);
-    setVelocityLast2Min(4);
-    setIsVpnOrProxy(true);
-    setDistanceJumpKm(5400);
-    setMerchantCategory("Crypto");
-    setMerchantName("Binance P2P Exchange");
-  };
-
-  const applyMediumOtpPreset = () => {
-    setActiveScenario("discretionary");
-    setAmount(32000);
-    setAvgUserAmount(9000);
-    setIsNewDevice(true);
-    setVelocityLast2Min(1);
-    setIsVpnOrProxy(false);
-    setDistanceJumpKm(25);
-    setMerchantCategory("Jewelry");
-    setMerchantName("Tanishq Jewellers");
-  };
-
-  const applyLegitimatePreset = () => {
-    setActiveScenario("legitimate");
-    setAmount(1850);
-    setAvgUserAmount(4500);
-    setIsNewDevice(false);
-    setVelocityLast2Min(1);
-    setIsVpnOrProxy(false);
-    setDistanceJumpKm(12);
-    setMerchantCategory("Grocery");
-    setMerchantName("Blinkit Supermarket");
-  };
 
   const handleInject = () => {
     const now = new Date();
@@ -158,101 +105,6 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
 
   return (
     <div className="space-y-6">
-      {/* Overview & Quick Scenario Cards */}
-      <div className="rounded-2xl border border-[#222226] bg-[#0d0d10] p-5 space-y-4">
-        <div>
-          <h2 className="text-base font-bold text-white tracking-wide">
-            Interactive Rule Testing Sandbox
-          </h2>
-          <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
-            Test how the AI model evaluates different transaction scenarios in real time. Click a preset scenario below or adjust the sliders to watch how risk rules calculate scores.
-          </p>
-        </div>
-
-        {/* 4 Clickable Scenarios */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
-          {/* Scenario 1 */}
-          <div
-            onClick={applyAbstractFraudPreset}
-            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
-              activeScenario === "velocity"
-                ? "border-rose-500/70 bg-rose-950/30 ring-1 ring-rose-500/30"
-                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Flame className="h-4 w-4 text-rose-400" />
-              <span className="text-xs font-semibold text-zinc-200">Velocity Attack</span>
-            </div>
-            <div className="mt-2 text-sm font-bold font-mono text-white">₹85,000</div>
-            <p className="text-[11px] text-zinc-400 mt-1">3 attempts in 2 min + Lagos IP</p>
-            <span className="inline-block mt-2 text-[10px] font-semibold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">
-              Expected: Auto-Blocked
-            </span>
-          </div>
-
-          {/* Scenario 2 */}
-          <div
-            onClick={applyAtoCryptoPreset}
-            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
-              activeScenario === "crypto"
-                ? "border-rose-500/70 bg-rose-950/30 ring-1 ring-rose-500/30"
-                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-purple-400" />
-              <span className="text-xs font-semibold text-zinc-200">Crypto Account Drain</span>
-            </div>
-            <div className="mt-2 text-sm font-bold font-mono text-white">₹1,45,000</div>
-            <p className="text-[11px] text-zinc-400 mt-1">Brand new device + VPN Proxy</p>
-            <span className="inline-block mt-2 text-[10px] font-semibold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">
-              Expected: Auto-Blocked
-            </span>
-          </div>
-
-          {/* Scenario 3 */}
-          <div
-            onClick={applyMediumOtpPreset}
-            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
-              activeScenario === "discretionary"
-                ? "border-amber-500/70 bg-amber-950/30 ring-1 ring-amber-500/30"
-                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <KeyRound className="h-4 w-4 text-amber-400" />
-              <span className="text-xs font-semibold text-zinc-200">Unusual High Spend</span>
-            </div>
-            <div className="mt-2 text-sm font-bold font-mono text-white">₹32,000</div>
-            <p className="text-[11px] text-zinc-400 mt-1">Jewelry store on new browser</p>
-            <span className="inline-block mt-2 text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40">
-              Expected: 2FA OTP Challenge
-            </span>
-          </div>
-
-          {/* Scenario 4 */}
-          <div
-            onClick={applyLegitimatePreset}
-            className={`rounded-xl border p-3.5 cursor-pointer transition-all ${
-              activeScenario === "legitimate"
-                ? "border-emerald-500/70 bg-emerald-950/30 ring-1 ring-emerald-500/30"
-                : "border-[#222226] bg-[#121215] hover:border-zinc-700 hover:bg-[#18181c]"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span className="text-xs font-semibold text-zinc-200">Normal Grocery</span>
-            </div>
-            <div className="mt-2 text-sm font-bold font-mono text-white">₹1,850</div>
-            <p className="text-[11px] text-zinc-400 mt-1">Known laptop + domestic home ISP</p>
-            <span className="inline-block mt-2 text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">
-              Expected: Instant Approval
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Grid: Parameters on Left, Output on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Parameters Column (7 cols) */}
@@ -318,8 +170,8 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <button
                   type="button"
                   onClick={() => setIsNewDevice(false)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                    !isNewDevice ? "bg-slate-800 text-white border border-slate-700 shadow-sm" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all hover:scale-[1.02] active:scale-95 ${
+                    !isNewDevice ? "bg-slate-800 text-white border border-slate-700 shadow-sm" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                   }`}
                 >
                   Known Device
@@ -327,8 +179,8 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <button
                   type="button"
                   onClick={() => setIsNewDevice(true)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                    isNewDevice ? "bg-rose-950 text-rose-300 border border-rose-800/50 shadow-sm" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all hover:scale-[1.02] active:scale-95 ${
+                    isNewDevice ? "bg-rose-950 text-rose-300 border border-rose-800/50 shadow-sm" : "text-slate-400 hover:text-white hover:bg-rose-950/30"
                   }`}
                 >
                   Unrecognized
@@ -342,8 +194,8 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <button
                   type="button"
                   onClick={() => setIsVpnOrProxy(false)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                    !isVpnOrProxy ? "bg-slate-800 text-white border border-slate-700 shadow-sm" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all hover:scale-[1.02] active:scale-95 ${
+                    !isVpnOrProxy ? "bg-slate-800 text-white border border-slate-700 shadow-sm" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                   }`}
                 >
                   Residential ISP
@@ -351,8 +203,8 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
                 <button
                   type="button"
                   onClick={() => setIsVpnOrProxy(true)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                    isVpnOrProxy ? "bg-rose-950 text-rose-300 border border-rose-800/50 shadow-sm" : "text-slate-400 hover:text-white"
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all hover:scale-[1.02] active:scale-95 ${
+                    isVpnOrProxy ? "bg-rose-950 text-rose-300 border border-rose-800/50 shadow-sm" : "text-slate-400 hover:text-white hover:bg-rose-950/30"
                   }`}
                 >
                   VPN / Proxy
@@ -452,7 +304,7 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
             <div className="pt-2 border-t border-[#222226]">
               <button
                 onClick={handleInject}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-100 hover:bg-white px-4 py-3 text-xs font-bold text-zinc-900 transition-colors shadow-lg shadow-black/40"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-100 hover:bg-white px-4 py-3 text-xs font-bold text-zinc-900 transition-all duration-200 shadow-lg shadow-black/40 hover:shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Send className="h-4 w-4" />
                 Inject this Test into Live Stream
@@ -465,13 +317,6 @@ export const RiskSimulator: React.FC<RiskSimulatorProps> = ({ onInjectTransactio
               )}
             </div>
           </div>
-
-          {/* TreeSHAP Waterfall Explanation */}
-          <ShapWaterfallChart
-            shapValues={result.shapExplanation}
-            baseScore={14}
-            finalScore={result.riskScore}
-          />
         </div>
       </div>
     </div>
